@@ -77,8 +77,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(6,6,15,.8);
 .hero-media{position:relative}
 .hero-media::before{content:"";position:absolute;inset:-2px;border-radius:22px;
   background:var(--grad);opacity:.55;filter:blur(18px);z-index:-1}
-.hero-media img{border-radius:20px;border:1px solid var(--line2);aspect-ratio:4/5;
-  object-fit:cover;position:relative}
+.hero-media img{width:100%;height:auto;border-radius:20px;border:1px solid var(--line2);
+  aspect-ratio:4/5;object-fit:cover;position:relative}
 .badge{position:absolute;left:-24px;bottom:32px;background:rgba(14,14,28,.94);
   border:1px solid var(--line2);border-radius:16px;padding:18px 24px;backdrop-filter:blur(8px);
   box-shadow:0 22px 50px -18px rgba(0,0,0,.9)}
@@ -120,7 +120,7 @@ section.pad{padding:clamp(72px,10vw,124px) 0}
 
 /* split */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,80px);align-items:center}
-.split img{border-radius:20px;border:1px solid var(--line2);aspect-ratio:1;object-fit:cover}
+.split img{width:100%;height:auto;border-radius:20px;border:1px solid var(--line2);aspect-ratio:1;object-fit:cover}
 .bullets{list-style:none;padding:0;margin:1.7em 0 0}
 .bullets li{position:relative;padding:15px 0 15px 34px;border-top:1px solid var(--line);color:var(--mute)}
 .bullets li:last-child{border-bottom:1px solid var(--line)}
@@ -130,7 +130,7 @@ section.pad{padding:clamp(72px,10vw,124px) 0}
 
 /* gallery */
 .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.gal img{aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid var(--line);
+.gal img{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid var(--line);
   transition:transform .3s, border-color .2s, box-shadow .3s}
 .gal a:hover img{transform:scale(1.03);border-color:var(--cyan);
   box-shadow:0 0 30px -6px rgba(34,211,238,.6)}
@@ -239,9 +239,22 @@ footer .tagline{color:var(--mute);font-size:.94rem;max-width:34ch;margin-top:18p
   .prow{grid-template-columns:1fr;gap:6px;padding:20px 22px}
   .prow.hd{display:none}
   .f2{grid-template-columns:1fr}
+  .fcols{grid-template-columns:1fr 1fr;gap:30px}   /* footer: 4 cols -> 2 */
+}
+
+@media(max-width:620px){
+  .fcols{grid-template-columns:1fr;gap:26px}        /* footer: 2 cols -> 1 */
+  .brandrow{gap:14px}
+  .cert{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
+
+
+/* <picture> wrappers must not participate in layout — display:contents makes the
+   inner <img> behave as a direct child, exactly as it did before WebP was added.
+   Without this the gallery grid items collapsed to 2x2px. */
+picture{display:contents}
 
 /* ---------- gallery lightbox ---------- */
 .gal a{display:block;position:relative;cursor:zoom-in;border-radius:14px}
@@ -298,3 +311,24 @@ body.lb-open{overflow:hidden}
   object-fit:contain !important;border:0 !important;border-radius:0 !important;display:block}
 .certfig a:hover{border-color:var(--cyan);box-shadow:0 0 34px -10px rgba(34,211,238,.55)}
 .certfig figcaption{color:var(--mute);font-size:.9rem;margin-top:14px}
+
+
+/* ---------- very narrow phones (iPhone SE and similar, <=400px) ---------- */
+@media(max-width:400px){
+  .badge{right:0;padding:14px 18px}
+  .badge b{font-size:1.55rem}
+  .badge span{font-size:.66rem;letter-spacing:.1em}
+}
+@media(max-width:360px){
+  /* "compromise." is one long word — shrink so it can't push the page sideways */
+  h1{font-size:clamp(1.95rem,9vw,2.7rem)}
+  h2{font-size:clamp(1.55rem,7.5vw,2.2rem)}
+  .wrap{padding:0 18px}
+}
+h1,h2,h3{overflow-wrap:break-word}
+
+/* Grid children default to min-width:auto, which stops a 1fr column shrinking below
+   its content's min-content width — that's what pushed narrow phones sideways. */
+.hgrid>*,.split>*,.cgrid>*,.svc>*,.quotes>*,.fcols>*,.gal>*{min-width:0}
+.facts li{flex-wrap:wrap}
+.facts a,.facts span{overflow-wrap:anywhere}
