@@ -573,50 +573,56 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
    "headcover_hero")
  + f"""
 <section class="pad">
-  <div class="wrap">
-    <div class="head"><p class="eyebrow">The lineup</p>
-      <h2>Driver, fairway<br><span class="grad">and hybrid.</span></h2>
-      <p class="lede">A good headcover protects the club. A Chronic Clubworks headcover does that, then adds a little story to the bag.</p></div>
-    <div class="cover-grid">
-      <article class="cover-card">
-        <a class="lightbox" href="{FULL('headcover_driver')}" data-caption="{html.escape(ALT['headcover_driver'])}">
-          {pic('headcover_driver',1200,1200)}
-        </a>
-        <div><span class="num grad">01 — Big stick</span><h3>Driver Covers</h3>
-        <p>Statement pieces for the club everyone sees first. Built with enough structure to hold shape and enough personality to start a conversation on the first tee.</p></div>
-      </article>
-      <article class="cover-card">
-        <a class="lightbox" href="{FULL('headcover_fairway')}" data-caption="{html.escape(ALT['headcover_fairway'])}">
-          {pic('headcover_fairway',1200,1200)}
-        </a>
-        <div><span class="num grad">02 — Workhorse</span><h3>Fairway Covers</h3>
-        <p>Clean, durable covers for the clubs that do the quiet damage. Denim, canvas, jacket panels and found details all play well here.</p></div>
-      </article>
-      <article class="cover-card">
-        <a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}">
-          {pic('headcover_hero',1200,1200)}
-        </a>
-        <div><span class="num grad">03 — Utility</span><h3>Hybrid Covers</h3>
-        <p>Smaller covers with the same custom attitude. Great for matching a set, calling out a favorite number, or using a detail from a jacket, jeans or shirt.</p></div>
-      </article>
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Uniqueness</p>
+      <h2>No rack copies.<br><span class="grad">No twins.</span></h2>
+      <p class="lede">Every custom headcover starts with a different material, a different story and a different golfer. We can build driver, fairway and hybrid sizes from the same design language, but the finished piece stays one of one.</p>
+      <ul class="bullets">
+        <li><strong>Built around your bag.</strong> Match a color story, break it on purpose, or make one club impossible to miss.</li>
+        <li><strong>One-off by nature.</strong> Thrifted and second-hand materials bring texture, wear and details that new fabric usually can't fake.</li>
+        <li><strong>Sets when you want them.</strong> Driver, fairway and hybrid covers can share a theme without becoming identical.</li>
+      </ul>
     </div>
+    <a class="lightbox" href="{FULL('headcover_driver')}" data-caption="{html.escape(ALT['headcover_driver'])}">
+      {pic('headcover_driver',1200,1200)}
+    </a>
   </div>
 </section>
 
 <section class="pad tinted">
   <div class="wrap split">
+    <a class="lightbox" href="{FULL('headcover_fairway')}" data-caption="{html.escape(ALT['headcover_fairway'])}">
+      {pic('headcover_fairway',1200,1200)}
+    </a>
     <div>
-      <p class="eyebrow">Materials</p>
-      <h2>Thrifted fabric.<br><span class="grad">Second life.</span></h2>
-      <p class="lede">We like materials with a past. Denim, canvas, old jackets, athletic fabric, pockets, patches and unexpected trim all become part of the design.</p>
+      <p class="eyebrow">Craftsmanship</p>
+      <h2>Soft goods with<br><span class="grad">bench standards.</span></h2>
+      <p class="lede">The same Chronic Clubworks attitude applies here: measure it, fit it, finish it cleanly, and make sure it works in the real world. A headcover should look wild without feeling flimsy.</p>
       <ul class="bullets">
-        <li><strong>One-off by nature.</strong> Second-hand materials mean no two builds land exactly the same.</li>
-        <li><strong>Handmade locally.</strong> Designed and built through the same Chronic Clubworks lens as our custom clubs.</li>
-        <li><strong>Personalized when it fits.</strong> Initials, numbers, colors, patches, team-inspired details and inside jokes are all fair game.</li>
-        <li><strong>Quoted before we cut.</strong> You get a clear price and direction before the fabric becomes part of your bag.</li>
+        <li><strong>Made to fit the club.</strong> Driver, fairway and hybrid covers are sized around the club they need to protect.</li>
+        <li><strong>Structure matters.</strong> We care about shape, opening, lining, durability and how it comes on and off during a round.</li>
+        <li><strong>Finished by hand.</strong> Stitching, seams, patches and details are part of the build, not decoration slapped on at the end.</li>
       </ul>
     </div>
-    {pic('headcover_fairway',1200,1200)}
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Personalization</p>
+      <h2>Old material.<br><span class="grad">New meaning.</span></h2>
+      <p class="lede">The best builds come from something with a little history: denim, canvas, jackets, jerseys, patches, pockets, colors, logos or a piece you already care about.</p>
+      <ul class="bullets">
+        <li><strong>Repurpose something real.</strong> Bring a thrift find or a personal piece and we'll work it into the cover if the material fits the job.</li>
+        <li><strong>Make it yours.</strong> Initials, numbers, team colors, patches, inside jokes and weird little details are all welcome.</li>
+        <li><strong>Quoted before we cut.</strong> You get a clear direction and price before anything old becomes something new.</li>
+      </ul>
+    </div>
+    <a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}">
+      {pic('headcover_hero',1200,1200)}
+    </a>
   </div>
 </section>
 
