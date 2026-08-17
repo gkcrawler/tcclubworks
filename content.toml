@@ -1,0 +1,196 @@
+#  ═══════════════════════════════════════════════════════════════════════
+#   CHRONIC CLUBWORKS — EDIT YOUR SITE HERE
+#  ═══════════════════════════════════════════════════════════════════════
+#
+#   Everything you're likely to change lives in this one file.
+#   Change something, save, and the site rebuilds and publishes itself.
+#
+#   THREE RULES:
+#     1. Only change text INSIDE the "quote marks".
+#     2. Never delete a quote mark, bracket [ ] or equals sign.
+#     3. Lines starting with # are notes to you. They're ignored.
+#
+#   If you break something, the build fails and your LIVE SITE STAYS UP,
+#   exactly as it was. Nothing goes down. Fix the typo, save again.
+#
+#   Indentation does NOT matter in this file. Spaces are harmless.
+#  ═══════════════════════════════════════════════════════════════════════
+
+
+#  ── CONTACT DETAILS ────────────────────────────────────────────────────
+#  These appear in the header, footer, contact page and in the data Google
+#  reads. Change the phone number here and it updates in all 40+ places.
+
+[contact]
+phone_display = "(720) 854-4132"
+phone_link    = "+17208544132"          # digits only, keep the +1
+email         = "info@tcclubworks.io"
+instagram     = "https://www.instagram.com/tc_clubworks"
+hours         = "8:00am – 5:00pm"
+hours_open    = "08:00"                 # 24-hour, for Google
+hours_close   = "17:00"                 # 24-hour, for Google
+
+#  Towns you serve. Add or remove freely — used on the site AND in the
+#  structured data Google reads for local search.
+service_area = [
+  "Denver", "Lakewood", "Arvada", "Westminster",
+  "Littleton", "Englewood", "Aurora",
+]
+
+
+#  ── PRICING TABLE ──────────────────────────────────────────────────────
+#  Appears on the home page and the services page. Add a row by copying a
+#  whole [[pricing]] block. Delete one by removing all four of its lines.
+
+[[pricing]]
+service  = "Regripping"
+price    = "$5–$10"
+includes = "Per club, labor only. Old grip and tape removal, new grip installed. Grips typically $6–$15 each — bring your own or we'll order them."
+
+[[pricing]]
+service  = "Reshafting"
+price    = "$15–$20"
+includes = "Per club, labor only. Pull, prep, epoxy and frequency check. Shafts typically $20–$60 each depending on what you want."
+
+[[pricing]]
+service  = "Loft & lie adjustment"
+price    = "$5–$12"
+includes = "Per club, all in. Measured before and after."
+
+[[pricing]]
+service  = "Putter / wedge refinishing"
+price    = "From $85"
+includes = "Deep clean, refinish, optional re-mill and custom stamping."
+
+[[pricing]]
+service  = "Custom build"
+price    = "Quoted"
+includes = "Depends on heads, shafts and grips. We'll spec it with you before anything is ordered."
+
+#  The line printed under the pricing table.
+[pricing_note]
+text = "A full-set regrip runs roughly $110–$250 all in, depending on the grips you pick. Send photos of your clubs and we'll give you a firm number before any work starts."
+
+
+#  ── TESTIMONIALS ───────────────────────────────────────────────────────
+#  Copy a whole [[testimonials]] block to add another.
+#  Set  placeholder = true  to show it greyed out as a reminder to yourself.
+#  Set  placeholder = false  once it's a real quote.
+
+[[testimonials]]
+quote       = "The custom clubs from Chronic Clubworks transformed my game — precision and craftsmanship are unmatched."
+name        = "H Bomb"
+location    = "Denver, CO"
+placeholder = false
+
+[[testimonials]]
+quote       = "[Second testimonial goes here.]"
+name        = "Customer name"
+location    = "City"
+placeholder = true
+
+[[testimonials]]
+quote       = "[Third testimonial — ideally one naming a specific job, like a regrip or a putter restoration.]"
+name        = "Customer name"
+location    = "City"
+placeholder = true
+
+
+#  ── FREQUENTLY ASKED QUESTIONS ─────────────────────────────────────────
+#  These show as the drop-downs on the site AND get sent to Google as
+#  structured data, which can win you extra space in search results.
+#  Copy a whole [[faqs]] block to add one.
+
+[[faqs]]
+q = "How often should I regrip my clubs?"
+a = "Once a season, or every 40 rounds. Grips go slick long before they look worn, and a slick grip makes you squeeze harder, which quietly wrecks your release. It's the cheapest performance gain in golf."
+
+[[faqs]]
+q = "What does a regrip actually cost me?"
+a = "Our labor is $5 to $10 per club. Grips themselves run about $6 to $15 each depending on the model, so a full set of 13 usually lands between $110 and $250 all in. You're welcome to supply your own grips."
+
+[[faqs]]
+q = "How long does the work take?"
+a = "Most regripping and loft and lie work is turned around in a few days. Reshafts and restorations depend on parts availability. We'll give you a timeline when we quote."
+
+[[faqs]]
+q = "Do you work on graphite as well as steel?"
+a = "Yes. We install premium steel and graphite shafts and frequency match them across the set so the feel stays consistent through the bag."
+
+[[faqs]]
+q = "Where are you located?"
+a = "We work out of the Denver metro by appointment, serving Denver, Lakewood, Arvada, Westminster, Littleton, Englewood, Aurora and the wider Front Range. Call or message and we'll set a time."
+
+[[faqs]]
+q = "Is it worth restoring an old club?"
+a = "Sometimes yes, sometimes no. Send photos and we'll tell you honestly. Some clubs are worth it for how they play, some for what they mean, and some are better replaced."
+
+
+#  ── PHOTOS ─────────────────────────────────────────────────────────────
+#  To swap a photo:
+#    1. Upload your new image into the  assets/img/  folder
+#    2. Change the "file" line below to match your filename exactly
+#    3. Update the "alt" line to describe what's in the photo
+#
+#  "alt" matters: it's what a blind visitor hears, and what Google reads
+#  to understand the picture. Describe it plainly. No need to say "photo of".
+#
+#  SHAPES — crop before uploading or it'll be trimmed to fit:
+#    hero, bench, shop  →  TALL   4:5   (about 1200 × 1500)
+#    everything else    →  SQUARE 1:1   (about 1200 × 1200)
+
+[photos.hero]                            # Home page — the big one
+file = "/assets/img/hero.jpg"
+alt  = "Teal and silver mallet putter with custom paint fill, resting on a trout-embroidered headcover"
+
+[photos.bench]                           # Services page hero
+file = "/assets/img/bench.jpg"
+alt  = "Custom wedges, putters and headcovers arranged on a fairway at a Colorado golf course"
+
+[photos.shop]                            # About page hero
+file = "/assets/img/shop.jpg"
+alt  = "Inside the Chronic Clubworks workshop in Denver, with hitting bay, workbench and club building tools"
+
+[photos.bench_home]                      # Home — "Not a counter. A bench."
+file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1024,fit=crop/YD0BxoN0wqC93Wwq/gnarkill2k24_create_a_pov_image_of_a_mad_scientist_putting_a__7c0f0eae-91f2-4bab-98c5-4aa56009c5b2_1-d9578zeOMvhxWkxg.png"
+alt  = "Clubmaker assembling a custom golf club at the Chronic Clubworks bench"
+
+[photos.ball]                            # Services — Custom Clubmaking
+file = "/assets/img/ball.jpg"
+alt  = "Cleveland CG12 wedge with custom ORPHAN stamping and blue paint fill, on a patterned headcover"
+
+[photos.w1]                              # Services — Repairs, and gallery
+file = "/assets/img/w1.jpg"
+alt  = "Before and after: three worn wedges refinished to a clean matte black finish"
+
+[photos.w2]                              # About — "Denver born"
+file = "/assets/img/w2.jpg"
+alt  = "Chronic Clubworks Denver Born emblem showing the Front Range and the metro service area"
+
+[photos.w3]                              # Gallery only
+file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1024,fit=crop/YD0BxoN0wqC93Wwq/img_4149-AVLxO3zZJPCr0Gn6.jpeg"
+alt  = "Freshly regripped iron set ready for collection"
+
+[photos.w4]                              # Services — Reshafting, and gallery
+file = "/assets/img/w4.jpg"
+alt  = "Iron set freshly regripped with new Golf Pride grips, lined up in the shop"
+
+[photos.w5]                              # Services — Loft & Lie, and gallery
+file = "/assets/img/w5.jpg"
+alt  = "Loft and lie bending machine adjusting an iron at the Chronic Clubworks bench"
+
+[photos.w6]                              # About — "How we got here", and gallery
+file = "/assets/img/w6.jpg"
+alt  = "The Chronic Clubworks crew on a links course in Colorado"
+
+[photos.w7]                              # Gallery only
+file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,fit=crop/YD0BxoN0wqC93Wwq/img_3832-A85VwGLeWQF0yzRB.jpg"
+alt  = "Vintage putter restored to playing condition"
+
+[photos.cert]                            # About — the clubmaker award
+file = "/assets/img/cert.jpg"
+alt  = "Golfsmith Distinguished Clubmaker Award presented to Paul Cohn in 2002"
+
+#  Which photos appear in the home page gallery, and in what order.
+[gallery]
+order = ["w1", "w3", "w4", "w5", "w6", "w7", "ball"]
