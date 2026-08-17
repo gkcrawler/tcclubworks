@@ -35,13 +35,15 @@ Submissions redirect to `/thanks`, which is `noindex` so it never shows up in se
 |---|---|
 | `/` | Home — hero, services, why-us, gallery, pricing, testimonials, FAQ, contact |
 | `/golf-club-repair-denver` | Services — four deep sections with anchors, pricing table, FAQ |
+| `/custom-golf-headcovers-denver` | Custom headcovers — driver, fairway and hybrid covers, process, pricing, FAQ |
 | `/custom-golf-clubs-about` | About — story, how-we-work, Denver/altitude angle |
 | `/contact` | Contact — form, details, FAQ |
 | `/thanks` | Form success page (noindex) |
 | `/404.html` | Custom not-found |
 
 Service anchors: `#reshafting-regripping`, `#custom-clubmaking`, `#loft-and-lie`,
-`#repairs-restorations`.
+`#repairs-restorations`. Headcover short URLs `/headcovers`, `/custom-headcovers`
+and `/golf-headcovers` redirect to `/custom-golf-headcovers-denver`.
 
 ## Redirects
 
@@ -171,6 +173,9 @@ Same `I` dictionary in `build.py` controls all of them. Change the URL, change t
 | `w6` | About | "How we got here" | 1:1 square |
 | `w2` | About | "Denver born" | 1:1 square |
 | `w1 w3 w4 w5 w6 w7 ball` | Home | The work gallery | 1:1 square |
+| `headcover_hero` | Headcovers | Hero + hybrid card | 1:1 square |
+| `headcover_driver` | Headcovers | Driver card | 1:1 square |
+| `headcover_fairway` | Headcovers | Fairway card + materials section | 1:1 square |
 | — | Contact | *(no photos)* | — |
 
 **Note that several images do double duty.** `bench` is both the Services hero and a home

@@ -116,6 +116,7 @@ alt  = "Describe what's actually in the picture"
 | Photo | Shape | Size |
 |---|---|---|
 | `hero`, `bench`, `shop` | tall portrait 4:5 | ~1200 × 1500 |
+| `headcover_hero`, `headcover_driver`, `headcover_fairway` | square 1:1 | ~1200 × 1200 |
 | everything else | square 1:1 | ~1200 × 1200 |
 
 Keep files under about 400 KB. Export JPEG at 78–82% quality.

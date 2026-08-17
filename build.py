@@ -35,6 +35,7 @@ def pic(key, w, h, loading="lazy", priority=False):
     return (f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
             f'loading="{loading}" decoding="async"{fp}>')
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
+       ("/custom-golf-headcovers-denver","Headcovers"),
        ("/custom-golf-clubs-about","About"),("/contact","Contact")]
 
 
@@ -49,7 +50,7 @@ def FULL(key):
 def biz():
     return {"@context":"https://schema.org","@type":"LocalBusiness","@id":D+"/#business",
       "name":BRAND,
-      "description":"Custom golf clubmaking and precision golf club repair serving the Denver metro. Reshafting, regripping, loft and lie adjustment, and putter restoration.",
+      "description":"Custom golf clubmaking, precision golf club repair, and handmade custom golf headcovers serving the Denver metro. Reshafting, regripping, loft and lie adjustment, putter restoration, and one-off headcover builds.",
       "url":D,"email":EMAIL,"telephone":TEL_E,"image":D+"/assets/og-image.jpg",
       "logo":D+"/assets/logo-v2.svg","priceRange":"$$",
       "address":{"@type":"PostalAddress","addressLocality":"Denver","addressRegion":"CO","addressCountry":"US"},
@@ -70,6 +71,13 @@ def svc(name, desc, anchor, low=None, high=None):
             "valueAddedTaxIncluded":False},
             "description":"Labor per club. Parts priced separately."}
     return o
+
+def svc_page(name, desc, path, price_desc="Quoted per project"):
+    return {"@context":"https://schema.org","@type":"Service","name":name,
+      "description":desc,"serviceType":name,"url":D+path,
+      "provider":{"@id":D+"/#business"},
+      "areaServed":[{"@type":"City","name":c} for c in AREAS],
+      "offers":{"@type":"Offer","priceCurrency":"USD","description":price_desc}}
 
 def faq(pairs):
     return {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -173,6 +181,7 @@ def form(compact=False):
       <option>Custom clubmaking</option>
       <option>Loft &amp; lie adjustment</option>
       <option>Repairs &amp; restoration</option>
+      <option>Custom headcovers</option>
       <option>Not sure — need advice</option>
     </select></div>
   <div class="fld"><label for="m">Tell us about your clubs</label>
@@ -230,6 +239,7 @@ def footer():
         <li><a href="/golf-club-repair-denver#custom-clubmaking">Custom Clubmaking</a></li>
         <li><a href="/golf-club-repair-denver#loft-and-lie">Loft &amp; Lie</a></li>
         <li><a href="/golf-club-repair-denver#repairs-restorations">Repairs &amp; Restorations</a></li>
+        <li><a href="/custom-golf-headcovers-denver">Custom Headcovers</a></li>
       </ul></div>
       <div><h4>Company</h4><ul>
         <li><a href="/custom-golf-clubs-about">About</a></li>
@@ -364,8 +374,8 @@ PAGES.append(dict(path="/",
 <section class="pad" id="services">
   <div class="wrap">
     <div class="head"><p class="eyebrow">What we do</p>
-      <h2>Four things,<br><span class="grad">done right.</span></h2>
-      <p class="lede">Off-the-rack clubs are built for an average golfer who doesn't exist. Everything here closes the gap between the clubs you own and the swing you actually have.</p></div>
+      <h2>Five things,<br><span class="grad">done right.</span></h2>
+      <p class="lede">Off-the-rack gear is built for an average golfer who doesn't exist. Everything here closes the gap between what you own and the way you actually play.</p></div>
     <div class="svc">
       <a class="card" href="/golf-club-repair-denver#reshafting-regripping">
         <span class="num grad">01 — Most requested</span><h3>Reshafting &amp; Regripping</h3>
@@ -383,6 +393,10 @@ PAGES.append(dict(path="/",
         <span class="num grad">04 — Bring it back</span><h3>Repairs &amp; Restorations</h3>
         <p>Dented wedge, cracked ferrule, a vintage putter that deserves better. Putter and wedge refinishing, re-milling and stamping, regrooving, clubhead and epoxy work. We like keeping classic clubs in play.</p>
         <span class="price">From $85</span><span class="go">Repairs &amp; restorations</span></a>
+      <a class="card" href="/custom-golf-headcovers-denver">
+        <span class="num grad">05 — One-off gear</span><h3>Custom Headcovers</h3>
+        <p>Driver, fairway and hybrid covers made from thrifted and second-hand materials. Handmade in small runs, personalized when you want it, and built so your bag doesn't look like anyone else's.</p>
+        <span class="price">Quoted per project</span><span class="go">Custom headcovers</span></a>
     </div>
   </div>
 </section>
@@ -534,6 +548,116 @@ PAGES.append(dict(path="/golf-club-repair-denver",
   <div class="wrap">
     <div class="head"><p class="eyebrow">Before you ask</p><h2>Common <span class="grad">questions.</span></h2></div>
     {faq_html(FAQS)}
+  </div>
+</section>
+""" + ctaband()))
+
+# ---------------- HEADCOVERS
+HEADCOVER_FAQS = [
+  ("What headcovers can you make?", "We build custom driver, fairway wood and hybrid headcovers. Matching sets are available, and every project is quoted before we start."),
+  ("Can I personalize a headcover?", "Yes. We can work in initials, numbers, patches, color direction, team-inspired details or a personal reference, depending on the materials and design."),
+  ("What materials do you use?", "Most covers start with thrifted or second-hand materials: denim, canvas, jackets, athletic fabric, old garments and found textiles that deserve another round."),
+  ("How much does a custom golf headcover cost?", "Headcovers are quoted per project because materials, personalization and set size change the build. Send us your idea and we'll give you a firm number."),
+]
+
+PAGES.append(dict(path="/custom-golf-headcovers-denver",
+ title="Custom Golf Headcovers Denver | Chronic Clubworks",
+ desc="Custom golf headcovers handmade in Denver from thrifted and second-hand materials. Driver, fairway and hybrid covers, one-off designs and personalization quoted per project.",
+ schemas=[biz(),crumbs("/custom-golf-headcovers-denver","Custom Headcovers"),
+   svc_page("Custom Golf Headcovers",
+     "Handmade custom golf headcovers in Denver for drivers, fairway woods and hybrids, built from thrifted and second-hand materials with one-off designs and personalization.",
+     "/custom-golf-headcovers-denver"),
+   faq(HEADCOVER_FAQS)],
+ body=hero("Custom headcovers","One-off covers","for your bag.",
+   "Driver, fairway and hybrid headcovers handmade in Denver from thrifted and second-hand materials. Built one at a time, quoted before we start, and designed to make your bag look like yours.",
+   "headcover_hero")
+ + f"""
+<section class="pad">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">The lineup</p>
+      <h2>Driver, fairway<br><span class="grad">and hybrid.</span></h2>
+      <p class="lede">A good headcover protects the club. A Chronic Clubworks headcover does that, then adds a little story to the bag.</p></div>
+    <div class="cover-grid">
+      <article class="cover-card">
+        <a class="lightbox" href="{FULL('headcover_driver')}" data-caption="{html.escape(ALT['headcover_driver'])}">
+          {pic('headcover_driver',1200,1200)}
+        </a>
+        <div><span class="num grad">01 — Big stick</span><h3>Driver Covers</h3>
+        <p>Statement pieces for the club everyone sees first. Built with enough structure to hold shape and enough personality to start a conversation on the first tee.</p></div>
+      </article>
+      <article class="cover-card">
+        <a class="lightbox" href="{FULL('headcover_fairway')}" data-caption="{html.escape(ALT['headcover_fairway'])}">
+          {pic('headcover_fairway',1200,1200)}
+        </a>
+        <div><span class="num grad">02 — Workhorse</span><h3>Fairway Covers</h3>
+        <p>Clean, durable covers for the clubs that do the quiet damage. Denim, canvas, jacket panels and found details all play well here.</p></div>
+      </article>
+      <article class="cover-card">
+        <a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}">
+          {pic('headcover_hero',1200,1200)}
+        </a>
+        <div><span class="num grad">03 — Utility</span><h3>Hybrid Covers</h3>
+        <p>Smaller covers with the same custom attitude. Great for matching a set, calling out a favorite number, or using a detail from a jacket, jeans or shirt.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pad tinted">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Materials</p>
+      <h2>Thrifted fabric.<br><span class="grad">Second life.</span></h2>
+      <p class="lede">We like materials with a past. Denim, canvas, old jackets, athletic fabric, pockets, patches and unexpected trim all become part of the design.</p>
+      <ul class="bullets">
+        <li><strong>One-off by nature.</strong> Second-hand materials mean no two builds land exactly the same.</li>
+        <li><strong>Handmade locally.</strong> Designed and built through the same Chronic Clubworks lens as our custom clubs.</li>
+        <li><strong>Personalized when it fits.</strong> Initials, numbers, colors, patches, team-inspired details and inside jokes are all fair game.</li>
+        <li><strong>Quoted before we cut.</strong> You get a clear price and direction before the fabric becomes part of your bag.</li>
+      </ul>
+    </div>
+    {pic('headcover_fairway',1200,1200)}
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">How it works</p>
+      <h2>From idea to<br><span class="grad">first tee.</span></h2></div>
+    <div class="svc">
+      <div class="card"><span class="num grad">01</span><h3>Send the idea</h3>
+        <p>Tell us the club type, colors, theme, personalization and whether you want one cover or a matching set.</p></div>
+      <div class="card"><span class="num grad">02</span><h3>We source the look</h3>
+        <p>We pull from thrifted and second-hand materials, then sketch a direction around the fabric, texture and details available.</p></div>
+      <div class="card"><span class="num grad">03</span><h3>You approve the quote</h3>
+        <p>Because every cover is different, every project is quoted. Nothing gets cut or built until the direction and price are clear.</p></div>
+      <div class="card"><span class="num grad">04</span><h3>We build it</h3>
+        <p>The finished cover is made to protect the club, fit the bag and feel like something you couldn't pull off a rack.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad tinted">
+  <div class="wrap cgrid">
+    <div>
+      <p class="eyebrow">Pricing</p>
+      <h2>Quoted per<br><span class="grad">project.</span></h2>
+      <p class="lede">A single hybrid cover, a driver statement piece and a matching three-cover set are different jobs. Send the idea and we'll price the build around material, detail and personalization.</p>
+      <ul class="facts">
+        <li><b>Types</b><span>Driver, fairway and hybrid</span></li>
+        <li><b>Materials</b><span>Thrifted and second-hand textiles</span></li>
+        <li><b>Designs</b><span>One-off builds and matching sets</span></li>
+        <li><b>Price</b><span>Quoted before work begins</span></li>
+      </ul>
+    </div>
+    {form()}
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Before you ask</p><h2>Headcover <span class="grad">questions.</span></h2></div>
+    {faq_html(HEADCOVER_FAQS)}
   </div>
 </section>
 """ + ctaband()))
@@ -711,6 +835,9 @@ REDIR=[("/services","/golf-club-repair-denver"),
  ("/repairs-and-restorations","/golf-club-repair-denver#repairs-restorations"),
  ("/vintage-golf-club-refinishing","/golf-club-repair-denver#repairs-restorations"),
  ("/about","/custom-golf-clubs-about"),("/page","/"),
+ ("/headcovers","/custom-golf-headcovers-denver"),
+ ("/custom-headcovers","/custom-golf-headcovers-denver"),
+ ("/golf-headcovers","/custom-golf-headcovers-denver"),
  ("/club-reshaft","/golf-club-repair-denver#reshafting-regripping"),
  ("/club-regrip","/golf-club-repair-denver#reshafting-regripping"),
  ("/loft-adjustment","/golf-club-repair-denver#loft-and-lie"),
