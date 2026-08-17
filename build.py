@@ -34,6 +34,14 @@ def pic(key, w, h, loading="lazy", priority=False):
                 f'loading="{loading}" decoding="async"{fp}></picture>')
     return (f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
             f'loading="{loading}" decoding="async"{fp}>')
+
+
+def img(key, w, h, loading="lazy", priority=False):
+    """Plain image tag for local previews that can be picky about <picture> sources."""
+    src, alt = I[key], html.escape(ALT[key])
+    fp = ' fetchpriority="high"' if priority else ''
+    return (f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
+            f'loading="{loading}" decoding="async"{fp}>')
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
        ("/custom-golf-headcovers-denver","Headcovers"),
        ("/custom-golf-clubs-about","About"),("/contact","Contact")]
@@ -139,8 +147,9 @@ def header(active):
 </header>
 """
 
-def hero(kick,h1a,h1b,lede,imgkey):
-    imghtml = pic(imgkey, 1200, 1500, loading='eager', priority=True)
+def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
+    image_fn = img if plain_image else pic
+    imghtml = image_fn(imgkey, 1200, 1500, loading='eager', priority=True)
     return f"""<section class="hero">
   <div class="wrap hgrid">
     <div>
@@ -582,7 +591,7 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
    faq(HEADCOVER_FAQS)],
  body=hero("Custom headcovers","One-off covers","for your bag.",
    "Driver, fairway and hybrid headcovers handmade in Denver from thrifted and second-hand materials. Built one at a time, quoted before we start, and designed to make your bag look like yours.",
-   "headcover_hero")
+   "headcover_hero", plain_image=True)
  + f"""
 <section class="pad">
   <div class="wrap split">
@@ -597,7 +606,7 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
       </ul>
     </div>
     <a class="lightbox" href="{FULL('headcover_driver')}" data-caption="{html.escape(ALT['headcover_driver'])}">
-      {pic('headcover_driver',1200,1200)}
+      {img('headcover_driver',1200,1200)}
     </a>
   </div>
 </section>
@@ -605,7 +614,7 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
 <section class="pad tinted">
   <div class="wrap split">
     <a class="lightbox" href="{FULL('headcover_fairway')}" data-caption="{html.escape(ALT['headcover_fairway'])}">
-      {pic('headcover_fairway',1200,1200)}
+      {img('headcover_fairway',1200,1200)}
     </a>
     <div>
       <p class="eyebrow">Craftsmanship</p>
@@ -633,7 +642,7 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
       </ul>
     </div>
     <a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}">
-      {pic('headcover_hero',1200,1200)}
+      {img('headcover_hero',1200,1200)}
     </a>
   </div>
 </section>
