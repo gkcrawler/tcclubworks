@@ -163,7 +163,7 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
     </div>
     <div class="hero-media">
       {imghtml}
-      <div class="badge"><b class="grad">150+</b><span>Combined years at the bench</span></div>
+      <div class="badge"><b class="grad">20+</b><span>Years of bench experience</span></div>
     </div>
   </div>
   <div class="trust"><div class="wrap"><ul>
