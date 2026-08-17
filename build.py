@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Chronic Clubworks — 4-page static site generator. Cyberpunk build."""
-import os, json, html, tomllib
+import os, json, html
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python < 3.11 local fallback; Netlify uses runtime.txt.
+    import tomli as tomllib
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(OUT, "content.toml"), "rb") as _f:
@@ -14,7 +19,6 @@ EMAIL = _c["email"]
 IG = _c["instagram"]
 AREAS = _c["service_area"]
 HOURS = _c["hours"]
-CDN = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w={w},fit=crop/YD0BxoN0wqC93Wwq/"
 I   = {k: v["file"] for k, v in C["photos"].items()}
 ALT = {k: v["alt"]  for k, v in C["photos"].items()}
 
@@ -81,6 +85,9 @@ def head(p):
     canon=D+(p["path"] if p["path"]!="/" else "/")
     ld="\n".join(f'<script type="application/ld+json">{json.dumps(x,separators=(",",":"))}</script>'
                  for x in p["schemas"])
+    preconnect = '<link rel="preconnect" href="https://assets.zyrosite.com" crossorigin>\n' if any(
+        str(v).startswith("https://assets.zyrosite.com") for v in I.values()
+    ) else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,8 +106,7 @@ def head(p):
 <meta property="og:url" content="{canon}">
 <meta property="og:image" content="{D}/assets/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://assets.zyrosite.com" crossorigin>
-<link rel="stylesheet" href="/assets/style.css">
+{preconnect}<link rel="stylesheet" href="/assets/style.css">
 {ld}
 </head>
 <body>
@@ -337,12 +343,12 @@ PRICING = ('<div class="ptable">'
 
 
 TESTIMONIALS = "".join(
-    '<figure class="quote{ph}">'
+    '<figure class="quote">'
     '<div class="stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>'
     '<p>&ldquo;{q}&rdquo;</p><cite>{n} &mdash; {loc}</cite></figure>'.format(
-        ph=" ph" if t.get("placeholder") else "",
         q=html.escape(t["quote"]), n=html.escape(t["name"]), loc=html.escape(t["location"]))
-    for t in C["testimonials"])
+    for t in C["testimonials"] if not t.get("placeholder"))
+GALLERY_KEYS = [k for k in C.get("gallery", {}).get("order", []) if k in I]
 
 PAGES=[]
 
@@ -401,7 +407,7 @@ PAGES.append(dict(path="/",
   <div class="wrap">
     <div class="head"><p class="eyebrow">The work</p><h2>Recent builds &amp;<br><span class="grad">restorations.</span></h2></div>
     <div class="gal">
-      {"".join(f'<a href="{FULL(k)}" data-caption="{html.escape(ALT[k])}">{pic(k,1200,1200)}</a>' for k in ["w1","w3","w4","w5","w6","w7","ball"])}
+      {"".join(f'<a href="{FULL(k)}" data-caption="{html.escape(ALT[k])}">{pic(k,1200,1200)}</a>' for k in GALLERY_KEYS)}
     </div>
   </div>
 </section>
@@ -417,7 +423,7 @@ PAGES.append(dict(path="/",
 <section class="pad">
   <div class="wrap">
     <div class="head"><p class="eyebrow">Word of mouth</p><h2>What golfers <span class="grad">say.</span></h2></div>
-    <div class="quotes">{TESTIMONIALS}</div>
+    <div class="quotes">{TESTIMONIALS or '<p class="lede">Real customer notes are coming soon. Until then, ask us for references when you get in touch.</p>'}</div>
   </div>
 </section>
 
@@ -621,7 +627,7 @@ PAGES.append(dict(path="/contact",
     <div>
       <p class="eyebrow">Get in touch</p>
       <h1 style="font-size:clamp(2.2rem,5vw,3.6rem)">Tell us about<br><span class="grad">your clubs.</span></h1>
-      <p class="lede">Send a note with what you're playing and what isn't working — photos help a lot. We'll come back with a firm quote and a timeline before anything happens.</p>
+      <p class="lede">Send a note with what you're playing and what isn't working. If photos would help, text or email them after you submit and we'll match them to your inquiry.</p>
       <ul class="facts">
         <li><b>Phone</b><a href="tel:{TEL_E}">{TEL_D}</a></li>
         <li><b>Email</b><a href="mailto:{EMAIL}">{EMAIL}</a></li>
@@ -713,6 +719,7 @@ REDIR=[("/services","/golf-club-repair-denver"),
 w("_redirects","".join(f"{o}  {n}  301!\n" for o,n in REDIR))
 
 w("netlify.toml", """[build]
+  command = "python3 build.py"
   publish = "."
 
 [[headers]]
@@ -722,11 +729,13 @@ w("netlify.toml", """[build]
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
 
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=3600, must-revalidate"
 """)
 
 print(f"built {len(PAGES)} pages (+404) | {len(INDEXED)} indexed | {len(REDIR)} redirects")

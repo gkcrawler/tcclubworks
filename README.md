@@ -1,16 +1,18 @@
 # Chronic Clubworks — Netlify site
 
-Four pages, no framework, no build step needed to deploy. ~14 KB of CSS, one stylesheet,
-zero JavaScript dependencies. Everything the SEO audit called for is already in place.
+Four pages, no framework, and a tiny Python build step that turns `content.toml`
+into static HTML. One stylesheet, zero JavaScript dependencies, and the SEO basics
+are generated consistently from the same source content.
 
 ## Deploy
 
-1. Netlify → **Add new site → Deploy manually**
-2. Drag this whole folder onto the drop zone
-3. Netlify reads `netlify.toml` and `_redirects` automatically
-4. Point `tcclubworks.io` at the site in **Domain management**
+1. Put the folder contents in the GitHub repo connected to Netlify
+2. Netlify reads `netlify.toml` automatically
+3. Confirm the build command is `python3 build.py`
+4. Confirm the publish directory is `.`
+5. Point `tcclubworks.io` at the site in **Domain management**
 
-That's it. No build command, no publish directory to configure.
+Manual drag-and-drop deploys still work after running `python3 build.py` locally first.
 
 ## Set the form recipients (do this right after the first deploy)
 
@@ -83,10 +85,8 @@ CSS lives in `assets/style.css` and is shared by every page.
 
 ## Two things worth doing soon
 
-**1. Self-host the images.** Every photo still loads from `assets.zyrosite.com` —
-Hostinger's CDN. If you cancel that account the URLs may die and the site loses its
-photography. Download them, drop them in `assets/img/`, and update the `I` dict in
-`build.py`.
+**1. Replace the remaining placeholder content.** The site now self-hosts its images,
+but the testimonial section still needs real customer quotes as they come in.
 
 **2. Google Business Profile.** Still the highest-value item on the whole list and the
 one thing I can't do for you. The site now has a real phone, real hours and a defined
@@ -204,4 +204,3 @@ generate WebP versions, write accurate alt text, self-host them, and hand back a
 Same `I` dictionary — keys `w1` through `w7`, plus `ball`. Add more by adding entries to
 both `I` and `ALT`, then adding the key to the list in the gallery section of the home
 page. The lightbox picks them up automatically.
-

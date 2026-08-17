@@ -152,8 +152,8 @@ file = "/assets/img/shop.jpg"
 alt  = "Inside the Chronic Clubworks workshop in Denver, with hitting bay, workbench and club building tools"
 
 [photos.bench_home]                      # Home — "Not a counter. A bench."
-file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1024,fit=crop/YD0BxoN0wqC93Wwq/gnarkill2k24_create_a_pov_image_of_a_mad_scientist_putting_a__7c0f0eae-91f2-4bab-98c5-4aa56009c5b2_1-d9578zeOMvhxWkxg.png"
-alt  = "Clubmaker assembling a custom golf club at the Chronic Clubworks bench"
+file = "/assets/img/bench.jpg"
+alt  = "Custom wedges, putters and headcovers arranged on a fairway at a Colorado golf course"
 
 [photos.ball]                            # Services — Custom Clubmaking
 file = "/assets/img/ball.jpg"
@@ -168,8 +168,8 @@ file = "/assets/img/w2.jpg"
 alt  = "Chronic Clubworks Denver Born emblem showing the Front Range and the metro service area"
 
 [photos.w3]                              # Gallery only
-file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1024,fit=crop/YD0BxoN0wqC93Wwq/img_4149-AVLxO3zZJPCr0Gn6.jpeg"
-alt  = "Freshly regripped iron set ready for collection"
+file = "/assets/img/shop.jpg"
+alt  = "Inside the Chronic Clubworks workshop in Denver, with hitting bay, workbench and club building tools"
 
 [photos.w4]                              # Services — Reshafting, and gallery
 file = "/assets/img/w4.jpg"
@@ -184,8 +184,8 @@ file = "/assets/img/w6.jpg"
 alt  = "The Chronic Clubworks crew on a links course in Colorado"
 
 [photos.w7]                              # Gallery only
-file = "https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=768,fit=crop/YD0BxoN0wqC93Wwq/img_3832-A85VwGLeWQF0yzRB.jpg"
-alt  = "Vintage putter restored to playing condition"
+file = "/assets/img/cert.jpg"
+alt  = "Golfsmith Distinguished Clubmaker Award presented to Paul Cohn in 2002"
 
 [photos.cert]                            # About — the clubmaker award
 file = "/assets/img/cert.jpg"
@@ -193,4 +193,4 @@ alt  = "Golfsmith Distinguished Clubmaker Award presented to Paul Cohn in 2002"
 
 #  Which photos appear in the home page gallery, and in what order.
 [gallery]
-order = ["w1", "w3", "w4", "w5", "w6", "w7", "ball"]
+order = ["w1", "w4", "ball", "w5", "w6", "shop", "hero"]
