@@ -328,8 +328,20 @@ def footer():
 </body>
 </html>"""
 
+def _asset_prefix(path):
+    if path == "/":
+        return ""
+    return "../" * len([part for part in path.strip("/").split("/") if part])
+
 def render(p):
-    return head(p)+header(p["path"])+'<main id="main">'+p["body"]+"</main>"+footer()
+    h = head(p)+header(p["path"])+'<main id="main">'+p["body"]+"</main>"+footer()
+    # Root-relative asset URLs work on Netlify but break when previewing nested
+    # pages directly as file:// URLs. Relative asset URLs work in both places.
+    prefix = _asset_prefix(p["path"])
+    return (h
+      .replace('href="/assets/', f'href="{prefix}assets/')
+      .replace('src="/assets/', f'src="{prefix}assets/')
+      .replace('srcset="/assets/', f'srcset="{prefix}assets/'))
 
 # ----------------------------------------------------------------- content
 FAQS = [(f["q"], f["a"]) for f in C["faqs"]]
