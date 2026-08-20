@@ -336,7 +336,8 @@
       '<section class="grid"><div class="box"><h2>Prepared for</h2><p><b>' + escapeHtml(q.customerName) + '</b></p><p>' + escapeHtml(q.customerEmail) + '</p><p>' + escapeHtml(q.customerPhone) + '</p></div><div class="box"><h2>Request</h2><p><b>' + escapeHtml(q.customerService) + '</b></p><p>' + escapeHtml(q.customerMessage).replace(/\\n/g,"<br>") + '</p></div></section>' +
       '<table><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<section class="totals"><p><span>Subtotal</span><b>' + money.format(q.subtotal) + '</b></p><p><span>Discount</span><b>' + money.format(q.discount) + '</b></p><p><span>Tax</span><b>' + money.format(q.tax) + '</b></p><p class="grand"><span>Total</span><b>' + money.format(q.total) + '</b></p><p><span>Balance after deposit</span><b>' + money.format(q.balance) + '</b></p></section>' +
-      action + '<section class="notes"><div class="box"><h2>Notes</h2><p>' + escapeHtml(q.notes).replace(/\\n/g,"<br>") + '</p></div><div class="box"><h2>Terms</h2><p>' + escapeHtml(q.terms).replace(/\\n/g,"<br>") + '</p></div></section><p class="footer">Prepared by Chronic Clubworks. Please reply to approve this quote before work begins.</p></body></html>';
+      '<section class="notes"><div class="box"><h2>Notes</h2><p>' + escapeHtml(q.notes).replace(/\\n/g,"<br>") + '</p></div><div class="box"><h2>Terms</h2><p>' + escapeHtml(q.terms).replace(/\\n/g,"<br>") + '</p></div></section>' +
+      action + '<p class="footer">Prepared by Chronic Clubworks. Please reply to approve this quote before work begins.</p></body></html>';
   }
 
   function exportPdf(){
