@@ -198,8 +198,9 @@
     sessionStorage.setItem("ccw_admin_password", password);
     loadSubmissions().catch(function(err){ els.authStatus.textContent = err.message; });
   });
-  document.addEventListener("change",function(e){
+  document.addEventListener("input",function(e){
     if(e.target.classList && e.target.classList.contains("whole-number")){
+      if(e.target.value === "") return;
       e.target.value = parseWhole(e.target.value);
       calculate();
     }

@@ -347,7 +347,7 @@ def admin_quotes_page():
 <title>Admin Quotes | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/admin-quotes.css">
+<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820b">
 </head>
 <body>
 <main class="admin-shell">
@@ -444,7 +444,7 @@ def admin_quotes_page():
     </form>
   </section>
 </main>
-<script src="/assets/admin-quotes.js"></script>
+<script src="/assets/admin-quotes.js?v=20260820b"></script>
 </body>
 </html>"""
 
