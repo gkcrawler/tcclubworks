@@ -1,5 +1,5 @@
 exports.handler = async function(event) {
-  if (event.httpMethod !== "GET") {
+  if (!["GET", "DELETE"].includes(event.httpMethod)) {
     return json(405, { message: "Method not allowed" });
   }
 
@@ -22,6 +22,17 @@ exports.handler = async function(event) {
       setupRequired: true,
       message: "Set NETLIFY_API_TOKEN and NETLIFY_SITE_ID in Netlify environment variables so submissions can be loaded."
     });
+  }
+
+  if (event.httpMethod === "DELETE") {
+    const id = (event.queryStringParameters || {}).id || "";
+    if (!id) return json(400, { message: "Missing submission id." });
+    try {
+      await deleteSubmission(id, token);
+      return json(200, { ok: true });
+    } catch (err) {
+      return json(err.statusCode || 502, { message: err.message || "Could not delete submission." });
+    }
   }
 
   let rows;
@@ -61,6 +72,17 @@ exports.handler = async function(event) {
 
   return json(200, { submissions });
 };
+
+async function deleteSubmission(id, token) {
+  const res = await fetch(`https://api.netlify.com/api/v1/submissions/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok && res.status !== 404) {
+    const body = await res.text();
+    throw Object.assign(new Error(`Netlify delete request failed: ${res.status} ${body.slice(0, 180)}`), { statusCode: 502 });
+  }
+}
 
 async function fetchSubmissions(siteId, token) {
   const base = `https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`;
