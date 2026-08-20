@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /thanks
 Disallow: /admin
+Disallow: /quote-approval
 
 Sitemap: https://tcclubworks.io/sitemap.xml

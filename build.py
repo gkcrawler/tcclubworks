@@ -347,7 +347,7 @@ def admin_quotes_page():
 <title>Admin Quotes | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820b">
+<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820c">
 </head>
 <body>
 <main class="admin-shell">
@@ -356,7 +356,7 @@ def admin_quotes_page():
       <img src="/assets/logo-v2.svg" alt="{BRAND}" width="320" height="154">
       <p class="eyebrow">Admin quotes</p>
       <h1>Estimate builder</h1>
-      <p>Create customer quotes from Netlify form submissions, add services or parts, and export a clean PDF.</p>
+      <p>Create customer quotes from Netlify form submissions, save quote history, email approval links, and export a clean PDF.</p>
     </div>
     <form class="auth-card" id="authForm">
       <label for="adminPassword">Admin password</label>
@@ -384,6 +384,14 @@ def admin_quotes_page():
       </div>
       <input id="submissionSearch" type="search" placeholder="Search name, email, service">
       <div class="submission-list" id="submissionList"></div>
+      <div class="history-head">
+        <div>
+          <p class="eyebrow">History</p>
+          <h2>Saved quotes</h2>
+        </div>
+        <button class="ghost" id="refreshQuotes" type="button">Refresh</button>
+      </div>
+      <div class="submission-list quote-history" id="quoteList"></div>
     </aside>
 
     <form class="panel quote-form" id="quoteForm">
@@ -394,12 +402,20 @@ def admin_quotes_page():
         </div>
         <button class="print" id="exportPdf" type="button">Export PDF</button>
       </div>
+      <div class="toolbar">
+        <button class="ghost" id="newQuote" type="button">New quote</button>
+        <button class="ghost" id="saveQuote" type="button">Save quote</button>
+        <button class="ghost" id="emailQuote" type="button">Email quote</button>
+        <p class="status" id="quoteStatus"></p>
+      </div>
 
       <div class="grid two">
         <label>Quote number<input name="quoteNumber" id="quoteNumber"></label>
         <label>Quote date<input name="quoteDate" id="quoteDate" type="date"></label>
         <label>Valid until<input name="validUntil" id="validUntil" type="date"></label>
         <label>Prepared by<input name="preparedBy" value="Chronic Clubworks"></label>
+        <label>Status<input name="status" id="status" value="Draft"></label>
+        <label>Deposit/payment link<input name="paymentLink" id="paymentLink" type="url" placeholder="https://"></label>
       </div>
 
       <div class="grid two">
@@ -444,7 +460,31 @@ def admin_quotes_page():
     </form>
   </section>
 </main>
-<script src="/assets/admin-quotes.js?v=20260820b"></script>
+<script src="/assets/admin-quotes.js?v=20260820c"></script>
+</body>
+</html>"""
+
+def quote_approval_page():
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Quote Approval | {BRAND}</title>
+<link rel="icon" href="/assets/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/icon-180.png">
+<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820a">
+</head>
+<body>
+<main id="approvalApp">
+  <section class="panel">
+    <p class="eyebrow">Chronic Clubworks</p>
+    <h1>Loading quote...</h1>
+    <p>Please wait while we pull up your estimate.</p>
+  </section>
+</main>
+<script src="/assets/quote-approval.js?v=20260820a"></script>
 </body>
 </html>"""
 
@@ -961,8 +1001,9 @@ w("sitemap.xml",'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://w
             f'<priority>{"1.0" if p["path"]=="/" else "0.8"}</priority></url>\n' for p in INDEXED)
   + "</urlset>\n")
 
-w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\n\nSitemap: {D}/sitemap.xml\n")
+w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\nDisallow: /quote-approval\n\nSitemap: {D}/sitemap.xml\n")
 w("admin/quotes/index.html", admin_quotes_page())
+w("quote-approval/index.html", quote_approval_page())
 
 REDIR=[("/services","/golf-club-repair-denver"),
  ("/custom-clubmaking","/golf-club-repair-denver#custom-clubmaking"),
