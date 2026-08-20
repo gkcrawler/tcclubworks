@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Quotes | Chronic Clubworks</title>
+<link rel="icon" href="/assets/icon-32.png">
+<link rel="apple-touch-icon" href="/assets/icon-180.png">
+<link rel="stylesheet" href="/assets/admin-quotes.css">
+</head>
+<body>
+<main class="admin-shell">
+  <section class="admin-hero">
+    <div>
+      <img src="/assets/logo-v2.svg" alt="Chronic Clubworks" width="320" height="154">
+      <p class="eyebrow">Admin quotes</p>
+      <h1>Estimate builder</h1>
+      <p>Create customer quotes from Netlify form submissions, add services or parts, and export a clean PDF.</p>
+    </div>
+    <form class="auth-card" id="authForm">
+      <label for="adminPassword">Admin password</label>
+      <div class="auth-row">
+        <input id="adminPassword" type="password" autocomplete="current-password" required>
+        <button type="submit">Unlock</button>
+      </div>
+      <p id="authStatus" class="status">Use the quote admin password from Netlify environment variables.</p>
+    </form>
+  </section>
+
+  <section class="setup-alert" id="setupAlert" hidden>
+    <h2>Netlify setup needed</h2>
+    <p id="setupMessage"></p>
+  </section>
+
+  <section class="quote-app" id="quoteApp" hidden>
+    <aside class="panel submissions-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Submissions</p>
+          <h2>Customer intake</h2>
+        </div>
+        <button class="ghost" id="refreshSubmissions" type="button">Refresh</button>
+      </div>
+      <input id="submissionSearch" type="search" placeholder="Search name, email, service">
+      <div class="submission-list" id="submissionList"></div>
+    </aside>
+
+    <form class="panel quote-form" id="quoteForm">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Quote details</p>
+          <h2>Customer estimate</h2>
+        </div>
+        <button class="print" id="exportPdf" type="button">Export PDF</button>
+      </div>
+
+      <div class="grid two">
+        <label>Quote number<input name="quoteNumber" id="quoteNumber"></label>
+        <label>Quote date<input name="quoteDate" id="quoteDate" type="date"></label>
+        <label>Valid until<input name="validUntil" id="validUntil" type="date"></label>
+        <label>Prepared by<input name="preparedBy" value="Chronic Clubworks"></label>
+      </div>
+
+      <div class="grid two">
+        <label>Customer name<input name="customerName" id="customerName"></label>
+        <label>Email<input name="customerEmail" id="customerEmail" type="email"></label>
+        <label>Phone<input name="customerPhone" id="customerPhone"></label>
+        <label>Requested service<input name="customerService" id="customerService"></label>
+      </div>
+
+      <label>Customer request<textarea name="customerMessage" id="customerMessage" rows="4"></textarea></label>
+
+      <div class="items-head">
+        <div>
+          <p class="eyebrow">Line items</p>
+          <h3>Services, parts, components</h3>
+        </div>
+        <div class="item-actions">
+          <button class="ghost" type="button" data-preset="Regripping labor|13|8">Regrip labor</button>
+          <button class="ghost" type="button" data-preset="Reshafting labor|1|20">Reshaft labor</button>
+          <button class="ghost" type="button" data-preset="Loft and lie adjustment|1|12">Loft/lie</button>
+          <button class="ghost" type="button" data-preset="Custom headcover|1|0">Headcover</button>
+          <button class="ghost" id="addItem" type="button">Add line</button>
+        </div>
+      </div>
+
+      <div class="line-items" id="lineItems"></div>
+
+      <div class="totals">
+        <label>Discount<input id="discount" name="discount" type="number" min="0" step="0.01" value="0"></label>
+        <label>Tax %<input id="taxRate" name="taxRate" type="number" min="0" step="0.01" value="0"></label>
+        <label>Deposit due<input id="deposit" name="deposit" type="number" min="0" step="0.01" value="0"></label>
+        <div class="summary">
+          <p><span>Subtotal</span><b id="subtotal">$0.00</b></p>
+          <p><span>Tax</span><b id="taxTotal">$0.00</b></p>
+          <p><span>Total</span><b id="grandTotal">$0.00</b></p>
+          <p><span>Balance after deposit</span><b id="balanceDue">$0.00</b></p>
+        </div>
+      </div>
+
+      <label>Notes<textarea name="notes" id="notes" rows="4">Quote is based on the details available today. Final parts pricing may change if the requested components are unavailable or if the scope changes after inspection.</textarea></label>
+      <label>Terms<textarea name="terms" id="terms" rows="3">Quote valid until the date shown above. Work begins after customer approval and any required parts or deposit are received.</textarea></label>
+    </form>
+  </section>
+</main>
+<script src="/assets/admin-quotes.js"></script>
+</body>
+</html>
