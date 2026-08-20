@@ -1,54 +1,47 @@
-const { getStore } = require("@netlify/blobs");
-
 exports.handler = async function(event) {
+  if (event.httpMethod !== "GET") return json(405, { message: "Method not allowed" });
+
   try {
-    if (event.httpMethod === "GET") {
-      const token = (event.queryStringParameters || {}).token || "";
-      return json(200, { quote: publicQuote(await quoteByToken(token)) });
-    }
+    const token = (event.queryStringParameters || {}).token || "";
+    if (!token) return json(400, { message: "Missing quote token." });
 
-    if (event.httpMethod === "POST") {
-      const body = JSON.parse(event.body || "{}");
-      const quote = await quoteByToken(body.token || "");
-      quote.status = "Approved";
-      quote.approvedAt = new Date().toISOString();
-      quote.approvedBy = body.name || quote.customerName || "";
-      quote.updatedAt = quote.approvedAt;
-      const store = quoteStore();
-      await store.setJSON(`quotes/${quote.id}.json`, quote);
-      return json(200, { quote: publicQuote(quote) });
-    }
+    const rows = await fetchSubmissions();
+    const quote = rows
+      .map((row) => {
+        const data = row.data || {};
+        if (formName(row) !== "saved_quote" || !data.quotePayload) return null;
+        try { return JSON.parse(data.quotePayload); } catch (_) { return null; }
+      })
+      .filter((q) => q && q.approvalToken === token)
+      .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))[0];
 
-    return json(405, { message: "Method not allowed" });
+    if (!quote) return json(404, { message: "Quote not found." });
+    const { approvalToken, ...safe } = quote;
+    return json(200, { quote: safe });
   } catch (err) {
     return json(err.statusCode || 500, { message: err.message || "Quote request failed." });
   }
 };
 
-async function quoteByToken(token) {
-  if (!token) throw Object.assign(new Error("Missing quote token."), { statusCode: 400 });
-  const store = quoteStore();
-  const pointer = await store.get(`tokens/${token}.json`, { type: "json", consistency: "strong" });
-  if (!pointer) throw Object.assign(new Error("Quote not found."), { statusCode: 404 });
-  const quote = await store.get(`quotes/${pointer.quoteId}.json`, { type: "json", consistency: "strong" });
-  if (!quote) throw Object.assign(new Error("Quote not found."), { statusCode: 404 });
-  return quote;
-}
-
-function quoteStore() {
-  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
-  const token = process.env.NETLIFY_BLOBS_TOKEN || process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
-  const options = { name: "ccw-quotes", consistency: "strong" };
-  if (siteID && token) {
-    options.siteID = siteID;
-    options.token = token;
+async function fetchSubmissions() {
+  const token = process.env.NETLIFY_API_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
+  const siteId = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  if (!token || !siteId) {
+    throw Object.assign(new Error("Quote storage is not configured."), { statusCode: 500 });
   }
-  return getStore(options);
+  const res = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw Object.assign(new Error(`Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`), { statusCode: 502 });
+  }
+  return res.json();
 }
 
-function publicQuote(quote) {
-  const { approvalToken, ...safe } = quote;
-  return safe;
+function formName(row) {
+  const data = row.data || {};
+  return data["form-name"] || data.form_name || row.form_name || row.formName || "";
 }
 
 function json(statusCode, body) {

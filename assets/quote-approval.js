@@ -3,8 +3,15 @@
   var params = new URLSearchParams(location.search);
   var token = params.get("token") || "";
   var app = document.getElementById("approvalApp");
+  var quoteId = "";
   function esc(v){return String(v||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+  function encodedForm(data){
+    var params = new URLSearchParams();
+    Object.keys(data).forEach(function(key){ params.append(key, data[key] == null ? "" : data[key]); });
+    return params.toString();
+  }
   function render(q){
+    quoteId = q.id || "";
     var rows = (q.items||[]).map(function(item){
       return "<tr><td>"+esc(item.desc)+"</td><td>"+item.qty+"</td><td>"+money.format(item.unit)+"</td><td>"+money.format(item.total)+"</td></tr>";
     }).join("");
@@ -21,8 +28,8 @@
   document.addEventListener("click",function(e){
     if(e.target.id !== "approveBtn") return;
     var name = document.getElementById("approverName").value;
-    fetch("/.netlify/functions/quote-public",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,name:name})})
-      .then(function(res){return res.json().then(function(data){if(!res.ok) throw new Error(data.message||"Could not approve quote."); document.getElementById("approvalStatus").textContent = "Approved. Chronic Clubworks has been notified."; e.target.disabled = true;});})
+    fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:encodedForm({"form-name":"quote_approval",token:token,quoteId:quoteId,approvedBy:name})})
+      .then(function(res){if(!res.ok) throw new Error("Could not approve quote."); document.getElementById("approvalStatus").textContent = "Approved. Chronic Clubworks has been notified."; e.target.disabled = true;})
       .catch(function(err){document.getElementById("approvalStatus").textContent = err.message;});
   });
 })();

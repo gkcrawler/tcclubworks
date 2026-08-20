@@ -42,6 +42,22 @@
   function approvalUrl(token){
     return token ? location.origin + "/quote-approval/?token=" + encodeURIComponent(token) : "";
   }
+  function randomId(prefix){
+    return prefix + "_" + Date.now() + "_" + Math.random().toString(16).slice(2, 12);
+  }
+  function encodedForm(data){
+    var params = new URLSearchParams();
+    Object.keys(data).forEach(function(key){ params.append(key, data[key] == null ? "" : data[key]); });
+    return params.toString();
+  }
+  async function submitNetlifyForm(data){
+    var res = await fetch("/", {
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body:encodedForm(data)
+    });
+    if(!res.ok) throw new Error("Netlify Forms could not save this record.");
+  }
 
   async function adminFetch(url, options){
     options = options || {};
@@ -188,14 +204,26 @@
 
   async function saveQuote(silent){
     var quote = collectQuote();
-    var data = await adminFetch("/.netlify/functions/admin-quotes", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({action:"save", quote:quote})
+    var now = new Date().toISOString();
+    quote.id = quote.id || randomId("quote");
+    quote.approvalToken = quote.approvalToken || randomId("approve");
+    quote.createdAt = quote.createdAt || now;
+    quote.updatedAt = now;
+    await submitNetlifyForm({
+      "form-name":"saved_quote",
+      quoteId:quote.id,
+      approvalToken:quote.approvalToken,
+      quoteNumber:quote.quoteNumber,
+      customerName:quote.customerName,
+      customerEmail:quote.customerEmail,
+      status:quote.status,
+      total:quote.total,
+      quotePayload:JSON.stringify(quote)
     });
-    fillQuote(data.quote);
+    fillQuote(quote);
     await loadQuotes();
     if(!silent) showStatus("Saved. Approval link: " + approvalUrl(currentToken));
-    return data.quote;
+    return quote;
   }
 
   async function emailQuote(){

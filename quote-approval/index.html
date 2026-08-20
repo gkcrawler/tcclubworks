@@ -7,7 +7,7 @@
 <title>Quote Approval | Chronic Clubworks</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820a">
+<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820b">
 </head>
 <body>
 <main id="approvalApp">
@@ -17,6 +17,13 @@
     <p>Please wait while we pull up your estimate.</p>
   </section>
 </main>
-<script src="/assets/quote-approval.js?v=20260820a"></script>
+<form name="quote_approval" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="quote_approval">
+  <input name="bot-field">
+  <input name="token">
+  <input name="quoteId">
+  <input name="approvedBy">
+</form>
+<script src="/assets/quote-approval.js?v=20260820b"></script>
 </body>
 </html>

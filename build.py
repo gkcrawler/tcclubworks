@@ -347,7 +347,7 @@ def admin_quotes_page():
 <title>Admin Quotes | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820d">
+<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820e">
 </head>
 <body>
 <main class="admin-shell">
@@ -460,7 +460,19 @@ def admin_quotes_page():
     </form>
   </section>
 </main>
-<script src="/assets/admin-quotes.js?v=20260820d"></script>
+<form name="saved_quote" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="saved_quote">
+  <input name="bot-field">
+  <input name="quoteId">
+  <input name="approvalToken">
+  <input name="quoteNumber">
+  <input name="customerName">
+  <input name="customerEmail">
+  <input name="status">
+  <input name="total">
+  <textarea name="quotePayload"></textarea>
+</form>
+<script src="/assets/admin-quotes.js?v=20260820e"></script>
 </body>
 </html>"""
 
@@ -474,7 +486,7 @@ def quote_approval_page():
 <title>Quote Approval | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820a">
+<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820b">
 </head>
 <body>
 <main id="approvalApp">
@@ -484,7 +496,14 @@ def quote_approval_page():
     <p>Please wait while we pull up your estimate.</p>
   </section>
 </main>
-<script src="/assets/quote-approval.js?v=20260820a"></script>
+<form name="quote_approval" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="quote_approval">
+  <input name="bot-field">
+  <input name="token">
+  <input name="quoteId">
+  <input name="approvedBy">
+</form>
+<script src="/assets/quote-approval.js?v=20260820b"></script>
 </body>
 </html>"""
 
