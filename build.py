@@ -347,7 +347,7 @@ def admin_quotes_page():
 <title>Admin Quotes | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820f">
+<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820g">
 </head>
 <body>
 <main class="admin-shell">
@@ -481,7 +481,7 @@ def admin_quotes_page():
   <input name="total">
   <textarea name="quotePayload"></textarea>
 </form>
-<script src="/assets/admin-quotes.js?v=20260820f"></script>
+<script src="/assets/admin-quotes.js?v=20260820g"></script>
 </body>
 </html>"""
 
@@ -495,7 +495,7 @@ def quote_approval_page():
 <title>Quote Approval | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820b">
+<link rel="stylesheet" href="/assets/quote-approval.css?v=20260820c">
 </head>
 <body>
 <main id="approvalApp">
@@ -512,7 +512,7 @@ def quote_approval_page():
   <input name="quoteId">
   <input name="approvedBy">
 </form>
-<script src="/assets/quote-approval.js?v=20260820b"></script>
+<script src="/assets/quote-approval.js?v=20260820c"></script>
 </body>
 </html>"""
 
