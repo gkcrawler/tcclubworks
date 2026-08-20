@@ -14,7 +14,7 @@ exports.handler = async function(event) {
       quote.approvedAt = new Date().toISOString();
       quote.approvedBy = body.name || quote.customerName || "";
       quote.updatedAt = quote.approvedAt;
-      const store = getStore({ name: "ccw-quotes", consistency: "strong" });
+      const store = quoteStore();
       await store.setJSON(`quotes/${quote.id}.json`, quote);
       return json(200, { quote: publicQuote(quote) });
     }
@@ -27,12 +27,23 @@ exports.handler = async function(event) {
 
 async function quoteByToken(token) {
   if (!token) throw Object.assign(new Error("Missing quote token."), { statusCode: 400 });
-  const store = getStore({ name: "ccw-quotes", consistency: "strong" });
+  const store = quoteStore();
   const pointer = await store.get(`tokens/${token}.json`, { type: "json", consistency: "strong" });
   if (!pointer) throw Object.assign(new Error("Quote not found."), { statusCode: 404 });
   const quote = await store.get(`quotes/${pointer.quoteId}.json`, { type: "json", consistency: "strong" });
   if (!quote) throw Object.assign(new Error("Quote not found."), { statusCode: 404 });
   return quote;
+}
+
+function quoteStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN || process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
+  const options = { name: "ccw-quotes", consistency: "strong" };
+  if (siteID && token) {
+    options.siteID = siteID;
+    options.token = token;
+  }
+  return getStore(options);
 }
 
 function publicQuote(quote) {

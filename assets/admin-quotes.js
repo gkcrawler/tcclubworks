@@ -52,7 +52,7 @@
       sessionStorage.removeItem("ccw_admin_password");
       throw new Error("That admin password was not accepted.");
     }
-    if(!res.ok) throw new Error(data.message || "Request failed.");
+    if(!res.ok) throw new Error(data.message || ("Request failed with status " + res.status + "."));
     return data;
   }
 

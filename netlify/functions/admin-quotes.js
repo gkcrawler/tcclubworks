@@ -21,7 +21,18 @@ exports.handler = async function(event) {
 };
 
 function quoteStore() {
-  return getStore({ name: "ccw-quotes", consistency: "strong" });
+  return getStore(storeOptions());
+}
+
+function storeOptions() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN || process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_API_TOKEN;
+  const options = { name: "ccw-quotes", consistency: "strong" };
+  if (siteID && token) {
+    options.siteID = siteID;
+    options.token = token;
+  }
+  return options;
 }
 
 async function getQuote(id) {
