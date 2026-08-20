@@ -1,8 +1,15 @@
 exports.handler = async function(event) {
   if (!authorized(event.headers.authorization || "")) return json(401, { message: "Unauthorized" });
-  if (event.httpMethod !== "GET") return json(405, { message: "Method not allowed" });
+  if (!["GET", "DELETE"].includes(event.httpMethod)) return json(405, { message: "Method not allowed" });
 
   try {
+    if (event.httpMethod === "DELETE") {
+      const id = (event.queryStringParameters || {}).id || "";
+      if (!id) return json(400, { message: "Missing quote id." });
+      const result = await deleteQuote(id);
+      return json(200, result);
+    }
+
     const quotes = await loadQuotes();
     const id = (event.queryStringParameters || {}).id;
     if (id) {
@@ -15,6 +22,47 @@ exports.handler = async function(event) {
     return json(err.statusCode || 500, { message: err.message || "Could not load saved quotes." });
   }
 };
+
+async function deleteQuote(id) {
+  const rows = await fetchSubmissions();
+  const toDelete = [];
+  let token = "";
+
+  rows.forEach((row) => {
+    const data = row.data || {};
+    if (formName(row) !== "saved_quote" || !data.quotePayload) return;
+    try {
+      const quote = JSON.parse(data.quotePayload);
+      if (quote.id === id) {
+        toDelete.push(row.id);
+        token = token || quote.approvalToken || "";
+      }
+    } catch (_) {}
+  });
+
+  if (token) {
+    rows.forEach((row) => {
+      const data = row.data || {};
+      if (formName(row) === "quote_approval" && data.token === token) toDelete.push(row.id);
+    });
+  }
+
+  if (!toDelete.length) throw Object.assign(new Error("Quote not found."), { statusCode: 404 });
+  await Promise.all([...new Set(toDelete)].map(deleteSubmission));
+  return { ok: true, deleted: toDelete.length };
+}
+
+async function deleteSubmission(id) {
+  const apiToken = process.env.NETLIFY_API_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
+  const res = await fetch(`https://api.netlify.com/api/v1/submissions/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${apiToken}` }
+  });
+  if (!res.ok && res.status !== 404) {
+    const body = await res.text();
+    throw Object.assign(new Error(`Netlify delete request failed: ${res.status} ${body.slice(0, 180)}`), { statusCode: 502 });
+  }
+}
 
 async function loadQuotes() {
   const rows = await fetchSubmissions();
