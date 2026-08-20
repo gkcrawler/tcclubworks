@@ -347,7 +347,7 @@ def admin_quotes_page():
 <title>Admin Quotes | {BRAND}</title>
 <link rel="icon" href="/assets/icon-32.png">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
-<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820e">
+<link rel="stylesheet" href="/assets/admin-quotes.css?v=20260820f">
 </head>
 <body>
 <main class="admin-shell">
@@ -384,6 +384,15 @@ def admin_quotes_page():
       </div>
       <input id="submissionSearch" type="search" placeholder="Search name, email, service">
       <div class="submission-list" id="submissionList"></div>
+      <div class="history-head">
+        <div>
+          <p class="eyebrow">Catalog</p>
+          <h2>Parts lookup</h2>
+        </div>
+      </div>
+      <input id="catalogSearch" type="search" placeholder="Search SKU, category, brand, part">
+      <label class="filepick">Import CSV<input id="catalogFile" type="file" accept=".csv,text/csv"></label>
+      <div class="catalog-list" id="catalogList"></div>
       <div class="history-head">
         <div>
           <p class="eyebrow">History</p>
@@ -472,7 +481,7 @@ def admin_quotes_page():
   <input name="total">
   <textarea name="quotePayload"></textarea>
 </form>
-<script src="/assets/admin-quotes.js?v=20260820e"></script>
+<script src="/assets/admin-quotes.js?v=20260820f"></script>
 </body>
 </html>"""
 

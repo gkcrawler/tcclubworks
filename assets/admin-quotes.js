@@ -1,12 +1,13 @@
 (function(){
   var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
   var password = sessionStorage.getItem("ccw_admin_password") || "";
-  var submissions = [], quotes = [], activeId = "", currentQuoteId = "", currentToken = "";
+  var submissions = [], quotes = [], catalog = [], activeId = "", currentQuoteId = "", currentToken = "";
 
   var els = {
     authForm: $("authForm"), adminPassword: $("adminPassword"), authStatus: $("authStatus"),
     setupAlert: $("setupAlert"), setupMessage: $("setupMessage"), quoteApp: $("quoteApp"),
     submissionList: $("submissionList"), submissionSearch: $("submissionSearch"),
+    catalogList: $("catalogList"), catalogSearch: $("catalogSearch"), catalogFile: $("catalogFile"),
     refreshSubmissions: $("refreshSubmissions"), quoteList: $("quoteList"),
     refreshQuotes: $("refreshQuotes"), lineItems: $("lineItems"), addItem: $("addItem"),
     exportPdf: $("exportPdf"), saveQuote: $("saveQuote"), emailQuote: $("emailQuote"),
@@ -50,6 +51,30 @@
     Object.keys(data).forEach(function(key){ params.append(key, data[key] == null ? "" : data[key]); });
     return params.toString();
   }
+  function parseCsv(text){
+    var rows = [], row = [], value = "", quoted = false;
+    for(var i = 0; i < text.length; i++){
+      var ch = text[i], next = text[i + 1];
+      if(ch === '"' && quoted && next === '"'){ value += '"'; i++; }
+      else if(ch === '"'){ quoted = !quoted; }
+      else if(ch === "," && !quoted){ row.push(value); value = ""; }
+      else if((ch === "\n" || ch === "\r") && !quoted){
+        if(ch === "\r" && next === "\n") i++;
+        row.push(value); value = "";
+        if(row.some(function(cell){ return cell.trim() !== ""; })) rows.push(row);
+        row = [];
+      }else value += ch;
+    }
+    row.push(value);
+    if(row.some(function(cell){ return cell.trim() !== ""; })) rows.push(row);
+    if(!rows.length) return [];
+    var headers = rows.shift().map(function(h){ return h.trim(); });
+    return rows.map(function(cells){
+      var item = {};
+      headers.forEach(function(h, i){ item[h] = (cells[i] || "").trim(); });
+      return item;
+    });
+  }
   async function submitNetlifyForm(data){
     var res = await fetch("/", {
       method:"POST",
@@ -92,6 +117,17 @@
     }
   }
 
+  async function loadCatalog(){
+    try{
+      var res = await fetch("/assets/parts-catalog.csv?v=20260820a", {cache:"no-store"});
+      if(!res.ok) throw new Error("Could not load parts catalog.");
+      catalog = parseCsv(await res.text());
+      renderCatalog();
+    }catch(err){
+      els.catalogList.innerHTML = '<p class="help">' + escapeHtml(err.message) + '</p>';
+    }
+  }
+
   function renderSubmissions(){
     var q = els.submissionSearch.value.trim().toLowerCase();
     var visible = submissions.filter(function(s){
@@ -114,6 +150,31 @@
         '<span>' + escapeHtml([q.customerName,q.status,date].filter(Boolean).join(" | ")) + '</span>' +
         '<span>' + escapeHtml(money.format(q.total || 0)) + '</span></button>';
     }).join("") : '<p class="help">No saved quotes yet.</p>';
+  }
+
+  function renderCatalog(){
+    var q = els.catalogSearch.value.trim().toLowerCase();
+    var visible = catalog.filter(function(item){
+      return !q || [item.sku,item.category,item.brand,item.name,item.description,item.notes].join(" ").toLowerCase().includes(q);
+    }).slice(0, 60);
+    els.catalogList.innerHTML = visible.length ? visible.map(function(item){
+      var originalIndex = catalog.indexOf(item);
+      var price = parseWhole(item.quote_price || item.price || item.cost || 0);
+      return '<button type="button" class="catalog-item" data-catalog-index="' + originalIndex + '">' +
+        '<b>' + escapeHtml(item.name || "Unnamed part") + '</b>' +
+        '<span>' + escapeHtml([item.sku,item.category,item.brand].filter(Boolean).join(" | ")) + '</span>' +
+        '<span>' + escapeHtml(price ? money.format(price) : "Price TBD") + '</span>' +
+      '</button>';
+    }).join("") : '<p class="help">No catalog items found.</p>';
+  }
+
+  function addCatalogItem(index){
+    var item = catalog[Number(index)];
+    if(!item) return;
+    var price = parseWhole(item.quote_price || item.price || item.cost || 0);
+    var label = [item.sku, item.brand, item.name].filter(Boolean).join(" - ");
+    addItem(label || "Catalog part", 1, price);
+    showStatus("Added catalog item: " + (item.name || item.sku || "part") + ".");
   }
 
   function selectSubmission(id){
@@ -296,6 +357,16 @@
   els.refreshSubmissions.addEventListener("click",function(){ loadSubmissions().catch(function(err){ els.authStatus.textContent = err.message; }); });
   els.refreshQuotes.addEventListener("click",function(){ loadQuotes(); });
   els.submissionSearch.addEventListener("input",renderSubmissions);
+  els.catalogSearch.addEventListener("input",renderCatalog);
+  els.catalogFile.addEventListener("change",function(e){
+    var file = e.target.files && e.target.files[0];
+    if(!file) return;
+    file.text().then(function(text){
+      catalog = parseCsv(text);
+      renderCatalog();
+      showStatus("Imported " + catalog.length + " catalog rows for this session.");
+    }).catch(function(){ showStatus("Could not import that CSV."); });
+  });
   els.submissionList.addEventListener("click",function(e){
     var btn = e.target.closest("[data-submission-id]");
     if(btn) selectSubmission(btn.getAttribute("data-submission-id"));
@@ -303,6 +374,10 @@
   els.quoteList.addEventListener("click",function(e){
     var btn = e.target.closest("[data-quote-id]");
     if(btn) loadQuote(btn.getAttribute("data-quote-id")).catch(function(err){ showStatus(err.message); });
+  });
+  els.catalogList.addEventListener("click",function(e){
+    var btn = e.target.closest("[data-catalog-index]");
+    if(btn) addCatalogItem(btn.getAttribute("data-catalog-index"));
   });
   els.addItem.addEventListener("click",function(){ addItem("",1,0); });
   els.saveQuote.addEventListener("click",function(){ saveQuote(false).catch(function(err){ showStatus(err.message); }); });
@@ -322,6 +397,7 @@
   });
 
   resetQuote();
+  loadCatalog();
   if(password){
     els.adminPassword.value = password;
     Promise.all([loadSubmissions(), loadQuotes()]).catch(function(err){ els.authStatus.textContent = err.message; });

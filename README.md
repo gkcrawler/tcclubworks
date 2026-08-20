@@ -209,3 +209,13 @@ generate WebP versions, write accurate alt text, self-host them, and hand back a
 Same `I` dictionary — keys `w1` through `w7`, plus `ball`. Add more by adding entries to
 both `I` and `ALT`, then adding the key to the list in the gallery section of the home
 page. The lightbox picks them up automatically.
+## Quote builder parts catalog
+
+The admin quote builder loads parts from `assets/parts-catalog.csv`.
+
+Columns:
+
+`sku, category, brand, name, description, cost, quote_price, url, notes`
+
+Use `quote_price` for the price that should land on a customer quote. Leave it
+as `0` when you want to add the item but fill the price manually.
