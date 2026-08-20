@@ -1,5 +1,5 @@
 (function(){
-  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
+  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
   var password = sessionStorage.getItem("ccw_admin_password") || "";
   var submissions = [];
   var activeId = "";
@@ -24,6 +24,7 @@
   function val(id){ return ($(id) || {}).value || ""; }
   function set(id, value){ var el = $(id); if(el) el.value = value || ""; }
   function parseNumber(value){ return Number.parseFloat(value || "0") || 0; }
+  function parseWhole(value){ return Math.max(0, Math.round(parseNumber(value))); }
   function escapeHtml(value){
     return String(value || "").replace(/[&<>"']/g,function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
@@ -102,9 +103,9 @@
     row.className = "line-item";
     row.innerHTML =
       '<label>Description<input class="item-desc" value="' + escapeHtml(desc || "") + '"></label>' +
-      '<label>Qty<input class="item-qty" type="number" min="0" step="0.01" value="' + escapeHtml(qty || "1") + '"></label>' +
-      '<label>Unit<input class="item-unit" type="number" min="0" step="0.01" value="' + escapeHtml(unit || "0") + '"></label>' +
-      '<label>Total<span class="amount">$0.00</span></label>' +
+      '<label>Qty<input class="item-qty whole-number" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="' + escapeHtml(parseWhole(qty || "1")) + '"></label>' +
+      '<label>Unit<input class="item-unit whole-number" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="' + escapeHtml(parseWhole(unit || "0")) + '"></label>' +
+      '<label>Total<span class="amount">$0</span></label>' +
       '<button type="button" aria-label="Remove line item">&times;</button>';
     els.lineItems.appendChild(row);
     calculate();
@@ -113,8 +114,8 @@
   function lineData(){
     return [].slice.call(document.querySelectorAll(".line-item")).map(function(row){
       var desc = row.querySelector(".item-desc").value;
-      var qty = parseNumber(row.querySelector(".item-qty").value);
-      var unit = parseNumber(row.querySelector(".item-unit").value);
+      var qty = parseWhole(row.querySelector(".item-qty").value);
+      var unit = parseWhole(row.querySelector(".item-unit").value);
       return {desc:desc, qty:qty, unit:unit, total:qty * unit};
     });
   }
@@ -122,8 +123,8 @@
   function calculate(){
     var subtotal = 0;
     [].slice.call(document.querySelectorAll(".line-item")).forEach(function(row){
-      var qty = parseNumber(row.querySelector(".item-qty").value);
-      var unit = parseNumber(row.querySelector(".item-unit").value);
+      var qty = parseWhole(row.querySelector(".item-qty").value);
+      var unit = parseWhole(row.querySelector(".item-unit").value);
       var total = qty * unit;
       subtotal += total;
       row.querySelector(".amount").textContent = money.format(total);
@@ -167,11 +168,28 @@
   }
 
   function exportPdf(){
-    var win = window.open("", "_blank", "noopener,noreferrer");
-    if(!win){ alert("Please allow popups for this page so the PDF window can open."); return; }
-    win.document.open();
-    win.document.write(quoteHtml());
-    win.document.close();
+    var frame = document.getElementById("quotePrintFrame");
+    if(!frame){
+      frame = document.createElement("iframe");
+      frame.id = "quotePrintFrame";
+      frame.title = "Quote PDF preview";
+      frame.style.position = "fixed";
+      frame.style.right = "0";
+      frame.style.bottom = "0";
+      frame.style.width = "0";
+      frame.style.height = "0";
+      frame.style.border = "0";
+      document.body.appendChild(frame);
+    }
+    frame.onload = null;
+    var doc = frame.contentWindow.document;
+    doc.open();
+    doc.write(quoteHtml().replace('<script>window.addEventListener("load",function(){window.print();});<\\/script>', ""));
+    doc.close();
+    window.setTimeout(function(){
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }, 150);
   }
 
   els.authForm.addEventListener("submit",function(e){
@@ -179,6 +197,12 @@
     password = els.adminPassword.value;
     sessionStorage.setItem("ccw_admin_password", password);
     loadSubmissions().catch(function(err){ els.authStatus.textContent = err.message; });
+  });
+  document.addEventListener("change",function(e){
+    if(e.target.classList && e.target.classList.contains("whole-number")){
+      e.target.value = parseWhole(e.target.value);
+      calculate();
+    }
   });
   els.refreshSubmissions.addEventListener("click",function(){ loadSubmissions().catch(function(err){ els.authStatus.textContent = err.message; }); });
   els.submissionSearch.addEventListener("input",renderSubmissions);

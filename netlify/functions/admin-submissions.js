@@ -24,21 +24,27 @@ exports.handler = async function(event) {
     });
   }
 
-  const url = `https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    return json(res.status, {
-      message: `Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`
-    });
+  let rows;
+  try {
+    rows = await fetchSubmissions(siteId, token);
+  } catch (err) {
+    return json(err.statusCode || 502, { message: err.message || "Could not load Netlify submissions." });
   }
-
-  const rows = await res.json();
+  const seen = new Set();
   const submissions = rows
-    .filter((row) => (row.data || {})["form-name"] === "quote" || row.name === "quote")
+    .filter((row) => {
+      if (!row || !row.id || seen.has(row.id)) return false;
+      seen.add(row.id);
+      const data = row.data || {};
+      const formName = data["form-name"] || data.form_name || row.form_name || row.formName || "";
+      const looksLikeQuote =
+        formName === "quote" ||
+        data.service ||
+        data.message ||
+        (data.name && data.email);
+      return Boolean(looksLikeQuote);
+    })
+    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
     .map((row) => {
       const data = row.data || {};
       return {
@@ -55,6 +61,27 @@ exports.handler = async function(event) {
 
   return json(200, { submissions });
 };
+
+async function fetchSubmissions(siteId, token) {
+  const base = `https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`;
+  const headers = { Authorization: `Bearer ${token}` };
+  const requests = [base, `${base}&state=spam`].map(async (url) => {
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`);
+    }
+    return res.json();
+  });
+
+  const groups = await Promise.allSettled(requests);
+  if (groups[0].status === "rejected") {
+    throw Object.assign(groups[0].reason, { statusCode: 502 });
+  }
+  const verified = groups[0].value;
+  const spam = groups[1].status === "fulfilled" ? groups[1].value : [];
+  return verified.concat(spam);
+}
 
 function authorized(header, password) {
   if (!header || !header.toLowerCase().startsWith("basic ")) return false;
