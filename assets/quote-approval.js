@@ -1,5 +1,5 @@
 (function(){
-  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
   var params = new URLSearchParams(location.search);
   var token = params.get("token") || "";
   var app = document.getElementById("approvalApp");
