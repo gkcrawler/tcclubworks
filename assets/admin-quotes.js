@@ -1,5 +1,5 @@
 (function(){
-  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
   var password = sessionStorage.getItem("ccw_admin_password") || "";
   var submissions = [], quotes = [], catalog = [], activeId = "", currentQuoteId = "", currentToken = "";
 
@@ -19,6 +19,7 @@
   function set(id, value){ var el = $(id); if(el) el.value = value == null ? "" : value; }
   function parseNumber(value){ return Number.parseFloat(value || "0") || 0; }
   function parseWhole(value){ return Math.max(0, Math.round(parseNumber(value))); }
+  function parseMoney(value){ return Math.max(0, Math.round(parseNumber(value) * 100) / 100); }
   function escapeHtml(value){
     return String(value || "").replace(/[&<>"']/g,function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
@@ -97,6 +98,10 @@
     return data;
   }
 
+  async function adminDelete(url){
+    return adminFetch(url, {method:"DELETE"});
+  }
+
   async function loadSubmissions(){
     els.authStatus.textContent = "Loading customer submissions...";
     els.setupAlert.hidden = true;
@@ -135,20 +140,31 @@
     });
     els.submissionList.innerHTML = visible.length ? visible.map(function(s){
       var date = s.createdAt ? new Date(s.createdAt).toLocaleDateString() : "";
-      return '<button type="button" class="submission' + (s.id === activeId ? " active" : "") + '" data-submission-id="' + escapeHtml(s.id) + '">' +
-        '<b>' + escapeHtml(s.name || "No name") + '</b>' +
-        '<span>' + escapeHtml([s.service,date].filter(Boolean).join(" | ")) + '</span>' +
-        '<span>' + escapeHtml([s.email,s.phone].filter(Boolean).join(" | ")) + '</span></button>';
+      return '<div class="submission' + (s.id === activeId ? " active" : "") + '" data-submission-id="' + escapeHtml(s.id) + '">' +
+        '<button type="button" class="submission-main" data-submission-action="select">' +
+          '<b>' + escapeHtml(s.name || "No name") + '</b>' +
+          '<span>' + escapeHtml([s.service,date].filter(Boolean).join(" | ")) + '</span>' +
+          '<span>' + escapeHtml([s.email,s.phone].filter(Boolean).join(" | ")) + '</span>' +
+        '</button>' +
+        '<button type="button" class="mini danger" data-submission-action="delete">Delete</button>' +
+      '</div>';
     }).join("") : '<p class="help">No matching submissions found.</p>';
   }
 
   function renderQuotes(){
     els.quoteList.innerHTML = quotes.length ? quotes.map(function(q){
       var date = q.updatedAt ? new Date(q.updatedAt).toLocaleDateString() : "";
-      return '<button type="button" class="submission" data-quote-id="' + escapeHtml(q.id) + '">' +
-        '<b>' + escapeHtml(q.quoteNumber || q.id) + '</b>' +
-        '<span>' + escapeHtml([q.customerName,q.status,date].filter(Boolean).join(" | ")) + '</span>' +
-        '<span>' + escapeHtml(money.format(q.total || 0)) + '</span></button>';
+      return '<div class="submission quote-card" data-quote-id="' + escapeHtml(q.id) + '">' +
+        '<button type="button" class="submission-main" data-quote-action="edit">' +
+          '<b>' + escapeHtml(q.quoteNumber || q.id) + '</b>' +
+          '<span>' + escapeHtml([q.customerName,q.status,date].filter(Boolean).join(" | ")) + '</span>' +
+          '<span>' + escapeHtml(money.format(q.total || 0)) + '</span>' +
+        '</button>' +
+        '<div class="card-actions">' +
+          '<button type="button" class="mini" data-quote-action="edit">Edit</button>' +
+          '<button type="button" class="mini danger" data-quote-action="delete">Delete</button>' +
+        '</div>' +
+      '</div>';
     }).join("") : '<p class="help">No saved quotes yet.</p>';
   }
 
@@ -159,7 +175,7 @@
     }).slice(0, 60);
     els.catalogList.innerHTML = visible.length ? visible.map(function(item){
       var originalIndex = catalog.indexOf(item);
-      var price = parseWhole(item.quote_price || item.price || item.cost || 0);
+      var price = parseMoney(item.quote_price || item.price || item.cost || 0);
       return '<button type="button" class="catalog-item" data-catalog-index="' + originalIndex + '">' +
         '<b>' + escapeHtml(item.name || "Unnamed part") + '</b>' +
         '<span>' + escapeHtml([item.sku,item.category,item.brand].filter(Boolean).join(" | ")) + '</span>' +
@@ -171,7 +187,7 @@
   function addCatalogItem(index){
     var item = catalog[Number(index)];
     if(!item) return;
-    var price = parseWhole(item.quote_price || item.price || item.cost || 0);
+    var price = parseMoney(item.quote_price || item.price || item.cost || 0);
     var label = [item.sku, item.brand, item.name].filter(Boolean).join(" - ");
     addItem(label || "Catalog part", 1, price);
     showStatus("Added catalog item: " + (item.name || item.sku || "part") + ".");
@@ -214,8 +230,8 @@
     row.innerHTML =
       '<label>Description<input class="item-desc" value="' + escapeHtml(desc || "") + '"></label>' +
       '<label>Qty<input class="item-qty whole-number" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="' + escapeHtml(parseWhole(qty || "1")) + '"></label>' +
-      '<label>Unit<input class="item-unit whole-number" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*" value="' + escapeHtml(parseWhole(unit || "0")) + '"></label>' +
-      '<label>Total<span class="amount">$0</span></label>' +
+      '<label>Unit<input class="item-unit" type="number" min="0" step="0.01" inputmode="decimal" value="' + escapeHtml(parseMoney(unit || "0").toFixed(2)) + '"></label>' +
+      '<label>Total<span class="amount">$0.00</span></label>' +
       '<button type="button" aria-label="Remove line item">&times;</button>';
     els.lineItems.appendChild(row);
     calculate();
@@ -225,7 +241,7 @@
     return [].slice.call(document.querySelectorAll(".line-item")).map(function(row){
       var desc = row.querySelector(".item-desc").value;
       var qty = parseWhole(row.querySelector(".item-qty").value);
-      var unit = parseWhole(row.querySelector(".item-unit").value);
+      var unit = parseMoney(row.querySelector(".item-unit").value);
       return {desc:desc, qty:qty, unit:unit, total:qty * unit};
     }).filter(function(item){ return item.desc || item.qty || item.unit; });
   }
@@ -234,7 +250,7 @@
     var subtotal = 0;
     [].slice.call(document.querySelectorAll(".line-item")).forEach(function(row){
       var qty = parseWhole(row.querySelector(".item-qty").value);
-      var unit = parseWhole(row.querySelector(".item-unit").value);
+      var unit = parseMoney(row.querySelector(".item-unit").value);
       var total = qty * unit;
       subtotal += total;
       row.querySelector(".amount").textContent = money.format(total);
@@ -324,6 +340,9 @@
   }
 
   function exportPdf(){
+    var html = quoteHtml();
+    var blob = new Blob([html], {type:"text/html"});
+    var url = URL.createObjectURL(blob);
     var frame = $("quotePrintFrame");
     if(!frame){
       frame = document.createElement("iframe");
@@ -332,9 +351,34 @@
       frame.style.width = "0"; frame.style.height = "0"; frame.style.border = "0";
       document.body.appendChild(frame);
     }
-    var doc = frame.contentWindow.document;
-    doc.open(); doc.write(quoteHtml()); doc.close();
-    window.setTimeout(function(){ frame.contentWindow.focus(); frame.contentWindow.print(); }, 150);
+    frame.onload = function(){
+      window.setTimeout(function(){
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+        window.setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+      }, 150);
+    };
+    frame.src = url;
+  }
+
+  async function deleteSubmission(id){
+    var s = submissions.find(function(item){ return item.id === id; });
+    if(!s || !confirm("Delete this customer intake submission for " + (s.name || "this customer") + "?")) return;
+    await adminDelete("/.netlify/functions/admin-submissions?id=" + encodeURIComponent(id));
+    submissions = submissions.filter(function(item){ return item.id !== id; });
+    if(activeId === id) resetQuote();
+    renderSubmissions();
+    showStatus("Customer intake deleted.");
+  }
+
+  async function deleteQuote(id){
+    var q = quotes.find(function(item){ return item.id === id; });
+    if(!q || !confirm("Delete saved quote " + (q.quoteNumber || id) + "?")) return;
+    await adminDelete("/.netlify/functions/admin-quotes?id=" + encodeURIComponent(id));
+    quotes = quotes.filter(function(item){ return item.id !== id; });
+    if(currentQuoteId === id) resetQuote();
+    renderQuotes();
+    showStatus("Saved quote deleted.");
   }
 
   function resetQuote(){
@@ -368,12 +412,24 @@
     }).catch(function(){ showStatus("Could not import that CSV."); });
   });
   els.submissionList.addEventListener("click",function(e){
-    var btn = e.target.closest("[data-submission-id]");
-    if(btn) selectSubmission(btn.getAttribute("data-submission-id"));
+    var card = e.target.closest("[data-submission-id]");
+    if(!card) return;
+    var id = card.getAttribute("data-submission-id");
+    if(e.target.closest("[data-submission-action='delete']")){
+      deleteSubmission(id).catch(function(err){ showStatus(err.message); });
+    }else{
+      selectSubmission(id);
+    }
   });
   els.quoteList.addEventListener("click",function(e){
-    var btn = e.target.closest("[data-quote-id]");
-    if(btn) loadQuote(btn.getAttribute("data-quote-id")).catch(function(err){ showStatus(err.message); });
+    var card = e.target.closest("[data-quote-id]");
+    if(!card) return;
+    var id = card.getAttribute("data-quote-id");
+    if(e.target.closest("[data-quote-action='delete']")){
+      deleteQuote(id).catch(function(err){ showStatus(err.message); });
+    }else{
+      loadQuote(id).catch(function(err){ showStatus(err.message); });
+    }
   });
   els.catalogList.addEventListener("click",function(e){
     var btn = e.target.closest("[data-catalog-index]");
