@@ -36,6 +36,12 @@ button.print{background:var(--grad)}
 .history-head{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line);margin-top:22px;padding-top:22px}
 .quote-history{max-height:340px}
 .submission,.catalog-item{width:100%;display:block;text-align:left;border:1px solid var(--line);border-radius:14px;background:#080815;color:var(--ink);padding:14px}
+.submission{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.submission-main{min-width:0;text-align:left;background:transparent;border:0;border-radius:0;color:var(--ink);padding:0;font-weight:inherit}
+.submission-main:hover{filter:none}
+.card-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+button.mini{padding:7px 10px;font-size:.72rem;border:1px solid var(--line2);background:transparent;color:var(--ink)}
+button.mini.danger{border-color:#67304f;background:#231427;color:#f9a8d4}
 .submission:hover,.submission.active,.catalog-item:hover{border-color:var(--cyan);filter:none}
 .submission b,.catalog-item b{display:block;font-size:.98rem}
 .submission span,.catalog-item span{display:block;color:var(--mute);font-size:.82rem;margin-top:3px}
@@ -55,4 +61,4 @@ button.print{background:var(--grad)}
 .summary p:nth-child(3){border-top:1px solid var(--line);padding-top:10px;font-size:1.18rem}
 .summary b{color:var(--ink)}
 @media(max-width:1000px){.admin-hero,.quote-app{grid-template-columns:1fr}.submission-list{max-height:360px}}
-@media(max-width:700px){.admin-shell{padding:20px}.grid.two,.totals,.line-item{grid-template-columns:1fr}.items-head{display:block}.item-actions{justify-content:flex-start;margin-top:14px}}
+@media(max-width:700px){.admin-shell{padding:20px}.grid.two,.totals,.line-item,.submission{grid-template-columns:1fr}.items-head{display:block}.item-actions,.card-actions{justify-content:flex-start;margin-top:14px}}
