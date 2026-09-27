@@ -1,8 +1,9 @@
 exports.handler = async function(event) {
   if (!authorized(event.headers.authorization || "")) return json(401, { message: "Unauthorized" });
-  if (!["GET", "DELETE"].includes(event.httpMethod)) return json(405, { message: "Method not allowed" });
+  if (!["GET", "POST", "DELETE"].includes(event.httpMethod)) return json(405, { message: "Method not allowed" });
 
   try {
+    if (event.httpMethod === "POST") return await saveQuote(event);
     if (event.httpMethod === "DELETE") {
       const id = (event.queryStringParameters || {}).id || "";
       if (!id) return json(400, { message: "Missing quote id." });
@@ -22,6 +23,61 @@ exports.handler = async function(event) {
     return json(err.statusCode || 500, { message: err.message || "Could not load saved quotes." });
   }
 };
+
+// Admin saves use the same Forms history, but only confirm success after the
+// exact authenticated payload is verified. Public contact forms retain filtering.
+async function saveQuote(event) {
+  let quote;
+  try { quote = JSON.parse(event.body || ""); }
+  catch (_) { return json(400, { message: "Invalid quote data." }); }
+  if (!quote || typeof quote !== "object" || Array.isArray(quote) ||
+      typeof quote.id !== "string" || !quote.id.startsWith("quote_") ||
+      typeof quote.approvalToken !== "string" || !quote.approvalToken.startsWith("approve_") ||
+      !Array.isArray(quote.items)) {
+    return json(400, { message: "Invalid quote data." });
+  }
+  const payload = JSON.stringify(quote);
+  if (Buffer.byteLength(payload) > 200000) return json(413, { message: "Quote is too large." });
+  const siteUrl = process.env.URL;
+  if (!siteUrl || !siteUrl.startsWith("https://")) {
+    return json(500, { message: "Quote storage URL is not configured." });
+  }
+  const form = new URLSearchParams({
+    "form-name": "saved_quote", "bot-field": "",
+    quoteId: quote.id, approvalToken: quote.approvalToken,
+    quoteNumber: quote.quoteNumber || "", customerName: quote.customerName || "",
+    customerEmail: quote.customerEmail || "", status: quote.status || "Draft",
+    total: String(quote.total || 0), quotePayload: payload
+  });
+  const response = await fetch(new URL("/", siteUrl), {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: form.toString()
+  });
+  if (!response.ok) throw new Error("Quote storage rejected the save. Your draft is still available.");
+
+  // Forms processing may be asynchronous. Never treat an HTTP 200 alone as a save.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const verified = await fetchSubmissions();
+    if (verified.some((row) => matchesPayload(row, payload))) return json(200, { quote });
+    const spam = await fetchSubmissions("spam");
+    const match = spam.find((row) => matchesPayload(row, payload));
+    if (match) {
+      const token = process.env.NETLIFY_API_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
+      const result = await fetch(`https://api.netlify.com/api/v1/submissions/${encodeURIComponent(match.id)}/ham`, {
+        method: "PUT", headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!result.ok) throw new Error("Could not verify the saved quote. Your draft is still available; please retry.");
+      const rows = await fetchSubmissions();
+      if (rows.some((row) => matchesPayload(row, payload))) return json(200, { quote });
+    }
+    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  return json(503, { message: "Quote storage has not confirmed this save. Your draft is still available; please retry." });
+}
+
+function matchesPayload(row, payload) {
+  return formName(row) === "saved_quote" && row.data?.quotePayload === payload;
+}
 
 async function deleteQuote(id) {
   const rows = await fetchSubmissions();
@@ -101,20 +157,22 @@ async function loadQuotes() {
   return Array.from(byId.values()).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
 }
 
-async function fetchSubmissions() {
+async function fetchSubmissions(state = "verified") {
   const token = process.env.NETLIFY_API_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
   const siteId = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
   if (!token || !siteId) {
     throw Object.assign(new Error("Set NETLIFY_API_TOKEN and NETLIFY_SITE_ID in Netlify environment variables."), { statusCode: 500 });
   }
-  const res = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw Object.assign(new Error(`Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`), { statusCode: 502 });
+  const rows = [];
+  for (let page = 1; ; page++) {
+    const res = await fetch(`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100&page=${page}&state=${state}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`Quote storage request failed (${res.status}). Please retry.`);
+    const batch = await res.json();
+    rows.push(...batch);
+    if (batch.length < 100) return rows;
   }
-  return res.json();
 }
 
 function formName(row) {
