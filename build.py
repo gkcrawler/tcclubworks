@@ -481,7 +481,7 @@ def admin_quotes_page():
   <input name="total">
   <textarea name="quotePayload"></textarea>
 </form>
-<script src="/assets/admin-quotes.js?v=20260820g"></script>
+<script src="/assets/admin-quotes.js?v=20260927a"></script>
 </body>
 </html>"""
 

@@ -47,11 +47,6 @@
   function randomId(prefix){
     return prefix + "_" + Date.now() + "_" + Math.random().toString(16).slice(2, 12);
   }
-  function encodedForm(data){
-    var params = new URLSearchParams();
-    Object.keys(data).forEach(function(key){ params.append(key, data[key] == null ? "" : data[key]); });
-    return params.toString();
-  }
   function parseCsv(text){
     var rows = [], row = [], value = "", quoted = false;
     for(var i = 0; i < text.length; i++){
@@ -76,15 +71,6 @@
       return item;
     });
   }
-  async function submitNetlifyForm(data){
-    var res = await fetch("/", {
-      method:"POST",
-      headers:{"Content-Type":"application/x-www-form-urlencoded"},
-      body:encodedForm(data)
-    });
-    if(!res.ok) throw new Error("Netlify Forms could not save this record.");
-  }
-
   async function adminFetch(url, options){
     options = options || {};
     options.headers = authHeaders(options.headers || {});
@@ -279,24 +265,30 @@
     };
   }
 
-  async function saveQuote(silent){
+  var saveInProgress = null;
+  function saveQuote(silent){
+    if(saveInProgress) return saveInProgress;
+    els.saveQuote.disabled = true; els.emailQuote.disabled = true;
+    saveInProgress = persistQuote(silent).finally(function(){
+      saveInProgress = null; els.saveQuote.disabled = false; els.emailQuote.disabled = false;
+    });
+    return saveInProgress;
+  }
+
+  async function persistQuote(silent){
     var quote = collectQuote();
     var now = new Date().toISOString();
     quote.id = quote.id || randomId("quote");
     quote.approvalToken = quote.approvalToken || randomId("approve");
     quote.createdAt = quote.createdAt || now;
     quote.updatedAt = now;
-    await submitNetlifyForm({
-      "form-name":"saved_quote",
-      quoteId:quote.id,
-      approvalToken:quote.approvalToken,
-      quoteNumber:quote.quoteNumber,
-      customerName:quote.customerName,
-      customerEmail:quote.customerEmail,
-      status:quote.status,
-      total:quote.total,
-      quotePayload:JSON.stringify(quote)
+    // Retain identity on failure so retrying cannot create a separate quote.
+    currentQuoteId = quote.id; currentToken = quote.approvalToken;
+    showStatus("Saving and verifying quote...");
+    var saved = await adminFetch("/.netlify/functions/admin-quotes", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(quote)
     });
+    quote = saved.quote;
     fillQuote(quote);
     await loadQuotes();
     if(!silent) showStatus("Saved. Approval link: " + approvalUrl(currentToken));
