@@ -26,12 +26,21 @@ def should_skip(path: Path) -> bool:
 
 def inject(path: Path) -> bool:
     html = path.read_text(encoding="utf-8")
-    if TAG_ID in html or should_skip(path):
+    if should_skip(path):
         return False
     marker = "</head>"
     if marker not in html:
         return False
-    html = html.replace(marker, TAG + marker, 1)
+    original = html
+    if TAG_ID not in html:
+        html = html.replace(marker, TAG + marker, 1)
+    tracking = '<script defer src="/assets/inquiry-conversion.js?v=1"></script>'
+    if 'inquiry-conversion.js' not in html and (
+        'name="quote"' in html or path.as_posix().endswith('thanks/index.html')
+    ):
+        html = html.replace(marker, tracking + "\n" + marker, 1)
+    if html == original:
+        return False
     path.write_text(html, encoding="utf-8")
     return True
 
