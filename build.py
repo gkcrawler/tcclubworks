@@ -175,7 +175,7 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
 </section>"""
 
 def form(compact=False):
-    return f"""<form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field"
+    return f"""<form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true"
         action="/thanks">
   <input type="hidden" name="form-name" value="quote">
   <p class="hp"><label>Don't fill this out: <input name="bot-field" tabindex="-1"></label></p>
@@ -195,6 +195,7 @@ def form(compact=False):
     </select></div>
   <div class="fld"><label for="m">Tell us about your clubs</label>
     <textarea id="m" name="message" rows="5" placeholder="What are you playing now, and what isn't working?" required></textarea></div>
+  <div data-netlify-recaptcha="true"></div>
   <button class="btn lg" type="submit">Send inquiry</button>
   <p class="formnote">Goes to info@ and paul@tcclubworks.io. We reply within a day.</p>
 </form>"""
@@ -1054,7 +1055,7 @@ REDIR=[("/services","/golf-club-repair-denver"),
 w("_redirects","".join(f"{o}  {n}  301!\n" for o,n in REDIR))
 
 w("netlify.toml", """[build]
-  command = "python3 build.py"
+  command = "python3 build.py && python3 inject_google_ads.py"
   publish = "."
 
 [[headers]]
@@ -1065,7 +1066,7 @@ w("netlify.toml", """[build]
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.googleadservices.com https://www.googletagmanager.com https://googleads.g.doubleclick.net; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.googleadservices.com https://www.googletagmanager.com https://googleads.g.doubleclick.net; font-src 'self' data:; connect-src 'self' https://www.google.com/recaptcha/ https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
 
 [[headers]]
   for = "/assets/*"

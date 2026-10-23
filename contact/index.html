@@ -53,7 +53,7 @@
       </ul>
       <p class="note">Prefer to talk it through? Call or text — that's usually fastest.</p>
     </div>
-    <form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field"
+    <form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true"
         action="/thanks">
   <input type="hidden" name="form-name" value="quote">
   <p class="hp"><label>Don't fill this out: <input name="bot-field" tabindex="-1"></label></p>
@@ -73,6 +73,7 @@
     </select></div>
   <div class="fld"><label for="m">Tell us about your clubs</label>
     <textarea id="m" name="message" rows="5" placeholder="What are you playing now, and what isn't working?" required></textarea></div>
+  <div data-netlify-recaptcha="true"></div>
   <button class="btn lg" type="submit">Send inquiry</button>
   <p class="formnote">Goes to info@ and paul@tcclubworks.io. We reply within a day.</p>
 </form>

@@ -87,22 +87,14 @@ async function deleteSubmission(id, token) {
 async function fetchSubmissions(siteId, token) {
   const base = `https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`;
   const headers = { Authorization: `Bearer ${token}` };
-  const requests = [base, `${base}&state=spam`].map(async (url) => {
-    const res = await fetch(url, { headers });
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`);
-    }
-    return res.json();
-  });
-
-  const groups = await Promise.allSettled(requests);
-  if (groups[0].status === "rejected") {
-    throw Object.assign(groups[0].reason, { statusCode: 502 });
+  const res = await fetch(base, { headers });
+  if (!res.ok) {
+    const body = await res.text();
+    throw Object.assign(new Error(
+      `Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`
+    ), { statusCode: 502 });
   }
-  const verified = groups[0].value;
-  const spam = groups[1].status === "fulfilled" ? groups[1].value : [];
-  return verified.concat(spam);
+  return res.json();
 }
 
 function authorized(header, password) {
