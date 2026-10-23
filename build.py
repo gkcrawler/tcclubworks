@@ -170,7 +170,7 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
     <li><b>Location</b><span>Denver metro</span></li>
     <li><b>Hours</b><span>{HOURS}</span></li>
     <li><b>Turnaround</b><span>Most work in days</span></li>
-    <li><b>Service area</b><span>Denver &amp; Front Range</span></li>
+    <li><b>Service area</b><span>Denver &amp; US mail-in</span></li>
   </ul></div></div>
 </section>"""
 
@@ -565,7 +565,7 @@ PAGES=[]
 
 # ---------------- HOME
 PAGES.append(dict(path="/",
- title="Custom Golf Clubs Denver | Club Repair | Chronic Clubworks",
+ title="Golf Club Repair Denver & Custom Headcovers | Chronic Clubworks",
  desc="Custom golf clubs and expert club repair in Denver. Reshafting, regripping, loft & lie adjustment and putter restoration. By appointment, 8am-5pm. Call today.",
  schemas=[biz(),crumbs("/","Home"),faq(FAQS[:4])],
  body=hero("Denver, Colorado · By appointment","Craft without","compromise.",
@@ -652,8 +652,8 @@ PAGES.append(dict(path="/",
 
 # ---------------- SERVICES
 PAGES.append(dict(path="/golf-club-repair-denver",
- title="Golf Club Repair Denver | Fitting | Chronic Clubworks",
- desc="Golf club repair Denver golfers rely on: custom clubmaking, reshafting, regripping, loft & lie adjustment and putter restoration. Labor rates listed. 8am-5pm.",
+ title="Golf Club Repair Denver & Mail-In Service | Chronic Clubworks",
+ desc="Golf club repair in Denver with US mail-in service. Reshafting, regripping, loft and lie adjustments, and putter restoration. Request a quote before shipping.",
  schemas=[biz(),crumbs("/golf-club-repair-denver","Services"),
    svc("Golf Club Reshafting and Regripping","Reshafting with premium steel and graphite shafts, frequency matching, and regripping in Denver, Colorado.","reshafting-regripping",5,20),
    svc("Custom Clubmaking","Completely custom golf clubs built driver to wedge with shaft selection, MOI matching and swing weighting, in Denver, Colorado.","custom-clubmaking"),
@@ -661,7 +661,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
    svc("Golf Club Repairs and Putter Restoration","Putter and wedge refinishing, re-milling, stamping, clubhead and ferrule repair in Denver, Colorado.","repairs-restorations"),
    faq(FAQS)],
  body=hero("Services","Golf club repair","in Denver.",
-   "Four services, one bench. Everything measured, everything quoted before we start.",
+   "Reshafting, regripping, loft and lie adjustments, and restoration from our Denver bench. Local appointments and mail-in club repair from across the USA. Everything quoted before we start.",
    "bench")
  + f"""
 <section class="pad" id="reshafting-regripping">
@@ -762,15 +762,15 @@ HEADCOVER_FAQS = [
 ]
 
 PAGES.append(dict(path="/custom-golf-headcovers-denver",
- title="Custom Golf Headcovers Denver | Chronic Clubworks",
- desc="Custom golf headcovers handmade in Denver from thrifted and second-hand materials. Driver, fairway and hybrid covers, one-off designs and personalization quoted per project.",
+ title="Custom Golf Headcovers | Handmade in Denver | Chronic Clubworks",
+ desc="Custom golf headcovers handmade in Denver with US shipping. One-off driver, fairway and hybrid covers, personalized and quoted per project. Share your idea.",
  schemas=[biz(),crumbs("/custom-golf-headcovers-denver","Custom Headcovers"),
    svc_page("Custom Golf Headcovers",
      "Handmade custom golf headcovers in Denver for drivers, fairway woods and hybrids, built from thrifted and second-hand materials with one-off designs and personalization.",
      "/custom-golf-headcovers-denver"),
    faq(HEADCOVER_FAQS)],
  body=hero("Custom headcovers","One-off covers","for your bag.",
-   "Driver, fairway and hybrid headcovers handmade in Denver from thrifted and second-hand materials. Built one at a time, quoted before we start, and designed to make your bag look like yours.",
+   "Driver, fairway and hybrid headcovers handmade in Denver from thrifted and second-hand materials. Built one at a time, quoted before we start, and designed to make your bag look like yours. US shipping available.",
    "headcover_hero", plain_image=True)
  + f"""
 <section class="pad">
@@ -980,6 +980,27 @@ PAGES.append(dict(path="/contact",
   </div>
 </section>
 """))
+
+# Mail-in information appears on the pages customers use to choose a service.
+MAIL_IN = """
+<section class="pad tinted" id="mail-in">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">Denver bench. Nationwide service.</p>
+      <h2>Outside Colorado? <span class="grad">We accept shipments.</span></h2></div>
+    <p class="lede">You can send clubs to Chronic Clubworks for repair from anywhere in the USA.
+      Custom headcover projects are also available to customers nationwide.</p>
+    <ol class="bullets">
+      <li><strong>Tell us about the project.</strong> Describe the clubs and work needed, or your headcover idea. Send photos by text or email.</li>
+      <li><strong>Confirm the details first.</strong> Contact us for a quote, timing and shipping instructions before sending anything.</li>
+      <li><strong>Plan the shipment.</strong> We will discuss packing, shipping costs and return arrangements with you before work starts.</li>
+    </ol>
+    <a class="btn lg" href="/contact">Ask about a mail-in project</a>
+  </div>
+</section>
+"""
+for page in PAGES:
+    if page["path"] in ["/", "/golf-club-repair-denver", "/custom-golf-headcovers-denver", "/contact"]:
+        page["body"] += MAIL_IN
 
 # ---------------- THANKS (Netlify form redirect target)
 PAGES.append(dict(path="/thanks",
