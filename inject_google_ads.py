@@ -34,10 +34,10 @@ def inject(path: Path) -> bool:
     original = html
     if TAG_ID not in html:
         html = html.replace(marker, TAG + marker, 1)
-    tracking = '<script defer src="/assets/inquiry-conversion.js?v=1"></script>'
-    if 'inquiry-conversion.js' not in html and (
-        'name="quote"' in html or path.as_posix().endswith('thanks/index.html')
-    ):
+    # Every public page, including ones without a quote form. Phone taps on
+    # /golf-club-repair-denver and /custom-golf-clubs-about have to count too.
+    tracking = '<script defer src="/assets/inquiry-conversion.js"></script>'
+    if 'inquiry-conversion.js' not in html:
         html = html.replace(marker, tracking + "\n" + marker, 1)
     if html == original:
         return False

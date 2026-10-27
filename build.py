@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Chronic Clubworks — 4-page static site generator. Cyberpunk build."""
-import os, json, html
+import os, json, html, hashlib, re, datetime, shutil, subprocess
 
 try:
     import tomllib
@@ -23,25 +23,53 @@ I   = {k: v["file"] for k, v in C["photos"].items()}
 ALT = {k: v["alt"]  for k, v in C["photos"].items()}
 
 
+_ASSET_HASHES = {}
+
+def asset_hash(root_path):
+    """Short content hash for a site-root path such as /assets/style.css."""
+    if root_path not in _ASSET_HASHES:
+        fp = os.path.join(OUT, root_path.lstrip("/"))
+        with open(fp, "rb") as fh:
+            _ASSET_HASHES[root_path] = hashlib.sha256(fh.read()).hexdigest()[:10]
+    return _ASSET_HASHES[root_path]
+
+def vurl(url):
+    path = url.split("?", 1)[0]
+    if not path.startswith("/assets/"):
+        return url
+    return f"{path}?v={asset_hash(path)}"
+
+def version_asset_urls(html_text):
+    """Cache-bust /assets/* so the immutable Cache-Control header stays safe."""
+    def repl(match):
+        return vurl(match.group(0))
+    return re.sub(r'/assets/[\w.@+/-]+(?:\?[^"\'\s<>]*)?', repl, html_text)
+
 def pic(key, w, h, loading="lazy", priority=False):
-    """<picture> with WebP for self-hosted images; plain <img> for remote ones."""
+    """AVIF and WebP at ~800px, with an 800px JPEG fallback. Alt and the
+    layout width/height stay on the img. Lightbox links still use the original."""
     src, alt = I[key], html.escape(ALT[key])
     fp = ' fetchpriority="high"' if priority else ''
-    if src.startswith("/assets/"):
-        webp = src.rsplit(".",1)[0] + ".webp"
-        return (f'<picture><source type="image/webp" srcset="{webp}">'
-                f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
-                f'loading="{loading}" decoding="async"{fp}></picture>')
+    if src.startswith("/assets/") and src.rsplit(".", 1)[-1].lower() in {"jpg", "jpeg", "png"}:
+        stem = src.rsplit(".", 1)[0]
+        avif, webp, fallback = stem + "-800.avif", stem + "-800.webp", stem + "-800.jpg"
+        for variant in (avif, webp, fallback):
+            if not os.path.isfile(os.path.join(OUT, variant.lstrip("/"))):
+                raise SystemExit(f"missing optimized image {variant} (from {src})")
+        sizes = "(max-width: 980px) 92vw, 800px"
+        return (
+            f'<picture><source type="image/avif" srcset="{avif} 800w" sizes="{sizes}">'
+            f'<source type="image/webp" srcset="{webp} 800w" sizes="{sizes}">'
+            f'<img src="{fallback}" srcset="{fallback} 800w" alt="{alt}" width="{w}" height="{h}" '
+            f'loading="{loading}" decoding="async"{fp}></picture>'
+        )
     return (f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
             f'loading="{loading}" decoding="async"{fp}>')
 
 
 def img(key, w, h, loading="lazy", priority=False):
-    """Plain image tag for local previews that can be picky about <picture> sources."""
-    src, alt = I[key], html.escape(ALT[key])
-    fp = ' fetchpriority="high"' if priority else ''
-    return (f'<img src="{src}" alt="{alt}" width="{w}" height="{h}" '
-            f'loading="{loading}" decoding="async"{fp}>')
+    """Same optimized picture as pic(). display:contents keeps the old layout."""
+    return pic(key, w, h, loading, priority)
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
        ("/custom-golf-headcovers-denver","Headcovers"),
        ("/custom-golf-clubs-about","About"),("/contact","Contact")]
@@ -56,13 +84,22 @@ def FULL(key):
 
 # ----------------------------------------------------------------- schema
 def biz():
-    return {"@context":"https://schema.org","@type":"LocalBusiness","@id":D+"/#business",
+    # TODO: no street address is published in this repo. Do not invent one.
+    # geo is Denver's city center so the service area is explicit until the
+    # owner supplies a shop address and a precise map pin.
+    cities = [{"@type":"City","name":c,"containedInPlace":{"@type":"State","name":"Colorado"}} for c in AREAS]
+    return {"@context":"https://schema.org",
+      "@type":["ProfessionalService","SportingGoodsStore"],
+      "@id":D+"/#business",
       "name":BRAND,
       "description":"Custom golf clubmaking, precision golf club repair, and handmade custom golf headcovers serving the Denver metro. Reshafting, regripping, loft and lie adjustment, putter restoration, and one-off headcover builds.",
       "url":D,"email":EMAIL,"telephone":TEL_E,"image":D+"/assets/og-image.jpg",
       "logo":D+"/assets/logo-v2.svg","priceRange":"$$",
       "address":{"@type":"PostalAddress","addressLocality":"Denver","addressRegion":"CO","addressCountry":"US"},
-      "areaServed":[{"@type":"City","name":c} for c in AREAS],
+      "geo":{"@type":"GeoCoordinates","latitude":39.7392,"longitude":-104.9903},
+      "areaServed":cities + [
+          {"@type":"AdministrativeArea","name":"Denver metropolitan area"},
+          {"@type":"State","name":"Colorado"}],
       "openingHoursSpecification":[{"@type":"OpeningHoursSpecification",
         "dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens":_c["hours_open"],"closes":_c["hours_close"]}],
@@ -125,6 +162,15 @@ def head(p):
 <meta name="twitter:card" content="summary_large_image">
 {preconnect}<link rel="stylesheet" href="/assets/style.css">
 {ld}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18288494011"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', 'AW-18288494011');
+</script>
+<script defer src="/assets/inquiry-conversion.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -148,14 +194,18 @@ def header(active):
 </header>
 """
 
-def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
-    image_fn = img if plain_image else pic
-    imghtml = image_fn(imgkey, 1200, 1500, loading='eager', priority=True)
+def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None):
+    imghtml = pic(imgkey, 1200, 1500, loading='eager', priority=True)
+    if seo_h1:
+        heading = (f'<h1 class="page-title">{html.escape(seo_h1)}</h1>\n'
+                   f'      <p class="display">{html.escape(h1a)}<br><span class="grad">{html.escape(h1b)}</span></p>')
+    else:
+        heading = f'<h1>{html.escape(h1a)}<br><span class="grad">{html.escape(h1b)}</span></h1>'
     return f"""<section class="hero">
   <div class="wrap hgrid">
     <div>
       <p class="eyebrow">{html.escape(kick)}</p>
-      <h1>{html.escape(h1a)}<br><span class="grad">{html.escape(h1b)}</span></h1>
+      {heading}
       <p class="lede h1sub">{lede}</p>
       <div class="hbtns">
         <a class="btn lg" href="/contact">Get a quote</a>
@@ -168,7 +218,7 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False):
     </div>
   </div>
   <div class="trust"><div class="wrap"><ul>
-    <li><b>Location</b><span>Denver metro</span></li>
+    <li><b>Location</b><span>Denver metro<span class="sep"> · </span><span class="num">{TEL_D}</span></span></li>
     <li><b>Hours</b><span>{HOURS}</span></li>
     <li><b>Turnaround</b><span>Most work in days</span></li>
     <li><b>Service area</b><span>Denver &amp; US mail-in</span></li>
@@ -518,13 +568,23 @@ def quote_approval_page():
 </body>
 </html>"""
 
-def _asset_prefix(path):
+def page_file(path):
+    """Public pages are root-level HTML files, not directory indexes.
+
+    With Netlify Pretty URLs that yields one hop to the no-slash canonical:
+    /contact is 200, and both /contact/ and /contact.html 301 to /contact.
+    A contact/index.html file does the opposite and makes the slash URL canonical.
+    """
     if path == "/":
-        return ""
-    return "../" * len([part for part in path.strip("/").split("/") if part])
+        return "index.html"
+    return path.strip("/") + ".html"
+
+def _asset_prefix(path):
+    return "../" * page_file(path).count("/")
 
 def render(p):
     h = head(p)+header(p["path"])+'<main id="main">'+p["body"]+"</main>"+footer()
+    h = version_asset_urls(h)
     # Root-relative asset URLs work on Netlify but break when previewing nested
     # pages directly as file:// URLs. Relative asset URLs work in both places.
     prefix = _asset_prefix(p["path"])
@@ -562,6 +622,45 @@ TESTIMONIALS = "".join(
     for t in C["testimonials"] if not t.get("placeholder"))
 GALLERY_KEYS = [k for k in C.get("gallery", {}).get("order", []) if k in I]
 
+def ensure_image_variants():
+    """Refresh ~800px AVIF/WebP/JPEG siblings when a source photo is newer.
+
+    The committed variants are what Netlify publishes. ffmpeg runs only for a
+    photo that has no variant yet, so a normal deploy does not need ffmpeg.
+    """
+    sources = []
+    for src in dict.fromkeys(I.values()):
+        if not src.startswith("/assets/img/") or not src.lower().endswith((".jpg", ".jpeg")):
+            continue
+        disk = os.path.join(OUT, src.lstrip("/"))
+        stem = os.path.splitext(disk)[0]
+        stale = False
+        for ext in (".avif", ".webp", ".jpg"):
+            variant = stem + "-800" + ext
+            if not os.path.isfile(variant) or os.path.getmtime(variant) < os.path.getmtime(disk):
+                stale = True
+                break
+        if stale:
+            sources.append(disk)
+    if not sources:
+        return
+    if not shutil.which("ffmpeg"):
+        names = ", ".join(os.path.basename(s) for s in sources)
+        raise SystemExit(f"ffmpeg is required to build 800px variants for: {names}")
+    for disk in sources:
+        stem = os.path.splitext(disk)[0]
+        scale = ["-vf", "scale=800:-2:flags=lanczos"]
+        subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", disk, *scale,
+                        "-c:v", "libwebp", "-quality", "72", "-compression_level", "6", stem + "-800.webp"], check=True)
+        subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", disk, *scale,
+                        "-q:v", "6", stem + "-800.jpg"], check=True)
+        subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", disk, *scale,
+                        "-c:v", "libaom-av1", "-still-picture", "1", "-crf", "34", "-b:v", "0",
+                        "-cpu-used", "6", "-an", "-f", "avif", stem + "-800.avif"], check=True)
+        print("optimized", os.path.basename(disk))
+
+ensure_image_variants()
+
 PAGES=[]
 
 # ---------------- HOME
@@ -571,7 +670,7 @@ PAGES.append(dict(path="/",
  schemas=[biz(),crumbs("/","Home"),faq(FAQS[:4])],
  body=hero("Denver, Colorado · By appointment","Craft without","compromise.",
    "Custom clubmaking and precision repair from a Denver bench. Reshafting, regripping, loft and lie, restorations — built by people who actually play.",
-   "hero")
+   "hero", seo_h1="Custom Golf Clubs & Golf Club Repair in Denver")
  + f"""
 <section class="pad" id="services">
   <div class="wrap">
@@ -654,7 +753,7 @@ PAGES.append(dict(path="/",
 # ---------------- SERVICES
 PAGES.append(dict(path="/golf-club-repair-denver",
  title="Golf Club Repair Denver & Mail-In Service | Chronic Clubworks",
- desc="Golf club repair in Denver with US mail-in service. Reshafting, regripping, loft and lie adjustments, and putter restoration. Request a quote before shipping.",
+ desc="Golf club repair in Denver with US mail-in. Reshafting, regripping, loft and lie adjustments, and putter restoration.",
  schemas=[biz(),crumbs("/golf-club-repair-denver","Services"),
    svc("Golf Club Reshafting and Regripping","Reshafting with premium steel and graphite shafts, frequency matching, and regripping in Denver, Colorado.","reshafting-regripping",5,20),
    svc("Custom Clubmaking","Completely custom golf clubs built driver to wedge with shaft selection, MOI matching and swing weighting, in Denver, Colorado.","custom-clubmaking"),
@@ -764,7 +863,7 @@ HEADCOVER_FAQS = [
 
 PAGES.append(dict(path="/custom-golf-headcovers-denver",
  title="Custom Golf Headcovers | Handmade in Denver | Chronic Clubworks",
- desc="Custom golf headcovers handmade in Denver with US shipping. One-off driver, fairway and hybrid covers, personalized and quoted per project. Share your idea.",
+ desc="Custom golf headcovers handmade in Denver. One-off driver, fairway and hybrid covers, quoted per project. US shipping.",
  schemas=[biz(),crumbs("/custom-golf-headcovers-denver","Custom Headcovers"),
    svc_page("Custom Golf Headcovers",
      "Handmade custom golf headcovers in Denver for drivers, fairway woods and hybrids, built from thrifted and second-hand materials with one-off designs and personalization.",
@@ -879,7 +978,7 @@ PAGES.append(dict(path="/custom-golf-clubs-about",
     "url":D+"/custom-golf-clubs-about","mainEntity":{"@id":D+"/#business"}}],
  body=hero("About","Just a bunch of dudes","who love golf.",
    "A brotherhood of golf obsessives with decades of camaraderie, competition and tinkering behind them.",
-   "shop")
+   "shop", seo_h1="Denver Custom Clubmakers Built by Lifelong Golfers")
  + f"""
 <section class="pad">
   <div class="wrap split">
@@ -958,7 +1057,8 @@ PAGES.append(dict(path="/contact",
   <div class="wrap cgrid">
     <div>
       <p class="eyebrow">Get in touch</p>
-      <h1 style="font-size:clamp(2.2rem,5vw,3.6rem)">Tell us about<br><span class="grad">your clubs.</span></h1>
+      <h1 class="page-title">Contact Chronic Clubworks – Denver Golf Club Repair</h1>
+      <p class="display" style="font-size:clamp(2.2rem,5vw,3.6rem)">Tell us about<br><span class="grad">your clubs.</span></p>
       <p class="lede">Send a note with what you're playing and what isn't working. If photos would help, text or email them after you submit and we'll match them to your inquiry.</p>
       <ul class="facts">
         <li><b>Phone</b><a href="tel:{TEL_E}">{TEL_D}</a></li>
@@ -1030,9 +1130,20 @@ for p in PAGES:
     h = render(p)
     if p.get("noindex"):
         h = h.replace('<meta name="theme-color"', '<meta name="robots" content="noindex,follow">\n<meta name="theme-color"')
-    w("index.html" if p["path"]=="/" else p["path"].strip("/")+"/index.html", h)
+    w(page_file(p["path"]), h)
 
-w("404.html", head({"path":"/404","title":"Page not found | Chronic Clubworks",
+# Directory indexes fight the no-slash canonical. Remove leftovers from older builds.
+for stale in ("contact/index.html","custom-golf-clubs-about/index.html",
+              "custom-golf-headcovers-denver/index.html","golf-club-repair-denver/index.html",
+              "thanks/index.html"):
+    fp = os.path.join(OUT, stale)
+    if os.path.isfile(fp):
+        os.remove(fp)
+    folder = os.path.dirname(fp)
+    if os.path.isdir(folder) and not os.listdir(folder):
+        os.rmdir(folder)
+
+w("404.html", version_asset_urls(head({"path":"/404","title":"Page not found | Chronic Clubworks",
   "desc":"That page doesn't exist. Find custom golf clubs and club repair in Denver.","schemas":[]})
   + header("") + f"""<main id="main"><section class="pad" style="min-height:56vh;display:flex;align-items:center">
   <div class="wrap" style="max-width:720px">
@@ -1044,17 +1155,19 @@ w("404.html", head({"path":"/404","title":"Page not found | Chronic Clubworks",
       <li><strong><a href="/custom-golf-clubs-about">About</a></strong> — who we are</li>
       <li><strong><a href="/contact">Contact</a></strong> — get a quote</li>
     </ul>
-  </div></section></main>""" + footer())
+  </div></section></main>""" + footer()))
 
 INDEXED=[p for p in PAGES if not p.get("noindex")]
+LASTMOD = datetime.date.today().isoformat()
 w("sitemap.xml",'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-  + "".join(f'  <url><loc>{D}{"/" if p["path"]=="/" else p["path"]}</loc><changefreq>monthly</changefreq>'
-            f'<priority>{"1.0" if p["path"]=="/" else "0.8"}</priority></url>\n' for p in INDEXED)
+  + "".join(f'  <url><loc>{D}{"/" if p["path"]=="/" else p["path"]}</loc><lastmod>{LASTMOD}</lastmod>'
+            f'<changefreq>monthly</changefreq><priority>{"1.0" if p["path"]=="/" else "0.8"}</priority></url>\n'
+            for p in INDEXED)
   + "</urlset>\n")
 
 w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\nDisallow: /quote-approval\n\nSitemap: {D}/sitemap.xml\n")
-w("admin/quotes/index.html", admin_quotes_page())
-w("quote-approval/index.html", quote_approval_page())
+w("admin/quotes/index.html", version_asset_urls(admin_quotes_page()))
+w("quote-approval/index.html", version_asset_urls(quote_approval_page()))
 
 REDIR=[("/services","/golf-club-repair-denver"),
  ("/custom-clubmaking","/golf-club-repair-denver#custom-clubmaking"),
@@ -1074,11 +1187,65 @@ REDIR=[("/services","/golf-club-repair-denver"),
  ("/loft-adjustment","/golf-club-repair-denver#loft-and-lie"),
  ("/lie-adjustment","/golf-club-repair-denver#loft-and-lie"),
  ("/custom-paint","/golf-club-repair-denver#custom-clubmaking")]
-w("_redirects","".join(f"{o}  {n}  301!\n" for o,n in REDIR))
+# www rules run only after www.tcclubworks.io is a domain on this Netlify site
+# and DNS for www points at Netlify. See the note in netlify.toml.
+WWW=[("https://www.tcclubworks.io/*","https://tcclubworks.io/:splat"),
+     ("http://www.tcclubworks.io/*","https://tcclubworks.io/:splat")]
+w("_redirects", "# www DNS must point at Netlify or the host rules below never run.\n"
+  + "".join(f"{o}  {n}  301!\n" for o,n in WWW+REDIR))
 
-w("netlify.toml", """[build]
+CSP = ("default-src 'self'; "
+ "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com "
+ "https://www.googleadservices.com https://www.gstatic.com/recaptcha/; "
+ "frame-src 'self' https://www.googletagmanager.com https://www.google.com/recaptcha/ "
+ "https://recaptcha.google.com/recaptcha/; "
+ "style-src 'self' 'unsafe-inline'; "
+ "img-src 'self' data: https://www.google.com https://www.googleadservices.com "
+ "https://www.googletagmanager.com https://googleads.g.doubleclick.net "
+ "https://pagead2.googlesyndication.com https://ad.doubleclick.net; "
+ "font-src 'self' data:; "
+ "connect-src 'self' https://www.google.com https://www.google-analytics.com "
+ "https://region1.google-analytics.com https://www.googletagmanager.com "
+ "https://www.googleadservices.com https://googleads.g.doubleclick.net "
+ "https://pagead2.googlesyndication.com https://ad.doubleclick.net; "
+ "form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests")
+
+w("_headers", f"""/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: {CSP}
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+""")
+
+w("netlify.toml", f"""[build]
   command = "python3 build.py && python3 inject_google_ads.py"
   publish = "."
+
+# Public pages are root-level HTML files (contact.html, not contact/index.html).
+# With Pretty URLs, /contact is 200 and both /contact/ and /contact.html 301
+# to that no-slash canonical in one hop. Do not also publish contact/index.html.
+[build.processing.html]
+  pretty_urls = true
+
+# www.tcclubworks.io → https://tcclubworks.io
+# Requires www to be added on the Netlify site. Point www DNS at Netlify
+# (CNAME www to the site hostname, or the ALIAS/ANAME Netlify documents).
+[[redirects]]
+  from = "https://www.tcclubworks.io/*"
+  to = "https://tcclubworks.io/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.tcclubworks.io/*"
+  to = "https://tcclubworks.io/:splat"
+  status = 301
+  force = true
 
 [[headers]]
   for = "/*"
@@ -1088,12 +1255,13 @@ w("netlify.toml", """[build]
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google.com https://www.googleadservices.com https://www.googletagmanager.com https://googleads.g.doubleclick.net; font-src 'self' data:; connect-src 'self' https://www.google.com/recaptcha/ https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = "{CSP}"
 
+# /assets/* URLs are content-hashed (?v=) in the HTML, so this can be immutable.
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=3600, must-revalidate"
+    Cache-Control = "public, max-age=31536000, immutable"
 """)
 
 print(f"built {len(PAGES)} pages (+404) | {len(INDEXED)} indexed | {len(REDIR)} redirects")

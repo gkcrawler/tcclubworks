@@ -16,6 +16,9 @@ img{max-width:100%;height:auto;display:block}
 a{color:inherit;text-decoration:none}
 h1,h2,h3,h4{margin:0 0 .55em;line-height:1.06;letter-spacing:-.035em;font-weight:900}
 h1{font-size:clamp(2.7rem,7vw,5.4rem);text-transform:uppercase}
+/* Keyword H1s stay readable. The old tagline keeps the display size. */
+h1.page-title{font-size:clamp(1.15rem,2.2vw,1.55rem);text-transform:none;letter-spacing:-.015em;line-height:1.3;font-weight:800;margin:0 0 .8em;max-width:36ch}
+.display{font-size:clamp(2.7rem,7vw,5.4rem);text-transform:uppercase;font-weight:900;line-height:1.06;letter-spacing:-.035em;margin:0 0 .55em}
 h2{font-size:clamp(1.9rem,3.8vw,3rem);text-transform:uppercase}
 h3{font-size:1.24rem;letter-spacing:-.02em;font-weight:800}
 p{margin:0 0 1.15em}
@@ -90,7 +93,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(6,6,15,.8);
 .trust{margin-top:clamp(56px,8vw,94px);border-top:1px solid var(--line);
   border-bottom:1px solid var(--line);background:var(--bg2)}
 .trust ul{display:grid;grid-template-columns:repeat(4,1fr);list-style:none;margin:0;padding:0}
-.trust li{padding:26px 24px;border-right:1px solid var(--line)}
+.trust li{padding:26px 24px;border-right:1px solid var(--line);min-width:0}
 .trust li:last-child{border-right:0}
 .trust b{display:block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
   color:var(--cyan);margin-bottom:6px;font-weight:800}
@@ -228,6 +231,8 @@ footer .tagline{color:var(--mute);font-size:.94rem;max-width:34ch;margin-top:18p
   .trust ul{grid-template-columns:1fr 1fr}
   .trust li:nth-child(2){border-right:0}
   .trust li:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .trust .sep{display:none}
+  .trust .num{display:block}
   .gal{grid-template-columns:repeat(2,1fr)}
   .gal a:nth-child(1),.gal a:nth-child(6){grid-row:span 1}
   .gal a:nth-child(1) img,.gal a:nth-child(6) img{aspect-ratio:1}
@@ -321,7 +326,8 @@ body.lb-open{overflow:hidden}
 }
 @media(max-width:360px){
   /* "compromise." is one long word — shrink so it can't push the page sideways */
-  h1{font-size:clamp(1.95rem,9vw,2.7rem)}
+  h1,.display{font-size:clamp(1.95rem,9vw,2.7rem)}
+  h1.page-title{font-size:clamp(1.05rem,4.8vw,1.35rem)}
   h2{font-size:clamp(1.55rem,7.5vw,2.2rem)}
   .wrap{padding:0 18px}
 }
