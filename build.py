@@ -881,12 +881,12 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
       <p class="note">Select any photo to enlarge.</p>
     </div>
     <div class="headcover-gallery">
-      <figure><a class="lightbox" href="{FULL('hc_riverdale')}" data-caption="{html.escape(ALT['hc_riverdale'])}" aria-label="Enlarge: Riverdale headcover">{pic('hc_riverdale',1200,1200)}</a><figcaption>Riverdale headcover</figcaption></figure>
-      <figure><a class="lightbox" href="{FULL('hc_india_front')}" data-caption="{html.escape(ALT['hc_india_front'])}" aria-label="Enlarge: Blue jersey — front">{pic('hc_india_front',1200,1200)}</a><figcaption>Blue jersey — front</figcaption></figure>
-      <figure><a class="lightbox" href="{FULL('hc_griz_front')}" data-caption="{html.escape(ALT['hc_griz_front'])}" aria-label="Enlarge: Maroon & white matching pair">{pic('hc_griz_front',1200,1200)}</a><figcaption>Maroon & white matching pair</figcaption></figure>
-      <figure><a class="lightbox" href="{FULL('hc_india_side')}" data-caption="{html.escape(ALT['hc_india_side'])}" aria-label="Enlarge: Blue jersey — stripe detail">{pic('hc_india_side',1200,1200)}</a><figcaption>Blue jersey — stripe detail</figcaption></figure>
-      <figure><a class="lightbox" href="{FULL('hc_griz_detail')}" data-caption="{html.escape(ALT['hc_griz_detail'])}" aria-label="Enlarge: Matching pair — top detail">{pic('hc_griz_detail',1200,1200)}</a><figcaption>Matching pair — top detail</figcaption></figure>
-      <figure><a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}" aria-label="Enlarge: Denim pocket detail">{pic('headcover_hero',1200,1200)}</a><figcaption>Denim pocket detail</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('hc_riverdale')}" data-caption="{html.escape(ALT['hc_riverdale'])}" aria-label="Enlarge: Riverdale headcover">{pic('hc_riverdale',1200,1200)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_india_front')}" data-caption="{html.escape(ALT['hc_india_front'])}" aria-label="Enlarge: Blue jersey — front">{pic('hc_india_front',1200,1200)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_griz_front')}" data-caption="{html.escape(ALT['hc_griz_front'])}" aria-label="Enlarge: Maroon & white matching pair">{pic('hc_griz_front',1200,1200)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_india_side')}" data-caption="{html.escape(ALT['hc_india_side'])}" aria-label="Enlarge: Blue jersey — stripe detail">{pic('hc_india_side',1200,1200)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_griz_detail')}" data-caption="{html.escape(ALT['hc_griz_detail'])}" aria-label="Enlarge: Matching pair — top detail">{pic('hc_griz_detail',1200,1200)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}" aria-label="Enlarge: Denim pocket detail">{pic('headcover_hero',1200,1200)}</a></figure>
     </div>
   </div>
 </section>
