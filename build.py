@@ -873,6 +873,24 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
    "Driver, fairway and hybrid headcovers handmade in Denver from thrifted and second-hand materials. Built one at a time, quoted before we start, and designed to make your bag look like yours. US shipping available.",
    "headcover_hero", plain_image=True)
  + f"""
+<section class="pad tinted" id="headcover-gallery" aria-labelledby="headcover-gallery-title">
+  <div class="wrap">
+    <div class="head"><p class="eyebrow">From the bench</p>
+      <h2 id="headcover-gallery-title">Recent custom <span class="grad">headcovers.</span></h2>
+      <p class="lede">Jersey details, course embroidery and repurposed denim. Explore the finished pieces and the details that make each one different.</p>
+      <p class="note">Select any photo to enlarge.</p>
+    </div>
+    <div class="headcover-gallery">
+      <figure><a class="lightbox" href="{FULL('hc_riverdale')}" data-caption="{html.escape(ALT['hc_riverdale'])}" aria-label="Enlarge: Riverdale headcover">{pic('hc_riverdale',1200,1200)}</a><figcaption>Riverdale headcover</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('hc_india_front')}" data-caption="{html.escape(ALT['hc_india_front'])}" aria-label="Enlarge: Blue jersey — front">{pic('hc_india_front',1200,1200)}</a><figcaption>Blue jersey — front</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('hc_griz_front')}" data-caption="{html.escape(ALT['hc_griz_front'])}" aria-label="Enlarge: Maroon & white matching pair">{pic('hc_griz_front',1200,1200)}</a><figcaption>Maroon & white matching pair</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('hc_india_side')}" data-caption="{html.escape(ALT['hc_india_side'])}" aria-label="Enlarge: Blue jersey — stripe detail">{pic('hc_india_side',1200,1200)}</a><figcaption>Blue jersey — stripe detail</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('hc_griz_detail')}" data-caption="{html.escape(ALT['hc_griz_detail'])}" aria-label="Enlarge: Matching pair — top detail">{pic('hc_griz_detail',1200,1200)}</a><figcaption>Matching pair — top detail</figcaption></figure>
+      <figure><a class="lightbox" href="{FULL('headcover_hero')}" data-caption="{html.escape(ALT['headcover_hero'])}" aria-label="Enlarge: Denim pocket detail">{pic('headcover_hero',1200,1200)}</a><figcaption>Denim pocket detail</figcaption></figure>
+    </div>
+  </div>
+</section>
+
 <section class="pad">
   <div class="wrap split">
     <div>

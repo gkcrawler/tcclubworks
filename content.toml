@@ -219,3 +219,23 @@ alt = "TaylorMade M2 driver head and detached shaft adapter against a softly blu
 [photos.pxg_service]
 file = "/assets/img/pxg-restoration.jpg"
 alt = "PXG 54 and 58 degree wedge faces before and after restoration"
+
+[photos.hc_riverdale]
+file = "/assets/img/headcover-riverdale.jpg"
+alt = "Charcoal and gray custom headcover with Riverdale embroidery and a Nike swoosh"
+
+[photos.hc_india_front]
+file = "/assets/img/headcover-india-front.jpg"
+alt = "Blue jersey headcover with white lettering and orange India lettering, front view"
+
+[photos.hc_griz_front]
+file = "/assets/img/headcover-griz-front.jpg"
+alt = "Maroon and white jersey headcovers with stitched lettering and number 23, front view"
+
+[photos.hc_india_side]
+file = "/assets/img/headcover-india-side.jpg"
+alt = "Blue jersey headcover showing the orange, white and green striped side panel"
+
+[photos.hc_griz_detail]
+file = "/assets/img/headcover-griz-detail.jpg"
+alt = "Maroon and white number 23 headcovers showing original jersey labels on the tops"

@@ -346,3 +346,13 @@ h1,h2,h3{overflow-wrap:break-word}
   .split>div{grid-row:1}
   .split>picture,.split>figure,.split>a.lightbox{grid-row:2}
 }
+
+/* Finished headcover examples: consistent square images and visible captions. */
+.headcover-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.headcover-gallery figure{margin:0;min-width:0}
+.headcover-gallery a{display:block;border-radius:16px;overflow:hidden;border:1px solid var(--line2);cursor:zoom-in;transition:border-color .2s}
+.headcover-gallery a:hover{border-color:var(--cyan)}
+.headcover-gallery img{width:100%;aspect-ratio:1;object-fit:contain;background:var(--panel)}
+.headcover-gallery figcaption{margin-top:12px;font-size:.92rem;font-weight:700;color:var(--ink)}
+@media(max-width:980px){.headcover-gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
+@media(max-width:520px){.headcover-gallery{grid-template-columns:1fr}}
