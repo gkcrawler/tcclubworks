@@ -765,7 +765,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
    "bench")
  + f"""
 <section class="pad" id="reshafting-regripping">
-  <div class="wrap split">
+  <div class="wrap split service-row">
     <div>
       <p class="eyebrow">01 — Most requested</p>
       <h2>Reshafting &amp;<br><span class="grad">regripping.</span></h2>
@@ -778,12 +778,12 @@ PAGES.append(dict(path="/golf-club-repair-denver",
       </ul>
       <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="/contact">Book a regrip</a></p>
     </div>
-    {pic('w4',1200,1200)}
+    {pic('m2_service',1200,1200)}
   </div>
 </section>
 
 <section class="pad tinted" id="custom-clubmaking">
-  <div class="wrap split">
+  <div class="wrap split service-row">
     {pic('ball',1200,1200)}
     <div>
       <p class="eyebrow">02 — Full build</p>
@@ -801,7 +801,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
 </section>
 
 <section class="pad" id="loft-and-lie">
-  <div class="wrap split">
+  <div class="wrap split service-row">
     <div>
       <p class="eyebrow">03 — Quick win</p>
       <h2>Loft &amp; lie<br><span class="grad">adjustments.</span></h2>
@@ -820,8 +820,8 @@ PAGES.append(dict(path="/golf-club-repair-denver",
 </section>
 
 <section class="pad tinted" id="repairs-restorations">
-  <div class="wrap split">
-    {pic('w1',1200,1200)}
+  <div class="wrap split service-row">
+    {pic('pxg_service',1200,1200)}
     <div>
       <p class="eyebrow">04 — Bring it back</p>
       <h2>Repairs &amp;<br><span class="grad">restorations.</span></h2>

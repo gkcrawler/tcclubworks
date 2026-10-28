@@ -211,3 +211,11 @@ alt  = "Custom blue driver headcover made from repurposed athletic fabric with w
 #  Which photos appear in the home page gallery, and in what order.
 [gallery]
 order = ["w1", "w4", "ball", "w5", "w6", "shop", "hero"]
+
+[photos.m2_service]
+file = "/assets/img/m2-reshafting.jpg"
+alt = "TaylorMade M2 driver head and detached shaft adapter against a softly blurred black background"
+
+[photos.pxg_service]
+file = "/assets/img/pxg-restoration.jpg"
+alt = "PXG 54 and 58 degree wedge faces before and after restoration"
