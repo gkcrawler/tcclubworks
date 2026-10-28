@@ -68,7 +68,7 @@ def pic(key, w, h, loading="lazy", priority=False):
 
 
 def img(key, w, h, loading="lazy", priority=False):
-    """Same optimized picture as pic(). display:contents keeps the old layout."""
+    """Same optimized, self-contained picture box as pic()."""
     return pic(key, w, h, loading, priority)
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
        ("/custom-golf-headcovers-denver","Headcovers"),
