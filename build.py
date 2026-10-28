@@ -623,7 +623,7 @@ TESTIMONIALS = "".join(
 GALLERY_KEYS = [k for k in C.get("gallery", {}).get("order", []) if k in I]
 
 def ensure_image_variants():
-    """Refresh ~800px AVIF/WebP/JPEG siblings when a source photo is newer.
+    """Create missing ~800px AVIF/WebP/JPEG siblings.
 
     The committed variants are what Netlify publishes. ffmpeg runs only for a
     photo that has no variant yet, so a normal deploy does not need ffmpeg.
@@ -637,7 +637,7 @@ def ensure_image_variants():
         stale = False
         for ext in (".avif", ".webp", ".jpg"):
             variant = stem + "-800" + ext
-            if not os.path.isfile(variant) or os.path.getmtime(variant) < os.path.getmtime(disk):
+            if not os.path.isfile(variant):
                 stale = True
                 break
         if stale:
