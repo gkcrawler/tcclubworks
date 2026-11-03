@@ -335,6 +335,9 @@
   function exportPdf(){
     if(els.exportPdf.disabled) return;
     var html = quoteHtml();
+    // macOS can read the parent title when its separate PDF save sheet opens.
+    // Set it before loading the print frame and keep it after afterprint fires.
+    document.title = new DOMParser().parseFromString(html, "text/html").title;
     var oldFrame = $("quotePrintFrame");
     if(oldFrame) oldFrame.remove();
     var frame = document.createElement("iframe");
@@ -357,18 +360,10 @@
       window.clearTimeout(timeout);
       try{
         if(doc.fonts) await doc.fonts.ready;
-        // Some browsers use the parent page title for the Save as PDF filename.
-        var originalTitle = document.title;
-        document.title = doc.title;
-        var restoreTitle = function(){ document.title = originalTitle; };
-        frame.contentWindow.addEventListener("afterprint", restoreTitle, {once:true});
-        try{
-          frame.contentWindow.focus();
-          frame.contentWindow.print();
-        }catch(err){
-          restoreTitle();
-          throw err;
-        }
+        // Let the browser publish the updated title before invoking native print UI.
+        await new Promise(function(resolve){ window.setTimeout(resolve, 250); });
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
         showStatus("Quote ready. Choose Save as PDF in the print dialog.");
       }catch(err){
         showStatus("Could not open the print dialog. Please try Export PDF again.");
