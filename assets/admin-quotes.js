@@ -322,7 +322,7 @@
     var action = (link || q.paymentLink) ? '<section class="box"><h2>Approval and payment</h2>' +
       (link ? '<p>Approve this quote: ' + escapeHtml(link) + '</p>' : "") +
       (q.paymentLink ? '<p>Deposit/payment link: ' + escapeHtml(q.paymentLink) + '</p>' : "") + '</section>' : "";
-    return '<!doctype html><html><head><meta charset="utf-8"><title>' + escapeHtml(q.quoteNumber) +
+    return '<!doctype html><html><head><meta charset="utf-8"><title>' + escapeHtml([q.customerName.trim(), q.quoteNumber.trim() || "Chronic Clubworks Quote"].filter(Boolean).join(" - ").replace(/[\\/:*?"<>|\x00-\x1f]/g, "-").replace(/\s+/g, " ").trim()) +
       '</title><style>body{font:14px/1.45 Arial,sans-serif;color:#15151f;margin:36px}.top{display:flex;justify-content:space-between;gap:30px;align-items:flex-start;border-bottom:3px solid #15151f;padding-bottom:20px;margin-bottom:28px}img{width:180px;height:auto}.meta{text-align:right}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:#555;font-weight:bold}h1{font-size:34px;margin:8px 0 0;text-transform:uppercase}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:28px}.box{border:1px solid #d8d8e5;border-radius:10px;padding:16px;margin-top:16px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:0 0 10px;color:#555}p{margin:0 0 6px}table{width:100%;border-collapse:collapse;margin:20px 0}th{text-align:left;background:#111124;color:white;padding:10px}td{border-bottom:1px solid #ddd;padding:10px;vertical-align:top}td:nth-child(n+2),th:nth-child(n+2){text-align:right}.totals{margin-left:auto;width:320px}.totals p{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:7px 0}.totals .grand{font-size:18px;font-weight:bold;border-bottom:2px solid #15151f}.notes{margin-top:26px;display:grid;gap:14px}.footer{margin-top:38px;color:#666;font-size:12px}@media print{body{margin:28px}}</style></head><body>' +
       '<section class="top"><div><img src="' + location.origin + '/assets/logo-v2.svg" alt="Chronic Clubworks"><p>Denver, CO<br>(720) 854-4132<br>info@tcclubworks.io<br>tcclubworks.io</p></div><div class="meta"><p class="eyebrow">Estimate / Quote</p><h1>' + escapeHtml(q.quoteNumber) + '</h1><p>Status: ' + escapeHtml(q.status) + '<br>Date: ' + escapeHtml(q.quoteDate) + '<br>Valid until: ' + escapeHtml(q.validUntil) + '</p></div></section>' +
       '<section class="grid"><div class="box"><h2>Prepared for</h2><p><b>' + escapeHtml(q.customerName) + '</b></p><p>' + escapeHtml(q.customerEmail) + '</p><p>' + escapeHtml(q.customerPhone) + '</p></div><div class="box"><h2>Request</h2><p><b>' + escapeHtml(q.customerService) + '</b></p><p>' + escapeHtml(q.customerMessage).replace(/\r?\n/g,"<br>") + '</p></div></section>' +
@@ -357,8 +357,18 @@
       window.clearTimeout(timeout);
       try{
         if(doc.fonts) await doc.fonts.ready;
-        frame.contentWindow.focus();
-        frame.contentWindow.print();
+        // Some browsers use the parent page title for the Save as PDF filename.
+        var originalTitle = document.title;
+        document.title = doc.title;
+        var restoreTitle = function(){ document.title = originalTitle; };
+        frame.contentWindow.addEventListener("afterprint", restoreTitle, {once:true});
+        try{
+          frame.contentWindow.focus();
+          frame.contentWindow.print();
+        }catch(err){
+          restoreTitle();
+          throw err;
+        }
         showStatus("Quote ready. Choose Save as PDF in the print dialog.");
       }catch(err){
         showStatus("Could not open the print dialog. Please try Export PDF again.");
