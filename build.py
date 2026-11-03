@@ -533,7 +533,10 @@ def admin_quotes_page():
   <input name="total">
   <textarea name="quotePayload"></textarea>
 </form>
-<script src="/assets/admin-quotes.js?v=20261103c"></script>
+<script src="/assets/vendor/pdf-lib.min.js?v=1.17.1"></script>
+<script src="/assets/vendor/fontkit.min.js?v=1.1.1"></script>
+<script src="/assets/quote-pdf.js?v=20261103a"></script>
+<script src="/assets/admin-quotes.js?v=20261103d"></script>
 </body>
 </html>"""
 
