@@ -115,8 +115,8 @@
     }
     newPage();
     // Original left logo/contact block and right-aligned quote metadata.
-    // Use the full-resolution artwork at 2.5 inches wide on the printed page.
-    var logoWidth=180;
+    // Convert the printed width from millimeters to PDF points.
+    var logoWidth=61.5*72/25.4;
     var logoHeight=logoWidth*logo.height/logo.width;
     page.drawImage(logo,{x:margin,y:792-top-logoHeight,width:logoWidth,height:logoHeight});
     heading('Estimate / Quote',right,top,8.25,true);
