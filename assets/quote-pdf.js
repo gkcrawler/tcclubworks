@@ -15,7 +15,7 @@
     if(!assets) assets = Promise.all([
       bytes('/assets/fonts/LiberationSans-Regular.ttf'),
       bytes('/assets/fonts/LiberationSans-Bold.ttf'),
-      bytes('/assets/quote-logo.png')
+      bytes('/assets/ccw-quote-helmet.png')
     ]).catch(function(err){ assets=null; throw err; });
     var resources = await assets;
     var pdf = await PDFLib.PDFDocument.create();
@@ -115,7 +115,10 @@
     }
     newPage();
     // Original left logo/contact block and right-aligned quote metadata.
-    page.drawImage(logo,{x:margin,y:792-top-135,width:135,height:135});
+    // Use the full-resolution artwork at 2.5 inches wide on the printed page.
+    var logoWidth=180;
+    var logoHeight=logoWidth*logo.height/logo.width;
+    page.drawImage(logo,{x:margin,y:792-top-logoHeight,width:logoWidth,height:logoHeight});
     heading('Estimate / Quote',right,top,8.25,true);
     var number=clean(q.quoteNumber || 'Chronic Clubworks Quote');
     var numberSize=Math.min(25.5,320/bold.widthOfTextAtSize(number,1));
@@ -126,8 +129,9 @@
     ['Status: '+(q.status||'Draft'),'Date: '+(q.quoteDate||''),'Valid until: '+(q.validUntil||'')].forEach(function(s){
       wrap(s,320,10.5).forEach(function(line){rightText(line,right,metaY,10.5);metaY+=lineHeight;});
     });
-    ['Denver, CO','(720) 854-4132','info@tcclubworks.io','tcclubworks.io'].forEach(function(s,i){text(s,margin,top+140+i*lineHeight,10.5);});
-    y=Math.max(top+218.5,metaY+18);rule(y,margin,right,2.25,ink);y+=34.5;
+    var contactTop=top+logoHeight+8;
+    ['Denver, CO','(720) 854-4132','info@tcclubworks.io','tcclubworks.io'].forEach(function(s,i){text(s,margin,contactTop+i*lineHeight,10.5);});
+    y=Math.max(contactTop+4*lineHeight+17.5,metaY+18);rule(y,margin,right,2.25,ink);y+=34.5;
     var cardWidth=(width-21)/2;
     var customer=linesFor([{value:q.customerName,bold:true},{value:q.customerEmail},{value:q.customerPhone}],cardWidth-25.5);
     var request=linesFor([{value:q.customerService,bold:true},{value:q.customerMessage}],cardWidth-25.5);

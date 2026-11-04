@@ -15,7 +15,7 @@
     var rows = (q.items||[]).map(function(item){
       return "<tr><td>"+esc(item.desc)+"</td><td>"+item.qty+"</td><td>"+money.format(item.unit)+"</td><td>"+money.format(item.total)+"</td></tr>";
     }).join("");
-    app.innerHTML = '<section class="top"><img src="/assets/logo-v2.svg" alt="Chronic Clubworks"><div><p class="eyebrow">Estimate / Quote</p><h1>'+esc(q.quoteNumber)+'</h1><p>Status: '+esc(q.status)+'<br>Valid until: '+esc(q.validUntil)+'</p></div></section>' +
+    app.innerHTML = '<section class="top"><img src="/assets/ccw-quote-helmet.webp" alt="Chronic Clubworks"><div><p class="eyebrow">Estimate / Quote</p><h1>'+esc(q.quoteNumber)+'</h1><p>Status: '+esc(q.status)+'<br>Valid until: '+esc(q.validUntil)+'</p></div></section>' +
       '<section class="panel"><h2>Prepared for</h2><p><b>'+esc(q.customerName)+'</b><br>'+esc(q.customerEmail)+'<br>'+esc(q.customerPhone)+'</p><p>'+esc(q.customerService)+'</p></section>' +
       '<section class="panel"><h2>Line items</h2><table><thead><tr><th>Description</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead><tbody>'+rows+'</tbody></table><div class="totals"><p><span>Subtotal</span><b>'+money.format(q.subtotal)+'</b></p><p><span>Tax</span><b>'+money.format(q.tax)+'</b></p><p class="grand"><span>Total</span><b>'+money.format(q.total)+'</b></p><p><span>Balance</span><b>'+money.format(q.balance)+'</b></p></div></section>' +
       '<section class="panel"><h2>Notes and terms</h2><p>'+esc(q.notes).replace(/\\n/g,"<br>")+'</p><p>'+esc(q.terms).replace(/\\n/g,"<br>")+'</p></section>' +

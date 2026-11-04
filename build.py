@@ -405,7 +405,7 @@ def admin_quotes_page():
 <main class="admin-shell">
   <section class="admin-hero">
     <div>
-      <img src="/assets/logo-v2.svg" alt="{BRAND}" width="320" height="154">
+      <img src="/assets/ccw-quote-helmet.webp" alt="{BRAND}" width="720" height="699">
       <p class="eyebrow">Admin quotes</p>
       <h1>Estimate builder</h1>
       <p>Create customer quotes from Netlify form submissions, save quote history, email approval links, and export a clean PDF.</p>

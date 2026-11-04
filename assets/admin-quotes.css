@@ -9,7 +9,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--f)}
 button,input,textarea{font:inherit}
 .admin-shell{max-width:1400px;margin:0 auto;padding:32px}
 .admin-hero{display:grid;grid-template-columns:1fr minmax(320px,420px);gap:28px;align-items:end;margin-bottom:28px}
-.admin-hero img{width:190px;height:auto;margin-bottom:24px}
+.admin-hero img{width:min(230px,100%);height:auto;margin-bottom:24px}
 .eyebrow{font-size:.72rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin:0 0 10px}
 h1,h2,h3{margin:0;color:var(--ink);line-height:1.05;letter-spacing:-.03em}
 h1{font-size:clamp(2.5rem,6vw,5.2rem);text-transform:uppercase}

@@ -3,7 +3,7 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--f)}
 main{max-width:980px;margin:0 auto;padding:34px 22px}
 .top{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:24px}
-.top img{width:170px;height:auto}
+.top img{width:min(230px,100%);height:auto;object-fit:contain}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:18px}
 .eyebrow{font-size:.72rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
 h1,h2{margin:0 0 12px;line-height:1.08;text-transform:uppercase}
