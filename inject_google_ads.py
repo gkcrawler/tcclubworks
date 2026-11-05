@@ -26,7 +26,7 @@ def should_skip(path: Path) -> bool:
 
 def inject(path: Path) -> bool:
     html = path.read_text(encoding="utf-8")
-    if should_skip(path):
+    if should_skip(path) or '<meta name="ccw-tracking" content="off">' in html:
         return False
     marker = "</head>"
     if marker not in html:

@@ -219,3 +219,60 @@ Columns:
 
 Use `quote_price` for the price that should land on a customer quote. Leave it
 as `0` when you want to add the item but fill the price manually.
+
+## CCW storefront
+
+The `/shop` page and `/shop-policies`, `/shop-privacy`, `/shop-terms` are generated
+by `storefront.py`, called by the existing build. `shop.toml` contains the reviewed
+draft catalog and launch settings. `mode = "live"` connects the verified Shopify
+store. Use `mode = "preview"` for isolated design review. Preview pages are marked noindex and do
+not load Google Ads or Shopify; their bag cannot submit an order.
+
+The live integration uses Shopify's official Storefront Web Components. Shopify
+owns products, photos, prices, variants, inventory, carts, checkout, orders,
+notifications, refunds and fulfillment. The browser never receives an Admin API
+token or payment secret. The draft catalog is not used for live pricing or stock.
+
+To connect the approved Shopify store:
+
+1. Use the verified CCW store `tdb7xz-4w.myshopify.com`. The connector still
+   returns the unrelated `pz811j-cb` store; use the verified browser admin until
+   that connection is corrected. Never apply CCW changes to the other store.
+2. Shopify Payments and the external payout destination are verified. Complete
+   USD and US-only delivery. The approved one-item launch is $110 with free
+   standard shipping, superseding $100 plus $10 shipping. Orders dispatch the
+   same or next business day; expected arrival is 3–5 business days after ordering,
+   including processing and transit. Verify state/local tax registrations and checkout calculations.
+   Keep pickup disabled until the owner supplies and approves a pickup location. The subscription
+   and tax collection settings do not themselves register or remit taxes.
+3. Create product types `Headcovers` and `Apparel` (these power category filters).
+   Add the real catalog to the manual collection with handle `ccw-storefront`.
+   Publish the approved products and collection to the relevant storefront channel.
+4. For each one-off cover, track inventory, quantity 1, and turn OFF continuing
+   sales when out of stock. Apparel needs stock for each actual size/color variant.
+   Do not import the draft as multiple independent inventory records.
+5. Review exact product photographs/materials/rights, fulfillment time, tax setup,
+   and all policy text. Put the matching policies in Shopify checkout as well.
+6. Test actual hosted checkout with Shopify test mode: success, decline, concurrent
+   last-item purchases, tax/delivery choices, notification delivery, cancellation,
+   refund and restock. Never treat an added bag item or success URL as payment.
+7. Record the checked launch fields in `shop.toml`, supply the verified domain and
+   dispatch and delivery times, then set `mode = "live"`. Build validation rejects missing items.
+   This guard records the review; it does not independently certify compliance.
+   Successful simulated payment, cancellation, refund request and restock are
+   verified separately from settlement. The simulated refund for #1001 still
+   shows pending; no real bank deposit or real-card refund has been tested.
+8. Run the build, tests and real-domain browser checks before deployment. Keep
+   the existing Netlify hosting and `tcclubworks.io` domain. Do not repoint the
+   main domain to Shopify as part of account signup.
+
+Validation: `python3 -m unittest discover -s tests -p 'test_storefront.py' -v`
+and `node --test tests/*.test.js`. Python 3.11+ includes TOML support; older local
+Python installations need `tomli` (prefer an isolated virtual environment).
+
+The Shopify script is the official hosted module at
+`https://cdn.shopify.com/storefront/web-components.js`; Shopify can update it.
+Retest catalog, variants and cart after Shopify changes. The catalog paginates in
+groups of 50, with category filtering on the displayed page; revisit filtering
+before the shop grows beyond that size. No customer accounts, subscriptions or
+international checkout are part of this initial launch.

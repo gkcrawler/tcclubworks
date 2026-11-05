@@ -1,0 +1,46 @@
+# CCW storefront. Draft catalog is for review; Shopify owns the live catalog.
+# Never put private Shopify or payment credentials in this file.
+[store]
+mode = "live"
+domain = "tdb7xz-4w.myshopify.com"
+collection = "ccw-storefront"
+country = "US"
+currency = "USD"
+shipping_flat_usd = 0
+pickup = false
+dispatch_time = "Orders ship the same or next business day."
+delivery_time = "Expected U.S. delivery is 3–5 business days after ordering."
+return_days = 14
+seller = "Chronic Clubworks"
+city = "Denver"
+region = "CO"
+
+# Set only after checking the actual account, products and test orders.
+[launch]
+payments_verified = true
+inventory_verified = true
+shipping_pickup_verified = true
+tax_registrations_verified = true
+product_listing_approved = true
+policies_approved = true
+test_order_verified = true
+refund_request_and_restock_verified = true
+# Shopify accepted the simulated refund and restored stock. Settlement is still pending.
+# This is a test transaction; no real refund or bank payout has been verified.
+simulated_refund_status = "pending"
+
+[[products]]
+handle = "india-cricket-custom-headcover"
+title = "India Cricket Custom Headcover"
+category = "Headcovers"
+fit = "Driver"
+price_usd = 110
+quantity = 1
+material = "Repurposed donor jersey"
+description = "A custom driver headcover made from a blue India cricket donor jersey. One available."
+image = "/assets/store/india-cricket-driver.jpg"
+image_alt = "Blue India cricket driver headcover with orange lettering, shown on a workshop bench"
+image_confirmed_accurate = true
+# Owner approved this listing and supplied photo. Approval is not legal clearance.
+# Fiber composition and third-party rights remain unverified; make no such claims.
+merchant_approved = true
