@@ -81,7 +81,8 @@ def live_catalog(store):
     return f'''<shopify-store store-domain="https://{esc(store['domain'])}" country="US" language="en"></shopify-store>
 <shopify-context type="collection" handle="{esc(store['collection'])}" id="shop-collection">
   <template>
-    <shopify-list-context type="product" query="collection.products" first="50" id="shop-products" class="shop-grid">
+    <div class="shop-grid">
+    <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
       <template>
         <article class="shop-card">
           <button class="shop-image-button" data-live-product aria-label="View product details">
@@ -95,6 +96,7 @@ def live_catalog(store):
         </article>
       </template>
     </shopify-list-context>
+    </div>
     <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
   </template>
   <p shopify-loading-placeholder>Loading the collection…</p>
