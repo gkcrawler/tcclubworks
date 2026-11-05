@@ -107,7 +107,13 @@ def live_catalog(store):
   <button class="shop-close" data-close="product-dialog" aria-label="Close product details">×</button>
   <shopify-context type="product" id="shop-product-detail" wait-for-update>
     <template><div class="shop-detail-grid">
-      <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="640" height="640"></shopify-media>
+      <div class="shop-product-media" aria-label="Product photos and video">
+        <shopify-list-context type="media" query="product.media" first="20">
+          <template><figure class="shop-media-item">
+            <shopify-media query="media" width="640" height="640" video-autoplay="false" video-loop="false" video-controls="true"></shopify-media>
+          </figure></template>
+        </shopify-list-context>
+      </div>
       <div class="shop-detail-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
         <h2><shopify-data query="product.title"></shopify-data></h2>
         <p class="shop-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <small>USD</small></p>

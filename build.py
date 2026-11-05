@@ -1249,6 +1249,7 @@ if SHOP['store']['mode'] == 'live':
     shop_origin = 'https://' + SHOP['store']['domain']
     CSP = CSP.replace("script-src 'self'", "script-src https://cdn.shopify.com 'self'")
     CSP = CSP.replace("img-src 'self'", "img-src https://cdn.shopify.com 'self'")
+    CSP += f"; media-src 'self' https://cdn.shopify.com {shop_origin}"
     CSP = CSP.replace("connect-src 'self'", f"connect-src {shop_origin} https://cdn.shopify.com 'self'")
 
 w("_headers", f"""/*

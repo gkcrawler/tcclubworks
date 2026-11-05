@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://tcclubworks.io/assets/og-image.jpg?v=5a9145ccd1">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/style.css?v=840825e7bb">
-<link rel="stylesheet" href="assets/storefront.css?v=2bf659ac81"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<link rel="stylesheet" href="assets/storefront.css?v=39ec225158"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 
 <meta name="ccw-tracking" content="off">
 </head>
@@ -47,7 +47,7 @@
       <a class="shop-text-button" href="/custom-golf-headcovers-denver">Want something custom? ↗</a></div>
     <div class="shop-hero-foot"><span>DENVER, COLORADO</span><span>BUILT WITH CHARACTER.</span></div>
   </div>
-  <figure class="shop-hero-image"><img src="assets/store/india-cricket-driver.jpg?v=27dc21723b" alt="Blue India cricket driver headcover with orange lettering, shown on a workshop bench" width="1254" height="1254" fetchpriority="high"><figcaption><span>From the CCW bench</span><span>01 / THE DETAILS MATTER</span></figcaption></figure>
+  <figure class="shop-hero-image"><img src="assets/store/india-cricket-driver-actual.jpg?v=3d9afde61b" alt="Actual blue India cricket driver headcover with a tricolor panel, on a club in a golf bag outdoors" width="1254" height="1254" fetchpriority="high"><figcaption><span>From the CCW bench</span><span>01 / THE DETAILS MATTER</span></figcaption></figure>
 </section>
 <div class="shop-strip"><div class="wrap"><span>Free U.S. shipping</span><span>Expected U.S. delivery is 3–5 business days after ordering.</span><span>14-day returns · unused items</span></div></div>
 <section class="shop-collection wrap" id="collection" aria-labelledby="collection-title">
@@ -85,7 +85,13 @@
   <button class="shop-close" data-close="product-dialog" aria-label="Close product details">×</button>
   <shopify-context type="product" id="shop-product-detail" wait-for-update>
     <template><div class="shop-detail-grid">
-      <shopify-media query="product.selectedOrFirstAvailableVariant.image" width="640" height="640"></shopify-media>
+      <div class="shop-product-media" aria-label="Product photos and video">
+        <shopify-list-context type="media" query="product.media" first="20">
+          <template><figure class="shop-media-item">
+            <shopify-media query="media" width="640" height="640" video-autoplay="false" video-loop="false" video-controls="true"></shopify-media>
+          </figure></template>
+        </shopify-list-context>
+      </div>
       <div class="shop-detail-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
         <h2><shopify-data query="product.title"></shopify-data></h2>
         <p class="shop-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <small>USD</small></p>
@@ -106,7 +112,7 @@
 <section class="shop-custom"><div class="wrap"><div><p class="eyebrow">Something only you could carry</p><h2>Your story.<br>Your headcover.</h2></div><div><p>A favorite jersey. A thrift-store find. Something with a little history. Let's turn it into your next headcover.</p><a class="shop-primary" href="/contact">Talk through an idea ↗</a></div></div></section>
 <div class="shop-service-links wrap"><a href="/shop-policies">Shipping &amp; returns ↗</a><a href="/shop-privacy">Privacy ↗</a><a href="/shop-terms">Terms ↗</a><a href="mailto:info@tcclubworks.io">Need a hand? Email CCW ↗</a></div>
 <script type="application/json" id="shop-data">{"mode": "live", "shipping": 0, "delivery": "Expected U.S. delivery is 3\u20135 business days after ordering.", "products": []}</script>
-<script defer src="assets/storefront.js?v=afe3669a0c"></script>
+<script defer src="assets/storefront.js?v=a8178ba4d2"></script>
 </div></main><footer>
   <div class="wrap">
     <div class="fcols">

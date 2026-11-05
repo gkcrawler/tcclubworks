@@ -101,6 +101,10 @@
     const rect=dialog.getBoundingClientRect();
     if(event.clientX<rect.left || event.clientX>rect.right || event.clientY<rect.top || event.clientY>rect.bottom) dialog.close();
   }));
+  // Stop product video when the dialog closes, including Escape and add-to-bag.
+  $('product-dialog').addEventListener('close', () => {
+    $('product-dialog').querySelectorAll('video').forEach(video => video.pause());
+  });
   $('open-bag').addEventListener('click', () => {
     if(preview) {renderBag(); showDialog('preview-cart');}
     else if(typeof $('shop-cart')?.showModal === 'function') $('shop-cart').showModal();

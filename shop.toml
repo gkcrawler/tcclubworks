@@ -38,8 +38,8 @@ price_usd = 110
 quantity = 1
 material = "Repurposed donor jersey"
 description = "A custom driver headcover made from a blue India cricket donor jersey. One available."
-image = "/assets/store/india-cricket-driver.jpg"
-image_alt = "Blue India cricket driver headcover with orange lettering, shown on a workshop bench"
+image = "/assets/store/india-cricket-driver-actual.jpg"
+image_alt = "Actual blue India cricket driver headcover with a tricolor panel, on a club in a golf bag outdoors"
 image_confirmed_accurate = true
 # Owner approved this listing and supplied photo. Approval is not legal clearance.
 # Fiber composition and third-party rights remain unverified; make no such claims.
