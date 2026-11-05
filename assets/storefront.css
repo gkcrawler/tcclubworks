@@ -1,4 +1,5 @@
 /* Storefront: existing CCW palette, quieter product presentation. */
+.ccw-shop [hidden]{display:none!important}
 .ccw-shop{--shop-accent:#83e9dc;--shop-ink:#f4f3ef;--shop-muted:#b2b4c5;color:var(--shop-ink)}
 .shop-preview-bar{padding:9px 20px;text-align:center;background:#18252c;color:#c7f5eb;font-size:.78rem;letter-spacing:.035em}
 .shop-intro{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-top:56px;padding-bottom:64px;align-items:center}
@@ -63,7 +64,7 @@
 .shop-detail-copy{padding-top:30px}
 .shop-detail-copy h2{font-size:2rem;line-height:1.13;letter-spacing:-.04em;text-transform:none}
 .shop-detail-copy .shop-price{font-size:1.5rem;margin-bottom:22px}
-.shop-description{color:#c8cbd6;white-space:pre-line;font-size:.95rem}
+.shop-description{color:#c8cbd6;white-space:normal;font-size:.95rem}
 .shop-detail-copy dl{display:grid;grid-template-columns:80px 1fr;font-size:.86rem;border-block:1px solid #3b4254;padding:16px 0;gap:8px}
 .shop-detail-copy dt{color:#aab2c4}.shop-detail-copy dd{margin:0}
 .shop-detail-copy .shop-primary{width:100%;margin-top:14px}

@@ -83,7 +83,7 @@ def live_catalog(store):
   <template>
     <shopify-list-context type="product" query="collection.products" first="50" id="shop-products" class="shop-grid">
       <template>
-        <article class="shop-card" shopify-attr--data-category="product.productType">
+        <article class="shop-card">
           <button class="shop-image-button" data-live-product aria-label="View product details">
             <shopify-media query="product.featuredImage" width="600" height="600"></shopify-media>
           </button>
@@ -95,7 +95,7 @@ def live_catalog(store):
         </article>
       </template>
     </shopify-list-context>
-    <div class="shop-pagination"><button class="shop-text-button" data-page="previousPage">Previous products</button><button class="shop-text-button" data-page="nextPage">More products</button></div>
+    <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
   </template>
   <p shopify-loading-placeholder>Loading the collection…</p>
 </shopify-context>
@@ -109,9 +109,10 @@ def live_catalog(store):
       <div class="shop-detail-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
         <h2><shopify-data query="product.title"></shopify-data></h2>
         <p class="shop-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <small>USD</small></p>
-        <p class="shop-description"><shopify-data query="product.description"></shopify-data></p>
+        <div class="shop-description"><shopify-data query="product.descriptionHtml"></shopify-data></div>
         <shopify-variant-selector></shopify-variant-selector>
-        <button class="shop-primary shop-add" data-live-add shopify-attr--disabled="!product.selectedOrFirstAvailableVariant.availableForSale"><span class="available-label">Add to bag</span><span class="unavailable-label">Unavailable</span></button>
+        <span data-product-availability hidden><shopify-data query="product.selectedOrFirstAvailableVariant.availableForSale"></shopify-data></span>
+        <button class="shop-primary shop-add" data-live-add disabled><span class="available-label">Add to bag</span><span class="unavailable-label">Unavailable</span></button>
         <p class="shop-fine">Items are not reserved until checkout. Shipping and tax are shown before payment.</p>
         <a class="shop-policy-link" href="/shop-policies">Shipping &amp; returns</a>
       </div>

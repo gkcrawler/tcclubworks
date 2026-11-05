@@ -66,7 +66,7 @@
   function filterProducts() {
     const cards = [...document.querySelectorAll('.shop-card')];
     let visible = 0;
-    cards.forEach(card => {const show = currentFilter === 'all' || card.dataset.category?.toLowerCase() === currentFilter.toLowerCase(); card.hidden = !show; if(show) visible++;});
+    cards.forEach(card => {const show = currentFilter === 'all' || (preview ? card.dataset.category : card.querySelector('.shop-meta')?.textContent)?.trim().toLowerCase() === currentFilter.toLowerCase(); card.hidden = !show; if(show) visible++;});
     const empty = $('shop-empty');
     empty.hidden = visible > 0 || (!preview && !cards.length);
     if (!empty.hidden) {
@@ -110,7 +110,22 @@
   else {
     // Native Shopify cart owns quantity; do not display an inaccurate local count.
     $('bag-count').hidden=true;
+    const detail=$('shop-product-detail');
+    const syncAvailability=() => {
+      const button=detail.querySelector('[data-live-add]');
+      if(button) button.disabled=detail.querySelector('[data-product-availability]')?.textContent.trim() !== 'true';
+    };
+    new MutationObserver(syncAvailability).observe(detail,{childList:true,characterData:true,subtree:true});
     const catalog=$('shop-collection');
+    catalog.addEventListener('shopify-list-context-update', event => {
+      const {hasNextPage,hasPreviousPage}=event.detail;
+      const previous=catalog.querySelector('[data-page="previousPage"]');
+      const next=catalog.querySelector('[data-page="nextPage"]');
+      if(previous) previous.disabled=!hasPreviousPage;
+      if(next) next.disabled=!hasNextPage;
+      const pagination=catalog.querySelector('.shop-pagination');
+      if(pagination) pagination.hidden=!(hasNextPage || hasPreviousPage);
+    },true);
     const observer=new MutationObserver(() => {filterProducts(); if(document.querySelector('.shop-card')) $('shop-connection-status').textContent='';});
     observer.observe(catalog,{childList:true,subtree:true});
     window.setTimeout(() => {

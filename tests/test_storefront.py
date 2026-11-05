@@ -60,7 +60,9 @@ class StorefrontTests(unittest.TestCase):
         self.assertNotIn('id="preview-cart"', result['body'])
         self.assertIn('<shopify-cart', result['body'])
         self.assertIn('product.selectedOrFirstAvailableVariant.price', result['body'])
-        self.assertIn('!product.selectedOrFirstAvailableVariant.availableForSale', result['body'])
+        self.assertIn('query="product.selectedOrFirstAvailableVariant.availableForSale"', result['body'])
+        self.assertIn('data-live-add disabled', result['body'])
+        self.assertNotIn('shopify-attr--', result['body'])
         self.assertNotIn('$100.00', result['body'])
         self.assertIn('"products": []', result['body'])
 
