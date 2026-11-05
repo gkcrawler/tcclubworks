@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Chronic Clubworks — 4-page static site generator. Cyberpunk build."""
 import os, json, html, hashlib, re, datetime, shutil, subprocess
+from storefront import load_config as load_shop_config, page as shop_page, policy_pages as shop_policy_pages
 
 try:
     import tomllib
@@ -10,6 +11,7 @@ except ModuleNotFoundError:  # Python < 3.11 local fallback; Netlify uses runtim
 OUT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(OUT, "content.toml"), "rb") as _f:
     C = tomllib.load(_f)
+SHOP = load_shop_config()
 
 _c = C["contact"]
 D = "https://tcclubworks.io"
@@ -72,6 +74,7 @@ def img(key, w, h, loading="lazy", priority=False):
     return pic(key, w, h, loading, priority)
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
        ("/custom-golf-headcovers-denver","Headcovers"),
+       ("/shop","Shop"),
        ("/custom-golf-clubs-about","About"),("/contact","Contact")]
 
 
@@ -141,6 +144,15 @@ def head(p):
     preconnect = '<link rel="preconnect" href="https://assets.zyrosite.com" crossorigin>\n' if any(
         str(v).startswith("https://assets.zyrosite.com") for v in I.values()
     ) else ""
+    tracking = '''<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18288494011"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18288494011');
+</script>
+<script defer src="/assets/inquiry-conversion.js"></script>''' if p.get("tracking", True) else '<meta name="ccw-tracking" content="off">'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,16 +173,9 @@ def head(p):
 <meta property="og:image" content="{D}/assets/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 {preconnect}<link rel="stylesheet" href="/assets/style.css">
+{p.get('extra_head', '')}
 {ld}
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18288494011"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  gtag('config', 'AW-18288494011');
-</script>
-<script defer src="/assets/inquiry-conversion.js"></script>
+{tracking}
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -303,6 +308,7 @@ def footer():
         <li><a href="/custom-golf-headcovers-denver">Custom Headcovers</a></li>
       </ul></div>
       <div><h4>Company</h4><ul>
+        <li><a href="/shop">Shop headcovers &amp; apparel</a></li>
         <li><a href="/custom-golf-clubs-about">About</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="{IG}" rel="noopener">Instagram</a></li>
@@ -1144,6 +1150,9 @@ PAGES.append(dict(path="/thanks",
 </section>"""))
 
 # ----------------------------------------------------------------- write
+PAGES.append(shop_page(SHOP))
+PAGES.extend(shop_policy_pages(SHOP))
+
 def w(rel, s):
     f=os.path.join(OUT,rel); os.makedirs(os.path.dirname(f),exist_ok=True)
     open(f,"w",encoding="utf-8").write(s)
@@ -1233,6 +1242,14 @@ CSP = ("default-src 'self'; "
  "https://www.googleadservices.com https://googleads.g.doubleclick.net "
  "https://pagead2.googlesyndication.com https://ad.doubleclick.net; "
  "form-action 'self'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests")
+
+if SHOP['store']['mode'] == 'live':
+    # Only the configured Shopify store and Shopify's asset origin are added.
+    # Checkout is a top-level redirect; no card form is hosted on CCW.
+    shop_origin = 'https://' + SHOP['store']['domain']
+    CSP = CSP.replace("script-src 'self'", "script-src https://cdn.shopify.com 'self'")
+    CSP = CSP.replace("img-src 'self'", "img-src https://cdn.shopify.com 'self'")
+    CSP = CSP.replace("connect-src 'self'", f"connect-src {shop_origin} https://cdn.shopify.com 'self'")
 
 w("_headers", f"""/*
   X-Content-Type-Options: nosniff
