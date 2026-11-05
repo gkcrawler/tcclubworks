@@ -1,0 +1,111 @@
+
+#ccw-shop{--ccw-bg:light-dark(#f3f4f8,#090b12);--ccw-panel:light-dark(#ffffff,#12151e);--ccw-raised:light-dark(#f8f9fc,#191d29);--ccw-text:light-dark(#182033,#edf0f8);--ccw-muted:light-dark(#626c80,#9ca7bc);--ccw-line:light-dark(#dfe3ed,#282e3e);--ccw-accent:light-dark(#087c97,#65d9ef);--ccw-blue:light-dark(#3157cf,#8da6ff);--ccw-purple:light-dark(#8244c5,#c29aef);--ccw-green:light-dark(#187150,#7ed5b0);--ccw-amber:light-dark(#9b6104,#f0c16d);--ccw-shadow:light-dark(#1323400a,#00000025);font:400 14px/1.45 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ccw-text);background:var(--ccw-bg);border:1px solid var(--ccw-line);border-radius:16px;overflow:clip;container-type:inline-size;text-align:left}
+#ccw-shop *{box-sizing:border-box}
+#ccw-shop [hidden]{display:none!important}
+#ccw-shop h1,#ccw-shop h2,#ccw-shop h3,#ccw-shop p{margin:0;color:inherit}
+#ccw-shop button,#ccw-shop input,#ccw-shop select{font:inherit}
+#ccw-shop button{color:var(--ccw-text)}
+#ccw-shop button:focus-visible,#ccw-shop input:focus-visible,#ccw-shop select:focus-visible{outline:3px solid var(--ccw-accent);outline-offset:3px}
+#ccw-shop .ccw-top{display:flex;align-items:center;gap:22px;padding:14px 110px 14px 22px;border-bottom:1px solid var(--ccw-line);background:var(--ccw-panel);flex-wrap:wrap}
+#ccw-shop .ccw-brand{display:flex;align-items:center;gap:12px;min-width:206px}
+#ccw-shop .ccw-logo{width:44px;height:44px;object-fit:contain;border-radius:7px}
+#ccw-shop .ccw-brand-name{font-size:12px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;line-height:1.3}
+#ccw-shop .ccw-brand-sub{font-size:11px;color:var(--ccw-muted);margin-top:3px;letter-spacing:.04em}
+#ccw-shop .ccw-top nav{display:flex;gap:5px;flex-wrap:wrap}
+#ccw-shop .ccw-nav{border:0;background:transparent;border-radius:7px;padding:8px 11px;font-size:12px;font-weight:600}
+#ccw-shop .ccw-nav[aria-current="page"]{background:var(--ccw-raised);color:var(--ccw-accent)}
+#ccw-shop .ccw-preview{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:var(--ccw-muted);white-space:nowrap}
+#ccw-shop .ccw-dot{width:6px;height:6px;border-radius:50%;background:var(--ccw-purple);display:inline-block;flex:none}
+#ccw-shop .ccw-main{padding:26px 22px 18px}
+#ccw-shop .ccw-intro{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap}
+#ccw-shop .ccw-eyebrow{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ccw-accent);margin-bottom:7px}
+#ccw-shop h1{font-size:28px;line-height:1.15;font-weight:750;letter-spacing:-.045em}
+#ccw-shop .ccw-subtitle{font-size:12px;color:var(--ccw-muted);margin-top:7px}
+#ccw-shop .ccw-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--ccw-line);background:var(--ccw-panel);border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;white-space:normal}
+#ccw-shop .ccw-button:hover{background:var(--ccw-raised)}
+#ccw-shop .ccw-button.ccw-primary{background:var(--ccw-accent);color:light-dark(#fff,#071017);border-color:transparent}
+#ccw-shop .ccw-button:disabled{opacity:.55}
+#ccw-shop .ccw-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#ccw-shop .ccw-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:25px}
+#ccw-shop .ccw-metric{padding:16px 17px;background:var(--ccw-panel);border:1px solid var(--ccw-line);border-radius:11px;position:relative;overflow:hidden}
+#ccw-shop .ccw-metric:first-child:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ccw-accent),var(--ccw-purple))}
+#ccw-shop .ccw-metric-label{font-size:12px;color:var(--ccw-muted);display:flex;align-items:center;justify-content:space-between;gap:6px}
+#ccw-shop .ccw-number{display:block;margin:9px 0 3px;font-size:30px;letter-spacing:-.05em;font-weight:650;line-height:1.1;font-variant-numeric:tabular-nums}
+#ccw-shop .ccw-small{font-size:11px;color:var(--ccw-muted)}
+#ccw-shop .ccw-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+#ccw-shop h2{font-size:15px;letter-spacing:-.025em;font-weight:650}
+#ccw-shop .ccw-section-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#ccw-shop .ccw-segment{display:flex;gap:2px;border:1px solid var(--ccw-line);padding:3px;border-radius:8px;background:var(--ccw-panel)}
+#ccw-shop .ccw-segment button{border:0;background:transparent;padding:5px 10px;font-size:11px;border-radius:5px;display:flex;gap:5px;align-items:center}
+#ccw-shop .ccw-segment button[aria-pressed="true"]{background:var(--ccw-raised);color:var(--ccw-accent)}
+#ccw-shop .ccw-board{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:start}
+#ccw-shop .ccw-lane{min-width:0}
+#ccw-shop .ccw-lane-heading{display:flex;align-items:center;gap:6px;line-height:1.2;font-size:11px;font-weight:650;padding-bottom:8px;border-bottom:2px solid var(--ccw-line)}
+#ccw-shop .ccw-lane[data-stage="bench"] .ccw-lane-heading{border-color:var(--ccw-accent)}
+#ccw-shop .ccw-lane[data-stage="ready"] .ccw-lane-heading{border-color:var(--ccw-green)}
+#ccw-shop .ccw-count{margin-left:auto;font-size:10px;font-weight:500;color:var(--ccw-muted);background:var(--ccw-panel);padding:2px 5px;border-radius:4px}
+#ccw-shop .ccw-lane-value{font-size:10px;color:var(--ccw-muted);margin:7px 0 10px;font-variant-numeric:tabular-nums}
+#ccw-shop .ccw-job{width:100%;display:flex;flex-direction:column;gap:9px;text-align:left;border:1px solid var(--ccw-line);border-radius:9px;background:var(--ccw-panel);padding:12px 10px;margin:0 0 9px;box-shadow:0 3px 8px var(--ccw-shadow);min-width:0;transition:border-color .15s,transform .15s}
+#ccw-shop .ccw-job:hover{border-color:var(--ccw-accent);transform:translateY(-2px)}
+#ccw-shop .ccw-job-ref{font-size:10px;color:var(--ccw-muted);display:flex;align-items:center;gap:5px;justify-content:space-between}
+#ccw-shop .ccw-job-name{font-size:12px;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+#ccw-shop .ccw-customer{font-size:11px;color:var(--ccw-muted);margin-top:-5px}
+#ccw-shop .ccw-job-bottom{display:flex;justify-content:space-between;gap:5px;font-size:10px;flex-wrap:wrap;align-items:center;padding-top:8px;border-top:1px solid var(--ccw-line)}
+#ccw-shop .ccw-job-price{font-weight:650;font-variant-numeric:tabular-nums}
+#ccw-shop .ccw-tag{font-size:10px;display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:3px 5px;align-self:flex-start;line-height:1.3;color:var(--ccw-muted);background:var(--ccw-raised)}
+#ccw-shop .ccw-tag[data-tone="attention"]{color:var(--ccw-amber);background:color-mix(in srgb,var(--ccw-amber) 10%,var(--ccw-panel))}
+#ccw-shop .ccw-tag[data-tone="ready"]{color:var(--ccw-green);background:color-mix(in srgb,var(--ccw-green) 10%,var(--ccw-panel))}
+#ccw-shop .ccw-progress{display:flex;gap:3px;margin-top:1px}
+#ccw-shop .ccw-progress span{height:3px;flex:1;border-radius:1px;background:var(--ccw-line)}
+#ccw-shop .ccw-progress span.done{background:var(--ccw-accent)}
+#ccw-shop .ccw-bottom{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:23px;padding-top:22px;border-top:1px solid var(--ccw-line)}
+#ccw-shop .ccw-attention-row{width:100%;background:transparent;border:0;border-top:1px solid var(--ccw-line);padding:11px 0;display:flex;align-items:center;gap:9px;text-align:left}
+#ccw-shop .ccw-attention-row:first-of-type{margin-top:13px}
+#ccw-shop .ccw-attention-row .ccw-attention-icon{display:flex;align-items:center;justify-content:center;border-radius:7px;width:29px;height:29px;color:var(--ccw-amber);background:var(--ccw-panel);flex:none}
+#ccw-shop .ccw-attention-copy{flex:1;min-width:0}
+#ccw-shop .ccw-attention-title{font-size:12px;font-weight:550}
+#ccw-shop .ccw-attention-meta{font-size:11px;color:var(--ccw-muted);margin-top:2px}
+#ccw-shop .ccw-workload{display:flex;gap:12px;align-items:flex-end;margin-top:18px;min-height:135px;padding:0 4px}
+#ccw-shop .ccw-day{flex:1;min-width:0;text-align:center;font-size:11px}
+#ccw-shop .ccw-day-track{height:74px;display:flex;align-items:flex-end;margin:7px auto 9px;max-width:38px;background:var(--ccw-raised);border-radius:5px;overflow:hidden}
+#ccw-shop .ccw-day-bar{width:100%;background:color-mix(in srgb,var(--ccw-accent) 45%,var(--ccw-panel));border-radius:5px}
+#ccw-shop .ccw-day:first-child .ccw-day-bar{background:var(--ccw-accent)}
+#ccw-shop .ccw-footer{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;border-top:1px solid var(--ccw-line);padding:12px 22px;color:var(--ccw-muted);font-size:10px;background:var(--ccw-panel)}
+#ccw-shop .ccw-table{width:100%;border-collapse:collapse;font-size:12px}
+#ccw-shop .ccw-table th{text-align:left;color:var(--ccw-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:500;padding:10px 8px;border-bottom:1px solid var(--ccw-line)}
+#ccw-shop .ccw-table td{padding:12px 8px;border-bottom:1px solid var(--ccw-line)}
+#ccw-shop .ccw-text-button{padding:0;border:0;background:transparent;color:var(--ccw-accent);text-align:left;font-weight:600}
+#ccw-shop .ccw-table-wrap{overflow-x:auto}
+#ccw-shop .ccw-back{margin-bottom:20px}
+#ccw-shop .ccw-detail-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:18px}
+#ccw-shop .ccw-detail-box{border:1px solid var(--ccw-line);background:var(--ccw-panel);border-radius:11px;padding:20px;margin-bottom:15px}
+#ccw-shop .ccw-detail-box h2{margin-bottom:15px}
+#ccw-shop .ccw-detail-copy{font-size:13px;color:var(--ccw-muted);line-height:1.6}
+#ccw-shop .ccw-check{display:flex;gap:10px;padding:11px 0;align-items:center;border-bottom:1px solid var(--ccw-line);font-size:12px}
+#ccw-shop .ccw-check:last-child{border:0}
+#ccw-shop input[type="checkbox"]{accent-color:var(--ccw-accent);width:17px;height:17px;flex:none}
+#ccw-shop .ccw-kv{display:flex;justify-content:space-between;gap:14px;font-size:12px;padding:9px 0;border-bottom:1px solid var(--ccw-line)}
+#ccw-shop .ccw-kv:last-child{border:0}
+#ccw-shop .ccw-kv span:first-child{color:var(--ccw-muted)}
+#ccw-shop .ccw-detail-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+#ccw-shop .ccw-field{display:flex;flex-direction:column;gap:7px;font-size:12px;margin-bottom:14px}
+#ccw-shop .ccw-field input,#ccw-shop .ccw-field select{width:100%;min-width:0;background:var(--ccw-raised);border:1px solid var(--ccw-line);color:var(--ccw-text);padding:11px;border-radius:7px;font-size:14px}
+#ccw-shop .ccw-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+#ccw-shop .ccw-empty{font-size:11px;color:var(--ccw-muted);border:1px dashed var(--ccw-line);border-radius:8px;padding:18px 10px}
+#ccw-shop .ccw-banner{font-size:12px;color:var(--ccw-green);padding:9px 0 15px}
+#ccw-shop[data-density="compact"] .ccw-job{padding:9px;gap:7px}
+#ccw-shop[data-density="compact"] .ccw-metric{padding:12px 15px}
+#ccw-shop[data-density="compact"] .ccw-bottom{margin-top:16px;padding-top:16px}
+#ccw-shop[data-wall="true"] .ccw-customer,#ccw-shop[data-wall="true"] .ccw-job-price,#ccw-shop[data-wall="true"] .ccw-lane-value,#ccw-shop[data-wall="true"] .ccw-bottom,#ccw-shop[data-wall="true"] .ccw-metrics,#ccw-shop[data-wall="true"] .ccw-new-job,#ccw-shop[data-wall="true"] .ccw-segment{display:none}
+#ccw-shop[data-wall="true"] .ccw-job{padding:16px 12px;gap:14px;min-height:145px}
+#ccw-shop[data-wall="true"] .ccw-job-name{font-size:16px}
+#ccw-shop[data-wall="true"] .ccw-board{padding:12px 0 28px}
+#ccw-shop .ccw-screen-reader{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@container(max-width:820px){#ccw-shop .ccw-top{gap:12px;padding-left:18px}#ccw-shop .ccw-preview{margin-left:0}#ccw-shop .ccw-board{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 12px}#ccw-shop .ccw-main{padding:22px 18px 18px}#ccw-shop .ccw-metrics{gap:8px}#ccw-shop .ccw-metric{padding:13px 11px}#ccw-shop .ccw-number{font-size:26px}}
+@container(max-width:580px){#ccw-shop .ccw-top{padding:14px 16px;align-items:flex-start}#ccw-shop .ccw-brand{width:100%;padding-right:90px}#ccw-shop .ccw-preview{margin-left:auto}#ccw-shop .ccw-main{padding:21px 14px 16px}#ccw-shop h1{font-size:26px}#ccw-shop .ccw-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#ccw-shop .ccw-board{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 10px}#ccw-shop .ccw-bottom,#ccw-shop .ccw-detail-grid,#ccw-shop .ccw-form-grid{grid-template-columns:1fr}#ccw-shop .ccw-detail-box{padding:15px}#ccw-shop .ccw-job{padding:12px}#ccw-shop .ccw-footer{padding:12px 14px}#ccw-shop .ccw-job-name{font-size:13px}#ccw-shop .ccw-detail-grid{gap:0}#ccw-shop .ccw-nav{padding:7px 8px}}
+@media(pointer:coarse){#ccw-shop .ccw-nav,#ccw-shop .ccw-button,#ccw-shop .ccw-segment button{min-height:44px}#ccw-shop .ccw-field input,#ccw-shop .ccw-field select{font-size:16px}#ccw-shop .ccw-check{min-height:44px}}
+@media(prefers-reduced-motion:reduce){#ccw-shop .ccw-job{transition:none}}
+
+html{color-scheme:dark light;background:light-dark(#f3f4f8,#090b12)}body{margin:0;padding:18px}#ccw-shop{max-width:1540px;margin:auto}#ccw-shop .ccw-top{padding-right:22px}#ccw-shop a{color:var(--ccw-accent)}#ccw-shop .ccw-button{text-decoration:none}#ccw-shop .ccw-auth{max-width:430px;margin:50px auto 70px;padding:24px}#ccw-shop .ccw-auth h1{margin-bottom:12px}#ccw-shop .ccw-auth p{margin-bottom:22px}#ccw-shop .ccw-auth label{margin-top:15px}#ccw-shop .ccw-status{color:var(--ccw-muted);font-size:12px;min-height:18px}#ccw-shop .ccw-error{color:light-dark(#a52b3e,#ffa3af);margin:12px 0;font-size:13px;white-space:pre-wrap}#ccw-shop .ccw-notice{color:var(--ccw-green);font-size:12px;margin:12px 0}#ccw-shop textarea{width:100%;min-height:135px;background:var(--ccw-raised);color:var(--ccw-text);border:1px solid var(--ccw-line);border-radius:7px;padding:11px;font:inherit;resize:vertical}#ccw-shop .ccw-filter{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:16px}#ccw-shop .ccw-filter input,#ccw-shop .ccw-filter select{padding:9px 11px;border:1px solid var(--ccw-line);border-radius:7px;background:var(--ccw-panel);color:var(--ccw-text);font:inherit;min-width:0}#ccw-shop .ccw-filter input{flex:1;min-width:150px}#ccw-shop .ccw-detail-copy{white-space:pre-wrap;overflow-wrap:anywhere}#ccw-shop .ccw-save{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:18px}#ccw-shop .ccw-detail-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}#ccw-shop .ccw-meta{font-size:11px;color:var(--ccw-muted);margin-top:9px}#ccw-shop .ccw-job-name{max-height:3.9em;overflow:hidden}#ccw-shop .ccw-danger{color:light-dark(#a52b3e,#ffa3af)}#ccw-shop .ccw-error:empty,#ccw-shop .ccw-notice:empty{display:none}#ccw-shop .ccw-quote-table{font-size:12px;width:100%;border-collapse:collapse}#ccw-shop .ccw-quote-table td{padding:9px 0;border-bottom:1px solid var(--ccw-line);vertical-align:top}#ccw-shop .ccw-quote-table td:last-child{text-align:right;white-space:nowrap;padding-left:10px}#ccw-shop .ccw-plain{background:none;border:0;color:var(--ccw-accent);text-align:left;padding:0}#ccw-shop .ccw-empty-page{padding:30px 0;color:var(--ccw-muted)}#ccw-shop .ccw-footer{font-size:11px}#ccw-shop[data-wall="true"] .ccw-filter,#ccw-shop[data-wall="true"] .ccw-board-controls{display:none}#ccw-shop[data-wall="true"] .ccw-job{pointer-events:none}#ccw-shop .ccw-day-count{font-variant-numeric:tabular-nums}#ccw-shop .ccw-check{cursor:pointer}#ccw-shop button{cursor:pointer}#ccw-shop button:disabled{cursor:wait}#ccw-shop input[type="checkbox"]{accent-color:var(--ccw-accent)}#ccw-shop .ccw-inline{display:flex;gap:9px;align-items:center}#ccw-shop .ccw-kv{overflow-wrap:anywhere}#ccw-shop .ccw-kv span{min-width:0}#ccw-shop .ccw-due-overdue{color:var(--ccw-amber)}
+@media(min-width:1250px){#ccw-shop .ccw-job-name{font-size:14px}#ccw-shop .ccw-job{padding:15px}#ccw-shop .ccw-customer,#ccw-shop .ccw-job-ref,#ccw-shop .ccw-job-bottom,#ccw-shop .ccw-tag,#ccw-shop .ccw-lane-heading,#ccw-shop .ccw-lane-value{font-size:12px}}
+@media(max-width:580px){body{padding:8px}#ccw-shop .ccw-top{padding:14px}#ccw-shop .ccw-brand{padding-right:0}#ccw-shop .ccw-field input,#ccw-shop .ccw-field select,#ccw-shop textarea{font-size:16px}#ccw-shop .ccw-auth{margin:25px auto;padding:20px}#ccw-shop .ccw-table{min-width:550px}}

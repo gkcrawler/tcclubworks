@@ -406,6 +406,7 @@ def admin_quotes_page():
   <section class="admin-hero">
     <div>
       <img src="/assets/ccw-quote-helmet.webp" alt="{BRAND}" width="720" height="699">
+      <p><a href="/admin/shop/">← Shop command center</a></p>
       <p class="eyebrow">Admin quotes</p>
       <h1>Estimate builder</h1>
       <p>Create customer quotes from Netlify form submissions, save quote history, email approval links, and export a clean PDF.</p>
@@ -1188,6 +1189,8 @@ w("sitemap.xml",'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://w
 
 w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\nDisallow: /quote-approval\n\nSitemap: {D}/sitemap.xml\n")
 w("admin/quotes/index.html", version_asset_urls(admin_quotes_page()))
+with open(os.path.join(OUT, "templates/shop.html"), encoding="utf-8") as shop_template:
+    w("admin/shop/index.html", version_asset_urls(shop_template.read()))
 w("quote-approval/index.html", version_asset_urls(quote_approval_page()))
 
 REDIR=[("/services","/golf-club-repair-denver"),
@@ -1241,11 +1244,22 @@ w("_headers", f"""/*
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/admin/*
+  Cache-Control: private, no-store
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+/.netlify/functions/shop
+  Cache-Control: private, no-store
+  X-Robots-Tag: noindex, nofollow
 """)
 
 w("netlify.toml", f"""[build]
   command = "python3 build.py && python3 inject_google_ads.py"
   publish = "."
+
+[functions]
+  node_bundler = "esbuild"
 
 # Public pages are root-level HTML files (contact.html, not contact/index.html).
 # With Pretty URLs, /contact is 200 and both /contact/ and /contact.html 301
@@ -1283,6 +1297,12 @@ w("netlify.toml", f"""[build]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    X-Robots-Tag = "noindex, nofollow, noarchive"
 """)
 
 print(f"built {len(PAGES)} pages (+404) | {len(INDEXED)} indexed | {len(REDIR)} redirects")

@@ -1,5 +1,6 @@
+const {authorizedLegacy} = require('../lib/shop-auth.cjs');
 exports.handler = async function(event) {
-  if (!authorized(event.headers.authorization || "")) return json(401, { message: "Unauthorized" });
+  if (!authorizedLegacy(event)) return json(401, { message: "Unauthorized" });
   if (!["GET", "POST", "DELETE"].includes(event.httpMethod)) return json(405, { message: "Method not allowed" });
 
   try {

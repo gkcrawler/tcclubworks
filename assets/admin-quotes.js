@@ -1,6 +1,7 @@
 (function(){
   var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
-  var password = sessionStorage.getItem("ccw_admin_password") || "";
+  var sourceJobId = "", deepLinkLoaded = false;
+  try { sessionStorage.removeItem("ccw_admin_password"); } catch (_) {}
   var submissions = [], quotes = [], catalog = [], activeId = "", currentQuoteId = "", currentToken = "";
 
   var els = {
@@ -36,7 +37,7 @@
       String(d.getMinutes()).padStart(2,"0");
   }
   function authHeaders(extra){
-    var h = {Authorization:"Basic " + btoa("admin:" + password)};
+    var h = {};
     Object.keys(extra || {}).forEach(function(k){ h[k] = extra[k]; });
     return h;
   }
@@ -182,6 +183,7 @@
   function selectSubmission(id){
     var s = submissions.find(function(item){ return item.id === id; });
     if(!s) return;
+    resetQuote();
     activeId = id; currentQuoteId = ""; currentToken = "";
     set("customerName", s.name); set("customerEmail", s.email); set("customerPhone", s.phone);
     set("customerService", s.service); set("customerMessage", s.message);
@@ -198,6 +200,7 @@
 
   function fillQuote(q){
     currentQuoteId = q.id || ""; currentToken = q.approvalToken || "";
+    activeId = q.sourceSubmissionId || ""; sourceJobId = q.sourceJobId || "";
     set("quoteNumber", q.quoteNumber); set("quoteDate", q.quoteDate); set("validUntil", q.validUntil);
     set("preparedBy", q.preparedBy || "Chronic Clubworks"); set("status", q.status || "Draft");
     set("customerName", q.customerName); set("customerEmail", q.customerEmail); set("customerPhone", q.customerPhone);
@@ -255,6 +258,7 @@
     var totals = calculate();
     return {
       id: currentQuoteId, approvalToken: currentToken, quoteNumber: val("quoteNumber"),
+      sourceSubmissionId: activeId, sourceJobId: sourceJobId,
       quoteDate: val("quoteDate"), validUntil: val("validUntil"), preparedBy: val("preparedBy"),
       status: val("status") || "Draft", customerName: val("customerName"), customerEmail: val("customerEmail"),
       customerPhone: val("customerPhone"), customerService: val("customerService"),
@@ -357,7 +361,7 @@
   }
 
   function resetQuote(){
-    currentQuoteId = ""; currentToken = ""; activeId = "";
+    currentQuoteId = ""; currentToken = ""; activeId = ""; sourceJobId = "";
     set("quoteNumber", quoteNumber()); set("quoteDate", today(0)); set("validUntil", today(14));
     set("preparedBy", "Chronic Clubworks"); set("status", "Draft");
     set("customerName", ""); set("customerEmail", ""); set("customerPhone", "");
@@ -368,10 +372,30 @@
     els.lineItems.innerHTML = ""; addItem("",1,0); renderSubmissions(); showStatus("New draft ready.");
   }
 
-  els.authForm.addEventListener("submit",function(e){
-    e.preventDefault(); password = els.adminPassword.value;
-    sessionStorage.setItem("ccw_admin_password", password);
-    Promise.all([loadSubmissions(), loadQuotes()]).catch(function(err){ els.authStatus.textContent = err.message; });
+  async function initializeAdmin(){
+    await loadSubmissions(); await loadQuotes();
+    if(deepLinkLoaded) return;
+    var params=new URLSearchParams(location.search);
+    if(params.get("quote")) await loadQuote(params.get("quote"));
+    else if(params.get("inquiry")) selectSubmission(params.get("inquiry"));
+    else if(params.get("job")){
+      var response=await fetch("/.netlify/functions/shop",{cache:"no-store"});
+      if(!response.ok)throw new Error("Open the shop dashboard and sign in to prepare this quote.");
+      var data=await response.json(), job=(data.jobs||[]).find(function(j){return j.id===params.get("job");});
+      if(!job)throw new Error("That shop job could not be found.");
+      resetQuote(); sourceJobId=job.id;
+      set("customerName",job.customer);set("customerEmail",job.email);set("customerPhone",job.phone);
+      set("customerService",job.type||job.title);set("customerMessage",job.notes);
+    }
+    deepLinkLoaded=true;
+  }
+  els.authForm.addEventListener("submit",async function(e){
+    e.preventDefault(); var button=els.authForm.querySelector("button");button.disabled=true;
+    try{
+      var response=await fetch("/.netlify/functions/shop",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:els.adminPassword.value})});
+      var result=await response.json();if(!response.ok)throw new Error(result.message||"Sign-in failed.");
+      els.adminPassword.value="";await initializeAdmin();
+    }catch(err){els.authStatus.textContent=err.message;}finally{button.disabled=false;}
   });
   els.refreshSubmissions.addEventListener("click",function(){ loadSubmissions().catch(function(err){ els.authStatus.textContent = err.message; }); });
   els.refreshQuotes.addEventListener("click",function(){ loadQuotes(); });
@@ -429,8 +453,5 @@
 
   resetQuote();
   loadCatalog();
-  if(password){
-    els.adminPassword.value = password;
-    Promise.all([loadSubmissions(), loadQuotes()]).catch(function(err){ els.authStatus.textContent = err.message; });
-  }
+  initializeAdmin().catch(function(err){ els.authStatus.textContent = "Sign in with your quote admin password. " + (err.message || ""); });
 })();
