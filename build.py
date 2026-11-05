@@ -144,13 +144,21 @@ def head(p):
     preconnect = '<link rel="preconnect" href="https://assets.zyrosite.com" crossorigin>\n' if any(
         str(v).startswith("https://assets.zyrosite.com") for v in I.values()
     ) else ""
+    analytics = ""
+    if p["path"] in {"/", "/contact", "/golf-club-repair-denver", "/custom-golf-headcovers-denver",
+                     "/custom-golf-clubs-about", "/thanks"}:
+        # On /thanks the inquiry script records the view only for a fresh quote.
+        page_view = "false" if p["path"] == "/thanks" else "true"
+        analytics = f"""
+  window.ccwAnalyticsId = 'G-LEXFW54DVY';
+  gtag('config', window.ccwAnalyticsId, {{send_page_view: {page_view}, allow_google_signals: false}});"""
     tracking = '''<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18288494011"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'AW-18288494011');
+  gtag('config', 'AW-18288494011');''' + analytics + '''
 </script>
 <script defer src="/assets/inquiry-conversion.js"></script>''' if p.get("tracking", True) else '<meta name="ccw-tracking" content="off">'
     return f"""<!DOCTYPE html>

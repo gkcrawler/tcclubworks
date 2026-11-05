@@ -4,12 +4,13 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const code = fs.readFileSync('assets/inquiry-conversion.js','utf8');
 const SEND_TO = 'AW-18288494011/4rQbCMWt6-IcELuL0ZBE';
+const ANALYTICS_ID = 'G-LEXFW54DVY';
 
 function setup(path, stored) {
   let value = stored, submit;
   const calls = [];
   const context = {
-    window: {location:{pathname:path,href:''},crypto:{randomUUID:()=> 'test-inquiry'},gtag:(...args)=>calls.push(args)},
+    window: {ccwAnalyticsId:ANALYTICS_ID,location:{pathname:path,href:''},crypto:{randomUUID:()=> 'test-inquiry'},gtag:(...args)=>calls.push(args)},
     sessionStorage:{getItem:()=>value,setItem:(_,v)=>value=v,removeItem:()=>value=null},
     document:{querySelectorAll:()=>[{addEventListener:(_,fn)=>submit=fn}],addEventListener:()=>{}},
     Date, JSON
@@ -20,9 +21,11 @@ test('does not count a form attempt; counts confirmation once',()=>{
   const form=setup('/contact/',null);form.run();form.submit();
   assert.equal(form.calls.length,0);
   const thanks=setup('/thanks/',form.value());thanks.run();thanks.run();
-  assert.equal(thanks.calls.length,1);
+  assert.equal(thanks.calls.length,2);
   assert.equal(thanks.calls[0][2].send_to,SEND_TO);
   assert.equal(thanks.calls[0][2].transaction_id,'test-inquiry');
+  assert.equal(thanks.calls[1][1],'page_view');
+  assert.equal(thanks.calls[1][2].send_to,ANALYTICS_ID);
 });
 test('direct confirmation visits do not count as inquiries',()=>{
   const page=setup('/thanks/',null);page.run();assert.equal(page.calls.length,0);
@@ -43,6 +46,7 @@ test('a tel: click fires the contact conversion once, then dials',()=>{
   };
   const context = {
     window: {
+      ccwAnalyticsId:ANALYTICS_ID,
       location:{pathname:'/golf-club-repair-denver', href:''},
       gtag:(...args)=>calls.push(args),
       setTimeout:(fn)=>fn()
@@ -58,10 +62,11 @@ test('a tel: click fires the contact conversion once, then dials',()=>{
   const event = { target: link, metaKey:false, ctrlKey:false, shiftKey:false, altKey:false, button:0, prevented:false, preventDefault(){ this.prevented = true; } };
   click(event);
   click(event);
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0][0], 'event');
-  assert.equal(calls[0][1], 'conversion');
-  assert.equal(calls[0][2].send_to, SEND_TO);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0][1], 'click_to_call');
+  assert.equal(calls[0][2].send_to, ANALYTICS_ID);
+  assert.equal(calls[1][1], 'conversion');
+  assert.equal(calls[1][2].send_to, SEND_TO);
   assert.equal(event.prevented, true);
   assert.equal(context.window.location.href, 'tel:+17208544132');
 });

@@ -36,6 +36,12 @@
     try { sessionStorage.removeItem(KEY); } catch (_) { /* already gone */ }
   }
 
+  function sendAnalytics(eventName) {
+    if (window.ccwAnalyticsId && typeof window.gtag === 'function') {
+      window.gtag('event', eventName, { send_to: window.ccwAnalyticsId });
+    }
+  }
+
   function consumeInquiry() {
     var raw, pending, age;
     try {
@@ -62,6 +68,8 @@
       return;
     }
     dropPending();
+    // Smart campaign quote requests are measured by this confirmation pageview.
+    sendAnalytics('page_view');
   }
 
   function bindForms() {
@@ -87,6 +95,7 @@
       href = node.getAttribute('href');
       if (!href) return;
       node.setAttribute('data-ccw-tel', '1');
+      sendAnalytics('click_to_call');
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) {
         sendConversion('tel-' + Date.now());
         return;
