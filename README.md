@@ -276,3 +276,16 @@ Retest catalog, variants and cart after Shopify changes. The catalog paginates i
 groups of 50, with category filtering on the displayed page; revisit filtering
 before the shop grows beyond that size. No customer accounts, subscriptions or
 international checkout are part of this initial launch.
+## Private shop command center
+
+`/admin/shop/` connects to the site's existing quote inquiries, saved quotes, and customer approvals. Sign in with the existing quote admin password. Authentication uses a signed Secure, HttpOnly, SameSite cookie; the dashboard does not store the password in browser storage. The quote builder accepts the same session.
+
+The board refreshes every minute while visible. It keeps the last loaded view and displays an error if a refresh fails. Dates use America/Denver. Approved quote value is not cash collected; the existing deposit field is a requested deposit, not proof of payment.
+
+Shop stages, target handoff dates, checklists, notes, archives, manual jobs, and explicit record links live in the private Netlify Blobs store `ccw-shop-v1`. Writes use strong reads and conditional revisions so two windows cannot silently overwrite each other. Optional `SHOP_STORE_NAME` can isolate a separate preview store. Existing Forms records remain the source of truth for quotes and inquiries and are never rewritten by the board. Archiving does not delete them.
+
+New quotes retain the inquiry/manual-job source ID. Historical records remain separate until explicitly linked; names/emails alone are not sufficient to merge jobs. Ambiguous automatic links remain separate. Customer approval updates the quote status while preserving progressed shop stages and notes.
+
+Dashboard source: `templates/shop.html`, `assets/shop.css`, `assets/shop.js`; API: `netlify/functions/shop.mjs` and `netlify/lib/shop-*.cjs`. `build.py` emits the page and versioned asset URLs. Existing Netlify settings `QUOTE_ADMIN_PASSWORD`, `NETLIFY_API_TOKEN`, and `NETLIFY_SITE_ID` are reused. Optional `SHOP_SESSION_SECRET` can provide an independent signing secret; otherwise signing is derived from the admin password, so rotating the password invalidates existing sessions.
+
+Run `npm test`, then `npm run build` using Python 3.11+ (or Python with tomli installed). No customer information or credentials belong in source or fixtures.

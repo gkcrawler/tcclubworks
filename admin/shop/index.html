@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="same-origin">
+<meta name="theme-color" content="#090b12"><title>Shop Command Center | Chronic Clubworks</title>
+<link rel="icon" href="/assets/icon-32.png?v=4ab8eaf890"><link rel="apple-touch-icon" href="/assets/icon-180.png?v=a2dd57d87f">
+<link rel="stylesheet" href="/assets/shop.css?v=271d229e5b">
+<script src="/assets/shop.js?v=39427ea331" defer></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18288494011"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18288494011');
+</script>
+<script defer src="/assets/inquiry-conversion.js?v=8ec859eb68"></script>
+</head>
+<body>
+<div id="ccw-shop" aria-label="Chronic Clubworks shop command center">
+<header class="ccw-top"><div class="ccw-brand"><img class="ccw-logo" src="/assets/ccw-quote-helmet.webp?v=cc5373f83f" alt="Chronic Clubworks logo"><div><div class="ccw-brand-name">Chronic Clubworks</div><div class="ccw-brand-sub">Shop command center</div></div></div><nav id="shop-nav" aria-label="Shop navigation" hidden><button type="button" class="ccw-nav" data-page="board" aria-current="page">Shop board</button><button type="button" class="ccw-nav" data-page="schedule">Due dates</button><a class="ccw-button" href="/admin/quotes/">Quote builder ↗</a></nav><div class="ccw-preview"><span class="ccw-dot"></span><span>Private workspace</span></div><button id="logout" type="button" class="ccw-button" hidden>Sign out</button></header>
+<section id="login" class="ccw-auth"><div class="ccw-eyebrow">Your shop. All in one place.</div><h1>Welcome back.</h1><p class="ccw-detail-copy">Sign in with your CCW quote admin password.</p><form id="login-form"><label class="ccw-field">Admin password<input id="password" name="password" type="password" autocomplete="current-password" required></label><label class="ccw-inline"><input id="remember" type="checkbox"><span>Keep me signed in for 30 days on this device</span></label><div id="login-error" class="ccw-error" role="alert"></div><button type="submit" class="ccw-button ccw-primary" style="margin-top:20px">Open shop</button></form></section>
+<main id="workspace" class="ccw-main" hidden>
+<div id="global-error" class="ccw-error" role="alert"></div><div id="notice" class="ccw-notice" role="status"></div>
+<section id="dashboard"><div class="ccw-intro"><div><div id="today-label" class="ccw-eyebrow"></div><h1>The shop, at a glance.</h1><p class="ccw-subtitle">Your inquiries, quotes, and work in progress.</p></div><div class="ccw-actions"><button id="refresh" type="button" class="ccw-button">↻ Refresh</button><button id="wall" type="button" class="ccw-button" aria-pressed="false">Wall display</button><button id="new" type="button" class="ccw-button ccw-primary ccw-new-job">+ New job</button></div></div>
+<div id="metrics" class="ccw-metrics"></div>
+<div class="ccw-section-head"><div class="ccw-section-title"><h2 id="board-title">From first inquiry to final handoff</h2><span id="total" class="ccw-small"></span></div><div class="ccw-segment" aria-label="Job layout"><button type="button" data-view="board" aria-pressed="true">Board</button><button type="button" data-view="list" aria-pressed="false">List</button></div></div>
+<div class="ccw-filter"><input id="search" type="search" aria-label="Search jobs" placeholder="Search customers, jobs, or quote numbers"><select id="filter" aria-label="Filter jobs"><option value="current">Current jobs</option><option value="all">All jobs</option><option value="archived">Archived jobs</option></select></div>
+<div id="job-view"></div><div class="ccw-bottom"><section><h2>Needs your attention</h2><div id="attention"></div></section><section><div class="ccw-section-title"><h2>Next seven days</h2><span id="due-count" class="ccw-small"></span></div><div id="workload" class="ccw-workload" role="img"></div></section></div></section>
+<section id="detail" aria-label="Job details" hidden></section>
+<section id="create" hidden><button type="button" class="ccw-button ccw-back" data-action="back">← Back to shop</button><div class="ccw-intro"><div><div class="ccw-eyebrow">New customer work</div><h1>Start a job.</h1><p class="ccw-subtitle">For walk-ins, phone calls, and jobs that don’t have an online inquiry.</p></div></div><form id="new-form" class="ccw-detail-box"><div class="ccw-form-grid"><label class="ccw-field">Customer name<input name="customer" maxlength="200" required autocomplete="off"></label><label class="ccw-field">Job title<input name="title" maxlength="160" required></label><label class="ccw-field">Email<input name="email" type="email" maxlength="250"></label><label class="ccw-field">Phone<input name="phone" type="tel" maxlength="100"></label><label class="ccw-field">Service<select name="type"><option>Regripping</option><option>Reshafting</option><option>Custom headcover</option><option>Restoration</option><option>Loft & lie</option><option>Custom clubmaking</option><option>Other</option></select></label><label class="ccw-field">Target handoff date<input name="due" type="date"></label></div><label class="ccw-field">Job notes<textarea name="notes" maxlength="10000"></textarea></label><button type="submit" class="ccw-button ccw-primary">Create job</button></form></section>
+</main>
+<footer class="ccw-footer"><span id="sync" class="ccw-status" role="status">Sign in to load your shop.</span><span id="footer-mode">Chronic Clubworks</span></footer>
+</div>
+</body></html>

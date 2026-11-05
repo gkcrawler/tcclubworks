@@ -1,3 +1,4 @@
+const {authorizedLegacy} = require('../lib/shop-auth.cjs');
 exports.handler = async function(event) {
   if (!["GET", "DELETE"].includes(event.httpMethod)) {
     return json(405, { message: "Method not allowed" });
@@ -11,7 +12,7 @@ exports.handler = async function(event) {
     });
   }
 
-  if (!authorized(event.headers.authorization || "", password)) {
+  if (!authorizedLegacy(event)) {
     return json(401, { message: "Unauthorized" });
   }
 
@@ -49,10 +50,7 @@ exports.handler = async function(event) {
       const data = row.data || {};
       const formName = data["form-name"] || data.form_name || row.form_name || row.formName || "";
       const looksLikeQuote =
-        formName === "quote" ||
-        data.service ||
-        data.message ||
-        (data.name && data.email);
+        formName === "quote";
       return Boolean(looksLikeQuote);
     })
     .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
@@ -85,16 +83,15 @@ async function deleteSubmission(id, token) {
 }
 
 async function fetchSubmissions(siteId, token) {
-  const base = `https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100`;
-  const headers = { Authorization: `Bearer ${token}` };
-  const res = await fetch(base, { headers });
-  if (!res.ok) {
-    const body = await res.text();
-    throw Object.assign(new Error(
-      `Netlify submissions request failed: ${res.status} ${body.slice(0, 180)}`
-    ), { statusCode: 502 });
+  const rows=[];
+  for(let page=1;page<=1000;page++){
+    const url=`https://api.netlify.com/api/v1/sites/${encodeURIComponent(siteId)}/submissions?per_page=100&page=${page}`;
+    const res=await fetch(url,{headers:{Authorization:`Bearer ${token}`}});
+    if(!res.ok)throw Object.assign(new Error('Could not load customer inquiries. Please retry.'),{statusCode:502});
+    const batch=await res.json();rows.push(...batch);
+    if(batch.length<100)return rows;
   }
-  return res.json();
+  throw Object.assign(new Error('Too many inquiry records.'),{statusCode:503});
 }
 
 function authorized(header, password) {
