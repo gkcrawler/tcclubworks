@@ -220,6 +220,18 @@ alt = "TaylorMade M2 driver head and detached shaft adapter against a softly blu
 file = "/assets/img/pxg-restoration.jpg"
 alt = "PXG 54 and 58 degree wedge faces before and after restoration"
 
+[photos.hc_greyson_002]
+file = "/assets/img/headcover-greyson-no-002.jpg"
+alt = "Greyson × Chronic Clubworks, Dunes at Dawn No. 002. Black quilted headcover with a blue-eyed wolf, a Greyson × Chronic Clubworks label and the numbered edition patch."
+
+[photos.hc_rotc_driver]
+file = "/assets/img/headcover-rotc-driver.jpg"
+alt = "ROTC driver headcover with silver chevrons and gold braid. Detail views show the U.S. R.O.T.C. shield on the crown and the plush lining."
+
+[photos.hc_rotc_3wood]
+file = "/assets/img/headcover-rotc-3-wood.jpg"
+alt = "ROTC 3-wood headcover with a subdued U.S. flag on the back, three gold stripes on the crown and silver chevrons on the front."
+
 [photos.hc_riverdale]
 file = "/assets/img/headcover-riverdale.jpg"
 alt = "Charcoal and gray custom headcover with Riverdale embroidery and a Nike swoosh"

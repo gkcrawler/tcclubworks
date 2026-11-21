@@ -899,6 +899,9 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
       <p class="note">Select any photo to enlarge.</p>
     </div>
     <div class="headcover-gallery">
+      <figure><a class="lightbox" href="{FULL('hc_greyson_002')}" data-caption="{html.escape(ALT['hc_greyson_002'])}" aria-label="Enlarge Dunes at Dawn No. 002 headcover">{pic('hc_greyson_002',1800,1800)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_rotc_driver')}" data-caption="{html.escape(ALT['hc_rotc_driver'])}" aria-label="Enlarge ROTC driver headcover">{pic('hc_rotc_driver',1800,1800)}</a></figure>
+      <figure><a class="lightbox" href="{FULL('hc_rotc_3wood')}" data-caption="{html.escape(ALT['hc_rotc_3wood'])}" aria-label="Enlarge ROTC 3-wood headcover">{pic('hc_rotc_3wood',1800,1800)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_riverdale')}" data-caption="{html.escape(ALT['hc_riverdale'])}" aria-label="Enlarge: Riverdale headcover">{pic('hc_riverdale',1200,1200)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_india_front')}" data-caption="{html.escape(ALT['hc_india_front'])}" aria-label="Enlarge: Blue jersey — front">{pic('hc_india_front',1200,1200)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_griz_front')}" data-caption="{html.escape(ALT['hc_griz_front'])}" aria-label="Enlarge: Maroon & white matching pair">{pic('hc_griz_front',1200,1200)}</a></figure>
