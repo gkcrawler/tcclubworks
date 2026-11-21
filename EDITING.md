@@ -134,11 +134,12 @@ footer, contact page, and the business data Google reads — 40-odd places.
 ## Website logo
 
 The approved Denver skyline artwork is available in the project as `V2 CCW Logo_Denver.png`.
-Public pages and quote screens display `assets/ccw-denver.webp`. Business listings and quote PDFs use
-`assets/ccw-denver.png`. Header and footer display sizes are set in `assets/style.css`.
+Public pages and quote screens display `assets/ccw-denver-cutout.webp`. Business listings and quote PDFs use
+`assets/ccw-denver-cutout.png`. Header and footer display sizes are set in `assets/style.css`.
 
-For a logo change, export the square artwork as WebP and PNG, refresh the three
-`assets/icon-*.png` sizes and center the complete logo on the 1200 × 630 `assets/og-image.jpg` card.
+For the website, keep the area around the helmet and lettering transparent. The wide and narrow
+layouts use the same cutout. Export the icons on a square transparent canvas and center the full logo
+on the site’s dark background for the 1200 × 630 `assets/og-image.jpg` card.
 Use new filenames for logo assets requested directly by the quote scripts so returning users see the change.
 
 ## What is *not* in content.toml

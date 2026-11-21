@@ -15,7 +15,7 @@
     if(!assets) assets = Promise.all([
       bytes('/assets/fonts/LiberationSans-Regular.ttf'),
       bytes('/assets/fonts/LiberationSans-Bold.ttf'),
-      bytes('/assets/ccw-denver.png')
+      bytes('/assets/ccw-denver-cutout.png')
     ]).catch(function(err){ assets=null; throw err; });
     var resources = await assets;
     var pdf = await PDFLib.PDFDocument.create();

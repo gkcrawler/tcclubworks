@@ -20,7 +20,7 @@
 .shop-strip{background:#111723;border-top:1px solid #28303e;border-bottom:1px solid #28303e}
 .shop-strip .wrap{display:flex;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px;font-size:.76rem;color:#d1d4dd}
 .shop-strip span::before{content:'↗';color:#83e9dc;margin-right:12px}
-.shop-collection{padding-top:70px;padding-bottom:74px;scroll-margin-top:100px;min-height:650px}
+.shop-collection{padding-top:70px;padding-bottom:74px;min-height:650px}
 .shop-section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:28px}
 .shop-section-heading .eyebrow{margin-bottom:13px}
 .shop-section-heading h2{font-size:clamp(2rem,4vw,3rem);text-transform:none;letter-spacing:-.045em;margin:0}

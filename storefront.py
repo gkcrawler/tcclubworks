@@ -136,7 +136,7 @@ def page(config):
     products = config.get("products", [])
     hero_image = products[0] if products else None
     image = (f'<img src="{esc(hero_image["image"])}" alt="{esc(hero_image["image_alt"])}" width="1254" height="1254" fetchpriority="high">'
-             if hero_image else '<img src="/assets/ccw-denver.webp" alt="Chronic Clubworks" width="512" height="512">')
+             if hero_image else '<img src="/assets/ccw-denver-cutout.webp" alt="Chronic Clubworks" width="640" height="592">')
     banner = '<div class="shop-preview-bar">Store preview · Checkout is not open yet</div>' if preview else ''
     catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store)
     preview_dialogs = '''<dialog id="product-dialog" class="shop-dialog" aria-labelledby="product-title">
