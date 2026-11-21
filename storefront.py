@@ -86,11 +86,13 @@ def live_catalog(store):
       <template>
         <article class="shop-card">
           <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
+          <span data-product-availability hidden><shopify-data query="product.availableForSale"></shopify-data></span>
           <button class="shop-image-button" data-live-product aria-label="View product details">
             <shopify-media query="product.featuredImage" width="600" height="600"></shopify-media>
           </button>
           <div class="shop-card-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
             <h3><button class="shop-title-button" data-live-product><shopify-data query="product.title"></shopify-data></button></h3>
+            <span class="shop-stock" data-marker-stock hidden>In Stock</span>
             <div class="shop-card-bottom"><span class="shop-price">From <shopify-money query="product.priceRange.minVariantPrice"></shopify-money></span>
               <button class="shop-text-button" data-live-product>View details ↗</button></div>
           </div>
@@ -117,6 +119,8 @@ def live_catalog(store):
       </div>
       <div class="shop-detail-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
         <h2><shopify-data query="product.title"></shopify-data></h2>
+        <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
+        <span class="shop-stock" data-marker-stock hidden>In Stock</span>
         <p class="shop-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <small>USD</small></p>
         <div class="shop-description"><shopify-data query="product.descriptionHtml"></shopify-data></div>
         <shopify-variant-selector></shopify-variant-selector>
@@ -171,6 +175,7 @@ def page(config):
     <h1>CCW Denver<br><span>Ball Marker</span></h1>
     <p class="shop-lede">The Denver skyline sits across the visor of our turquoise and pink CCW mask. A polished metal edge frames the enamel face, with “Denver, CO” on the back.</p>
     <p class="shop-price">$15.00 <small>USD each</small></p>
+    <span id="marker-stock" class="shop-stock" hidden>In Stock</span>
     <p class="shop-fine">${marker_rate:g} flat U.S. shipping per order. Quarter shown for scale.</p>
     <div class="shop-hero-actions"><button class="shop-primary" id="open-marker" hidden>Shop the ball marker</button>
       <a id="marker-inquiry" class="shop-text-button" href="mailto:info@tcclubworks.io?subject=CCW%20Denver%20Ball%20Marker">Ask about availability</a>

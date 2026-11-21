@@ -115,9 +115,14 @@
     // Native Shopify cart owns quantity; do not display an inaccurate local count.
     $('bag-count').hidden=true;
     const detail=$('shop-product-detail');
+    const markerHandle = 'ccw-denver-ball-marker';
+    const available = scope => scope?.querySelector('[data-product-availability]')?.textContent.trim() === 'true';
     const syncAvailability=() => {
       const button=detail.querySelector('[data-live-add]');
-      if(button) button.disabled=detail.querySelector('[data-product-availability]')?.textContent.trim() !== 'true';
+      const canBuy = available(detail);
+      if(button) button.disabled = !canBuy;
+      const stock = detail.querySelector('[data-marker-stock]');
+      if (stock) stock.hidden = !canBuy || detail.querySelector('[data-catalog-handle]')?.textContent.trim() !== markerHandle;
     };
     new MutationObserver(syncAvailability).observe(detail,{childList:true,characterData:true,subtree:true});
     const catalog=$('shop-collection');
@@ -125,9 +130,15 @@
     let markerDetails;
     function syncMarker() {
       const handle = [...catalog.querySelectorAll('[data-catalog-handle]')].find(
-        node => node.textContent.trim() === 'ccw-denver-ball-marker'
+        node => node.textContent.trim() === markerHandle
       );
-      markerDetails = handle?.closest('.shop-card')?.querySelector('[data-live-product]');
+      const card = handle?.closest('.shop-card');
+      const inStock = available(card);
+      $('marker-stock').hidden = !inStock;
+      catalog.querySelectorAll('[data-marker-stock]').forEach(label => {
+        label.hidden = !inStock || label.closest('.shop-card') !== card;
+      });
+      markerDetails = card?.querySelector('[data-live-product]');
       markerButton.hidden = !markerDetails;
       $('marker-inquiry').hidden = Boolean(markerDetails);
     }
