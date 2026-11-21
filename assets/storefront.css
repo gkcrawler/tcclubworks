@@ -48,6 +48,8 @@
 .shop-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .shop-price{font-size:1.15rem;font-weight:650;letter-spacing:-.03em;white-space:nowrap}
 .shop-stock{display:block;margin:6px 0;color:var(--shop-accent);font-size:.85rem;font-weight:650}
+.shop-sold-out{color:var(--shop-muted)}
+#pins-and-aces{scroll-margin-top:110px}
 .shop-price small{font-size:.67rem;letter-spacing:.04em;color:#b5b9c9;font-weight:500}
 .shop-card-bottom .shop-text-button{font-size:.72rem}
 .shop-empty{border:1px solid #41485d;background:linear-gradient(110deg,#151c2b,#121426);padding:54px;max-width:750px}

@@ -62,19 +62,35 @@
     }
     $('bag-count').textContent=String(bag.size);
   }
+  const supplier = 'Pins and Aces';
   let currentFilter = 'all';
+  function matchesFilter(card) {
+    if (currentFilter === 'all') return true;
+    if (currentFilter === supplier) return card.querySelector('[data-vendor]')?.textContent.trim() === supplier;
+    const type = (card.dataset.category || card.querySelector('[data-type]')?.textContent || '').trim();
+    if (currentFilter === 'Headcovers') return /^headcovers?\b/i.test(type);
+    if (currentFilter === 'Apparel') return /\b(apparel|outerwear|hoodies?)\b/i.test(type);
+    if (currentFilter === 'Hats') return /\b(hats?|caps?)\b/i.test(type);
+    return type.toLowerCase() === currentFilter.toLowerCase();
+  }
   function filterProducts() {
     const cards = [...document.querySelectorAll('.shop-card')];
-    let visible = 0;
-    cards.forEach(card => {const show = currentFilter === 'all' || (preview ? card.dataset.category : card.querySelector('.shop-meta')?.textContent)?.trim().toLowerCase() === currentFilter.toLowerCase(); card.hidden = !show; if(show) visible++;});
-    const empty = $('shop-empty');
-    empty.hidden = visible > 0 || (!preview && !cards.length);
-    if (!empty.hidden) {
-      empty.querySelector('.eyebrow').textContent = currentFilter === 'Apparel' ? 'CCW apparel' : 'The next drop';
-      empty.querySelector('h3').textContent = currentFilter === 'Apparel' ? 'Off the bench. Into your rotation.' : 'More pieces are on the way.';
-      empty.querySelector('p:not(.eyebrow)').textContent = currentFilter === 'Apparel' ? 'The first apparel release is in the works. Come back for the drop.' : 'No pieces are listed in this category right now.';
-    }
+    for (const card of cards) card.hidden = !matchesFilter(card);
+    $('shop-empty').hidden = (!preview && !cards.length) || cards.some(card => !card.hidden);
   }
+  function selectFilter(value) {
+    currentFilter = value;
+    document.querySelectorAll('[data-filter]').forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.filter === value));
+    });
+    filterProducts();
+  }
+  function readCollectionLink() {
+    if (location.hash === '#pins-and-aces' && !preview) selectFilter(supplier);
+    else if (location.hash === '#collection') selectFilter('all');
+  }
+  window.addEventListener('hashchange', readCollectionLink);
+  readCollectionLink();
   document.addEventListener('click', event => {
     const close = event.target.closest('[data-close]');
     if (close) closeDialog(close.dataset.close);
@@ -82,10 +98,11 @@
     if (preview && draft) previewProduct(draft.dataset.product);
     const filter = event.target.closest('[data-filter]');
     if (filter) {
-      currentFilter=filter.dataset.filter;
-      document.querySelectorAll('[data-filter]').forEach(b => b.setAttribute('aria-pressed', String(b===filter)));
-      filterProducts();
+      selectFilter(filter.dataset.filter);
+      if (currentFilter === supplier) history.replaceState(null, '', '#pins-and-aces');
+      else if (location.hash === '#pins-and-aces') history.replaceState(null, '', '#collection');
     }
+    if (event.target.closest('a[href="#collection"]')) selectFilter('all');
     if (!preview) {
       const details=event.target.closest('[data-live-product]');
       if(details) {$('shop-product-detail').update(event); showDialog('product-dialog');}
@@ -121,8 +138,10 @@
       const button=detail.querySelector('[data-live-add]');
       const canBuy = available(detail);
       if(button) button.disabled = !canBuy;
-      const stock = detail.querySelector('[data-marker-stock]');
-      if (stock) stock.hidden = !canBuy || detail.querySelector('[data-catalog-handle]')?.textContent.trim() !== markerHandle;
+      const stock = detail.querySelector('[data-stock]');
+      if (stock) stock.hidden = !canBuy;
+      const shipping = detail.querySelector('[data-supplier-shipping]');
+      if (shipping) shipping.hidden = detail.querySelector('[data-vendor]')?.textContent.trim() !== supplier;
     };
     new MutationObserver(syncAvailability).observe(detail,{childList:true,characterData:true,subtree:true});
     const catalog=$('shop-collection');
@@ -135,9 +154,6 @@
       const card = handle?.closest('.shop-card');
       const inStock = available(card);
       $('marker-stock').hidden = !inStock;
-      catalog.querySelectorAll('[data-marker-stock]').forEach(label => {
-        label.hidden = !inStock || label.closest('.shop-card') !== card;
-      });
       markerDetails = card?.querySelector('[data-live-product]');
       markerButton.hidden = !markerDetails;
       $('marker-inquiry').hidden = Boolean(markerDetails);
@@ -153,8 +169,21 @@
       const pagination=catalog.querySelector('.shop-pagination');
       if(pagination) pagination.hidden=!(hasNextPage || hasPreviousPage);
     },true);
-    const observer=new MutationObserver(() => {filterProducts(); syncMarker(); if(document.querySelector('.shop-card')) $('shop-connection-status').textContent='';});
+    function syncCatalog() {
+      const cards = catalog.querySelectorAll('.shop-card');
+      for (const card of cards) {
+        const ready = Boolean(card.querySelector('[data-catalog-handle]')?.textContent.trim());
+        const canBuy = available(card);
+        card.querySelector('[data-stock]').hidden = !ready || !canBuy;
+        card.querySelector('[data-sold-out]').hidden = !ready || canBuy;
+      }
+      filterProducts();
+      syncMarker();
+      if (cards.length) $('shop-connection-status').textContent='';
+    }
+    const observer=new MutationObserver(syncCatalog);
     observer.observe(catalog,{childList:true,characterData:true,subtree:true});
+    syncCatalog();
     window.setTimeout(() => {
       if(!document.querySelector('.shop-card')) $('shop-connection-status').textContent='No products are available to display right now. Please try again later or contact info@tcclubworks.io.';
     },12000);

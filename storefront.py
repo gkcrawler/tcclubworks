@@ -90,9 +90,10 @@ def live_catalog(store):
           <button class="shop-image-button" data-live-product aria-label="View product details">
             <shopify-media query="product.featuredImage" width="600" height="600"></shopify-media>
           </button>
-          <div class="shop-card-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
+          <div class="shop-card-copy"><p class="shop-meta"><span data-vendor><shopify-data query="product.vendor"></shopify-data></span> · <span data-type><shopify-data query="product.productType"></shopify-data></span></p>
             <h3><button class="shop-title-button" data-live-product><shopify-data query="product.title"></shopify-data></button></h3>
-            <span class="shop-stock" data-marker-stock hidden>In Stock</span>
+            <span class="shop-stock" data-stock hidden>In Stock</span>
+            <span class="shop-stock shop-sold-out" data-sold-out hidden>Sold out</span>
             <div class="shop-card-bottom"><span class="shop-price">From <shopify-money query="product.priceRange.minVariantPrice"></shopify-money></span>
               <button class="shop-text-button" data-live-product>View details ↗</button></div>
           </div>
@@ -117,15 +118,16 @@ def live_catalog(store):
           </figure></template>
         </shopify-list-context>
       </div>
-      <div class="shop-detail-copy"><p class="shop-meta"><shopify-data query="product.productType"></shopify-data></p>
+      <div class="shop-detail-copy"><p class="shop-meta"><span data-vendor><shopify-data query="product.vendor"></shopify-data></span> · <shopify-data query="product.productType"></shopify-data></p>
         <h2><shopify-data query="product.title"></shopify-data></h2>
         <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
-        <span class="shop-stock" data-marker-stock hidden>In Stock</span>
+        <span class="shop-stock" data-stock hidden>In Stock</span>
         <p class="shop-price"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money> <small>USD</small></p>
         <div class="shop-description"><shopify-data query="product.descriptionHtml"></shopify-data></div>
         <shopify-variant-selector></shopify-variant-selector>
         <span data-product-availability hidden><shopify-data query="product.selectedOrFirstAvailableVariant.availableForSale"></shopify-data></span>
         <button class="shop-primary shop-add" data-live-add disabled><span class="available-label">Add to bag</span><span class="unavailable-label">Unavailable</span></button>
+        <p class="shop-fine" data-supplier-shipping hidden>Pins and Aces ships this item directly. Its shipping rate is shown at checkout.</p>
         <p class="shop-fine">Items are not reserved until checkout. Shipping and tax are shown before payment.</p>
         <a class="shop-policy-link" href="/shop-policies">Shipping &amp; returns</a>
       </div>
@@ -154,9 +156,9 @@ def page(config):
     # Escaping '<' prevents a product string from closing the JSON script element.
     data = json.dumps({"mode": store["mode"], "shipping": store["shipping_flat_usd"], "delivery": store["delivery_time"], "products": products if preview else []}).replace('<', '\\u003c')
     pickup_strip = '<span>Denver pickup by appointment</span>' if store.get('pickup') else ''
-    delivery_strip = f'<span>{esc(store["delivery_time"])}</span>' if store["delivery_time"] else ''
     marker_rate = store['ball_marker_shipping_usd']
-    shipping_label = f"Ball markers · ${marker_rate:g} flat U.S. shipping"
+    supplier_link = '' if preview else '<a class="shop-text-button" href="#pins-and-aces">Shop Pins and Aces ↘</a>'
+    supplier_filter = '' if preview else '<button id="pins-and-aces" data-filter="Pins and Aces" aria-pressed="false">Pins and Aces</button>'
     gallery = [
         ("front", "Turquoise and pink CCW enamel ball marker with a Denver skyline across the visor"),
         ("edge", "Angled view of the enamel face and polished metal edge"),
@@ -176,22 +178,22 @@ def page(config):
     <p class="shop-lede">The Denver skyline sits across the visor of our turquoise and pink CCW mask. A polished metal edge frames the enamel face, with “Denver, CO” on the back.</p>
     <p class="shop-price">$15.00 <small>USD each</small></p>
     <span id="marker-stock" class="shop-stock" hidden>In Stock</span>
-    <p class="shop-fine">${marker_rate:g} flat U.S. shipping per order. Quarter shown for scale.</p>
+    <p class="shop-fine">${marker_rate:g} flat U.S. shipping on ball markers. Quarter shown for scale.</p>
     <div class="shop-hero-actions"><button class="shop-primary" id="open-marker" hidden>Shop the ball marker</button>
       <a id="marker-inquiry" class="shop-text-button" href="mailto:info@tcclubworks.io?subject=CCW%20Denver%20Ball%20Marker">Ask about availability</a>
-      <a class="shop-text-button" href="#collection">Browse the collection ↘</a></div>
+      <a class="shop-text-button" href="#collection">Browse the collection ↘</a>{supplier_link}</div>
   </div>
   <div class="shop-marker-photos" aria-label="Ball marker photos">{''.join(marker_photos)}</div>
 </section>
-<div class="shop-strip"><div class="wrap"><span>{shipping_label}</span>{delivery_strip}{pickup_strip}<span>{store['return_days']}-day returns · unused items</span></div></div>
+<div class="shop-strip"><div class="wrap"><span>CCW ball markers · ${marker_rate:g} flat U.S. shipping</span>{pickup_strip}<span>Supplier shipping calculated at checkout</span><a href="/shop-policies">Shipping &amp; returns ↗</a></div></div>
 <section class="shop-collection wrap" id="collection" aria-labelledby="collection-title">
-  <div class="shop-section-heading"><div><p class="eyebrow">Small runs. Personal touches.</p><h2 id="collection-title">The collection.</h2></div>
+  <div class="shop-section-heading"><div><h2 id="collection-title">The collection.</h2></div>
     <button class="shop-bag-button" id="open-bag" aria-haspopup="dialog">Bag <span id="bag-count" aria-label="items in bag">0</span></button></div>
   <div class="shop-filters" role="group" aria-label="Filter products">
-    <button data-filter="all" aria-pressed="true">All pieces</button><button data-filter="Ball Markers" aria-pressed="false">Ball markers</button><button data-filter="Headcovers" aria-pressed="false">Headcovers</button><button data-filter="Apparel" aria-pressed="false">Apparel</button>
+    <button data-filter="all" aria-pressed="true">All pieces</button>{supplier_filter}<button data-filter="Ball Markers" aria-pressed="false">Ball markers</button><button data-filter="Headcovers" aria-pressed="false">Headcovers</button><button data-filter="Apparel" aria-pressed="false">Apparel</button><button data-filter="Hats" aria-pressed="false">Hats</button>
   </div>
   {catalog}
-  <div id="shop-empty" class="shop-empty" hidden><p class="eyebrow">CCW apparel</p><h3>Off the bench.<br>Into your rotation.</h3><p>The first apparel release is in the works. Come back for the drop.</p><a class="shop-text-button" href="/contact">Get in touch ↗</a></div>
+  <p id="shop-empty" class="shop-fine" role="status" hidden>No matching items on this page.</p>
   <p class="shop-fine" id="shop-announcement" role="status" aria-live="polite"></p>
 </section>
 <section class="shop-custom"><div class="wrap"><div><p class="eyebrow">Something only you could carry</p><h2>Your story.<br>Your headcover.</h2></div><div><p>A favorite jersey. A thrift-store find. Something with a little history. Let's turn it into your next headcover.</p><a class="shop-primary" href="/contact">Talk through an idea ↗</a></div></div></section>
@@ -202,8 +204,8 @@ def page(config):
     extra = '<link rel="stylesheet" href="/assets/storefront.css">'
     if not preview:
         extra += '<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>'
-    return dict(path="/shop", title="Shop Golf Ball Markers & Custom Headcovers | Chronic Clubworks",
-                desc="Shop the CCW Denver enamel golf ball marker and custom golf headcovers from Chronic Clubworks. U.S. shipping available.",
+    return dict(path="/shop", title="Shop CCW Golf Gear & Pins and Aces | Chronic Clubworks",
+                desc="Shop CCW Denver ball markers and custom headcovers alongside Pins and Aces driver, hybrid and putter covers, golf hoodies and hats.",
                 schemas=[], body=body, noindex=preview, tracking=False, extra_head=extra)
 
 
@@ -214,21 +216,23 @@ def policy_pages(config):
     dispatch = esc(store["dispatch_time"]) or 'Dispatch time will be confirmed before the store opens.'
     delivery = esc(store["delivery_time"]) or 'Delivery time will be confirmed before the store opens.'
     pickup_policy = '<h2>Denver pickup</h2><p>Local pickup is available by appointment. Select pickup at checkout when available. Wait for confirmation that your order is ready; we will provide the pickup details and arrange a time.</p>' if store.get('pickup') else ''
-    shipping_policy = f"Standard U.S. shipping is ${store['ball_marker_shipping_usd']:g} per order containing a CCW Denver Ball Marker, regardless of marker quantity. The India Cricket Custom Headcover ships free when ordered on its own."
+    shipping_policy = f"Standard U.S. shipping for CCW Denver Ball Markers is ${store['ball_marker_shipping_usd']:g}, regardless of marker quantity. The India Cricket Custom Headcover ships free when ordered on its own."
     refund_shipping = ' For products with shipping included in the listed price, an accepted full return refunds that price without an outbound shipping deduction.'
     policies = [
         ("/shop-policies", "Shipping & returns", f'''
 <h2>Shipping in the United States</h2><p>{shipping_policy} Applicable sales tax is shown at checkout. We do not offer international shipping at launch.</p>
-<p>{dispatch} {delivery} The delivery window includes order processing and carrier transit. If we cannot meet the promised shipment date, we will contact you about the delay and your cancellation/refund options. Contact us if delivery is delayed.</p>
+<h2>Items shipped by CCW</h2><p>{dispatch} {delivery} The delivery window includes order processing and carrier transit. If we cannot meet the promised shipment date, we will contact you about the delay and your cancellation/refund options. Contact us if delivery is delayed.</p>
+<h2>Pins and Aces shipping</h2><p>Pins and Aces ships its products directly. Available shipping rates appear at checkout. If your order also includes CCW gear, the items may arrive separately and supplier shipping may be added to the CCW rate.</p>
 {pickup_policy}
-<h2>Returns</h2><p>Contact info@tcclubworks.io within {store['return_days']} days of delivery to request a return of an unused item. The buyer pays return postage for change-of-mind returns. We will provide return instructions before you send it back.</p>
+<h2>Returns</h2><p>For an unused item shipped by CCW, contact info@tcclubworks.io within {store['return_days']} days of delivery to request a return. The buyer pays return postage for change-of-mind returns on these items.</p>
+<p>For Pins and Aces items, email info@tcclubworks.io within 30 days of delivery to request a return. There is no return label fee or restocking fee. Please wait for return instructions before mailing an item.</p>
 <p>We will review the returned item and contact you about the refund. Approved refunds go to the original payment method.{refund_shipping} Your payment provider may take additional time to post the credit.</p>
 <h2>Damaged, defective or incorrect items</h2><p>Email us with your order number and a description of the problem. Photos can help us resolve it. CCW will work with you to resolve defects or an incorrect shipment, including return postage when needed. The change-of-mind return policy does not limit rights provided by applicable law.</p>
 <h2>Personalized work & cancellations</h2><p>This store's return policy covers ready-made products. Any different terms for commissioned or personalized work will be disclosed and agreed before purchase. Contact us promptly if you need to cancel; we will confirm whether your order has shipped.</p>'''),
         ("/shop-privacy", "Store privacy notice", '''
 <h2>Who handles your information</h2><p>Chronic Clubworks, Denver, Colorado, operates this storefront. Contact info@tcclubworks.io with privacy questions or requests.</p>
 <h2>Information used for an order</h2><p>Shopify hosts our shopping cart and checkout. When you place an order, information such as your name, email, delivery or billing address, order details and payment status is used to process payment, fulfill the order, prevent fraud and provide support. Card details are entered with the payment provider; CCW does not collect or store full card numbers or card security codes on this website.</p>
-<h2>Service providers</h2><p>Shopify and its payment services, our website host Netlify, and the delivery carrier may process information needed to provide their services. Shopify checkout may use cookies and related technology for cart operation, security and payment. Visit <a href="https://www.shopify.com/legal/privacy">Shopify's privacy policy</a> for its practices.</p>
+<h2>Service providers</h2><p>Shopify and its payment services, our website host Netlify, and the delivery carrier may process information needed to provide their services. If you order Pins and Aces gear, Pins and Aces receives the order and shipping details needed to fulfill those items and handle returns. Shopify checkout may use cookies and related technology for cart operation, security and payment. Visit <a href="https://www.shopify.com/legal/privacy">Shopify's privacy policy</a> for its practices.</p>
 <h2>Browsing and contacting us</h2><p>Our website host may receive technical information such as your IP address and request logs. The shop pages do not load the site's Google Ads tag. Other pages on tcclubworks.io may use Google advertising technology. If you email us or use the separate contact form, we receive the information you choose to send.</p>
 <h2>Retention and choices</h2><p>We retain order and support records as needed to fulfill orders, handle returns and disputes, and meet tax and recordkeeping obligations. You may ask us to access, correct or delete personal information, subject to applicable legal and recordkeeping requirements. Purchasing does not subscribe you to CCW marketing emails.</p>'''),
         ("/shop-terms", "Store terms", '''
