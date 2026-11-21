@@ -121,6 +121,18 @@
     };
     new MutationObserver(syncAvailability).observe(detail,{childList:true,characterData:true,subtree:true});
     const catalog=$('shop-collection');
+    const markerButton = $('open-marker');
+    let markerDetails;
+    function syncMarker() {
+      const handle = [...catalog.querySelectorAll('[data-catalog-handle]')].find(
+        node => node.textContent.trim() === 'ccw-denver-ball-marker'
+      );
+      markerDetails = handle?.closest('.shop-card')?.querySelector('[data-live-product]');
+      markerButton.hidden = !markerDetails;
+      $('marker-inquiry').hidden = Boolean(markerDetails);
+    }
+    markerButton.addEventListener('click', () => markerDetails?.click());
+    syncMarker();
     catalog.addEventListener('shopify-list-context-update', event => {
       const {hasNextPage,hasPreviousPage}=event.detail;
       const previous=catalog.querySelector('[data-page="previousPage"]');
@@ -130,8 +142,8 @@
       const pagination=catalog.querySelector('.shop-pagination');
       if(pagination) pagination.hidden=!(hasNextPage || hasPreviousPage);
     },true);
-    const observer=new MutationObserver(() => {filterProducts(); if(document.querySelector('.shop-card')) $('shop-connection-status').textContent='';});
-    observer.observe(catalog,{childList:true,subtree:true});
+    const observer=new MutationObserver(() => {filterProducts(); syncMarker(); if(document.querySelector('.shop-card')) $('shop-connection-status').textContent='';});
+    observer.observe(catalog,{childList:true,characterData:true,subtree:true});
     window.setTimeout(() => {
       if(!document.querySelector('.shop-card')) $('shop-connection-status').textContent='No products are available to display right now. Please try again later or contact info@tcclubworks.io.';
     },12000);

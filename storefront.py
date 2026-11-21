@@ -85,6 +85,7 @@ def live_catalog(store):
     <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
       <template>
         <article class="shop-card">
+          <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
           <button class="shop-image-button" data-live-product aria-label="View product details">
             <shopify-media query="product.featuredImage" width="600" height="600"></shopify-media>
           </button>
@@ -134,9 +135,6 @@ def page(config):
     store = config["store"]
     preview = store["mode"] == "preview"
     products = config.get("products", [])
-    hero_image = products[0] if products else None
-    image = (f'<img src="{esc(hero_image["image"])}" alt="{esc(hero_image["image_alt"])}" width="1254" height="1254" fetchpriority="high">'
-             if hero_image else '<img src="/assets/ccw-denver-cutout.webp" alt="Chronic Clubworks" width="640" height="592">')
     banner = '<div class="shop-preview-bar">Store preview · Checkout is not open yet</div>' if preview else ''
     catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store)
     preview_dialogs = '''<dialog id="product-dialog" class="shop-dialog" aria-labelledby="product-title">
@@ -153,25 +151,39 @@ def page(config):
     data = json.dumps({"mode": store["mode"], "shipping": store["shipping_flat_usd"], "delivery": store["delivery_time"], "products": products if preview else []}).replace('<', '\\u003c')
     pickup_strip = '<span>Denver pickup by appointment</span>' if store.get('pickup') else ''
     delivery_strip = f'<span>{esc(store["delivery_time"])}</span>' if store["delivery_time"] else ''
-    shipping_label = 'Free U.S. shipping' if store['shipping_flat_usd'] == 0 else f"${store['shipping_flat_usd']:g} flat-rate U.S. shipping"
+    marker_rate = store['ball_marker_shipping_usd']
+    shipping_label = f"Ball markers · ${marker_rate:g} flat U.S. shipping"
+    gallery = [
+        ("front", "Turquoise and pink CCW enamel ball marker with a Denver skyline across the visor"),
+        ("edge", "Angled view of the enamel face and polished metal edge"),
+        ("scale", "CCW ball marker beside a U.S. quarter for scale"),
+        ("back", "Silver reverse of the marker stamped Denver, CO"),
+    ]
+    marker_photos = []
+    for index, (view, alt) in enumerate(gallery):
+        path = f"/assets/store/ccw-denver-ball-marker-{view}.jpg"
+        loading = 'fetchpriority="high"' if index == 0 else 'loading="lazy"'
+        marker_photos.append(f'<a class="lightbox" href="{path}" data-caption="{alt}"><img src="{path}" alt="{alt}" width="1254" height="1254" {loading}></a>')
     body = f'''<div class="ccw-shop" data-shop-mode="{store['mode']}">
 {banner}
-<section class="shop-intro wrap">
+<section class="shop-intro wrap" id="ccw-denver-ball-marker">
   <div class="shop-intro-copy"><p class="eyebrow">Chronic Clubworks / The shop</p>
-    <h1>One off.<br><span>All yours.</span></h1>
-    <p class="shop-lede">Custom headcovers. CCW apparel.<br>For a bag—and a game—that's your own.</p>
-    <div class="shop-hero-actions"><a class="shop-primary" href="#collection">Explore the collection <span aria-hidden="true">↘</span></a>
-      <a class="shop-text-button" href="/custom-golf-headcovers-denver">Want something custom? ↗</a></div>
-    <div class="shop-hero-foot"><span>DENVER, COLORADO</span><span>BUILT WITH CHARACTER.</span></div>
+    <h1>CCW Denver<br><span>Ball Marker</span></h1>
+    <p class="shop-lede">The Denver skyline sits across the visor of our turquoise and pink CCW mask. A polished metal edge frames the enamel face, with “Denver, CO” on the back.</p>
+    <p class="shop-price">$15.00 <small>USD each</small></p>
+    <p class="shop-fine">${marker_rate:g} flat U.S. shipping per order. Quarter shown for scale.</p>
+    <div class="shop-hero-actions"><button class="shop-primary" id="open-marker" hidden>Shop the ball marker</button>
+      <a id="marker-inquiry" class="shop-text-button" href="mailto:info@tcclubworks.io?subject=CCW%20Denver%20Ball%20Marker">Ask about availability</a>
+      <a class="shop-text-button" href="#collection">Browse the collection ↘</a></div>
   </div>
-  <figure class="shop-hero-image">{image}<figcaption><span>From the CCW bench</span><span>01 / THE DETAILS MATTER</span></figcaption></figure>
+  <div class="shop-marker-photos" aria-label="Ball marker photos">{''.join(marker_photos)}</div>
 </section>
 <div class="shop-strip"><div class="wrap"><span>{shipping_label}</span>{delivery_strip}{pickup_strip}<span>{store['return_days']}-day returns · unused items</span></div></div>
 <section class="shop-collection wrap" id="collection" aria-labelledby="collection-title">
   <div class="shop-section-heading"><div><p class="eyebrow">Small runs. Personal touches.</p><h2 id="collection-title">The collection.</h2></div>
     <button class="shop-bag-button" id="open-bag" aria-haspopup="dialog">Bag <span id="bag-count" aria-label="items in bag">0</span></button></div>
   <div class="shop-filters" role="group" aria-label="Filter products">
-    <button data-filter="all" aria-pressed="true">All pieces</button><button data-filter="Headcovers" aria-pressed="false">Headcovers</button><button data-filter="Apparel" aria-pressed="false">Apparel</button>
+    <button data-filter="all" aria-pressed="true">All pieces</button><button data-filter="Ball Markers" aria-pressed="false">Ball markers</button><button data-filter="Headcovers" aria-pressed="false">Headcovers</button><button data-filter="Apparel" aria-pressed="false">Apparel</button>
   </div>
   {catalog}
   <div id="shop-empty" class="shop-empty" hidden><p class="eyebrow">CCW apparel</p><h3>Off the bench.<br>Into your rotation.</h3><p>The first apparel release is in the works. Come back for the drop.</p><a class="shop-text-button" href="/contact">Get in touch ↗</a></div>
@@ -185,8 +197,8 @@ def page(config):
     extra = '<link rel="stylesheet" href="/assets/storefront.css">'
     if not preview:
         extra += '<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>'
-    return dict(path="/shop", title="Shop Headcovers & CCW Apparel | Chronic Clubworks",
-                desc="Explore custom golf headcovers and Chronic Clubworks apparel. One-off pieces from Denver, with U.S. shipping.",
+    return dict(path="/shop", title="Shop Golf Ball Markers & Custom Headcovers | Chronic Clubworks",
+                desc="Shop the CCW Denver enamel golf ball marker and custom golf headcovers from Chronic Clubworks. U.S. shipping available.",
                 schemas=[], body=body, noindex=preview, tracking=False, extra_head=extra)
 
 
@@ -197,8 +209,8 @@ def policy_pages(config):
     dispatch = esc(store["dispatch_time"]) or 'Dispatch time will be confirmed before the store opens.'
     delivery = esc(store["delivery_time"]) or 'Delivery time will be confirmed before the store opens.'
     pickup_policy = '<h2>Denver pickup</h2><p>Local pickup is available by appointment. Select pickup at checkout when available. Wait for confirmation that your order is ready; we will provide the pickup details and arrange a time.</p>' if store.get('pickup') else ''
-    shipping_policy = 'Free standard shipping within the United States. Shipping is included in the listed product price.' if store['shipping_flat_usd'] == 0 else f"Standard U.S. shipping is ${store['shipping_flat_usd']:g} per order."
-    refund_shipping = ' An accepted full return refunds the product price paid, including the amount built into it for outbound shipping. No separate outbound shipping deduction will be added.' if store['shipping_flat_usd'] == 0 else ''
+    shipping_policy = f"Standard U.S. shipping is ${store['ball_marker_shipping_usd']:g} per order containing a CCW Denver Ball Marker, regardless of marker quantity. The India Cricket Custom Headcover ships free when ordered on its own."
+    refund_shipping = ' For products with shipping included in the listed price, an accepted full return refunds that price without an outbound shipping deduction.'
     policies = [
         ("/shop-policies", "Shipping & returns", f'''
 <h2>Shipping in the United States</h2><p>{shipping_policy} Applicable sales tax is shown at checkout. We do not offer international shipping at launch.</p>

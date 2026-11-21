@@ -7,6 +7,7 @@ collection = "ccw-storefront"
 country = "US"
 currency = "USD"
 shipping_flat_usd = 0
+ball_marker_shipping_usd = 3
 pickup = false
 dispatch_time = "Orders ship the same or next business day."
 delivery_time = "Expected U.S. delivery is 3–5 business days after ordering."
