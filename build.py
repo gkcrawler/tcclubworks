@@ -899,6 +899,7 @@ PAGES.append(dict(path="/custom-golf-headcovers-denver",
       <p class="note">Select any photo to enlarge.</p>
     </div>
     <div class="headcover-gallery">
+      <figure><a class="lightbox" href="{FULL('hc_coors_cowboy')}" data-caption="{html.escape(ALT['hc_coors_cowboy'])}" aria-label="Enlarge Coors Cowboy headcover">{pic('hc_coors_cowboy',1800,1800)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_greyson_002')}" data-caption="{html.escape(ALT['hc_greyson_002'])}" aria-label="Enlarge Dunes at Dawn No. 002 headcover">{pic('hc_greyson_002',1800,1800)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_rotc_driver')}" data-caption="{html.escape(ALT['hc_rotc_driver'])}" aria-label="Enlarge ROTC driver headcover">{pic('hc_rotc_driver',1800,1800)}</a></figure>
       <figure><a class="lightbox" href="{FULL('hc_rotc_3wood')}" data-caption="{html.escape(ALT['hc_rotc_3wood'])}" aria-label="Enlarge ROTC 3-wood headcover">{pic('hc_rotc_3wood',1800,1800)}</a></figure>
