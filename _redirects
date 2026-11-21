@@ -20,3 +20,9 @@ http://www.tcclubworks.io/*  https://tcclubworks.io/:splat  301!
 /loft-adjustment  /golf-club-repair-denver#loft-and-lie  301!
 /lie-adjustment  /golf-club-repair-denver#loft-and-lie  301!
 /custom-paint  /golf-club-repair-denver#custom-clubmaking  301!
+/assets/logo-v2.svg  /assets/ccw-denver.webp  301!
+/assets/ccw-quote-helmet.webp  /assets/ccw-denver.webp  301!
+/assets/logo.png  /assets/ccw-denver.png  301!
+/assets/quote-logo.png  /assets/ccw-denver.png  301!
+/assets/ccw-quote-helmet.png  /assets/ccw-denver.png  301!
+/favicon.ico  /assets/icon-32.png  301!

@@ -97,7 +97,7 @@ def biz():
       "name":BRAND,
       "description":"Custom golf clubmaking, precision golf club repair, and handmade custom golf headcovers serving the Denver metro. Reshafting, regripping, loft and lie adjustment, putter restoration, and one-off headcover builds.",
       "url":D,"email":EMAIL,"telephone":TEL_E,"image":D+"/assets/og-image.jpg",
-      "logo":D+"/assets/logo-v2.svg","priceRange":"$$",
+      "logo":D+"/assets/ccw-denver.png","priceRange":"$$",
       "address":{"@type":"PostalAddress","addressLocality":"Denver","addressRegion":"CO","addressCountry":"US"},
       "geo":{"@type":"GeoCoordinates","latitude":39.7392,"longitude":-104.9903},
       "areaServed":cities + [
@@ -195,7 +195,7 @@ def header(active):
     return f"""<header>
   <div class="wrap nav">
     <a class="logo" href="/" aria-label="{BRAND} home">
-      <img src="/assets/logo-v2.svg" alt="{BRAND}" width="320" height="154">
+      <img src="/assets/ccw-denver.webp" alt="{BRAND}" width="512" height="512">
     </a>
     <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">☰</button>
     <nav class="menu" id="menu">{links}</nav>
@@ -298,7 +298,7 @@ def footer():
     <div class="fcols">
       <div>
         <div class="brandrow">
-          <a class="logo" href="/"><img src="/assets/logo-v2.svg" alt="{BRAND}" width="320" height="154"></a>
+          <a class="logo" href="/"><img src="/assets/ccw-denver.webp" alt="{BRAND}" width="512" height="512"></a>
           <a class="cert lightbox" href="/assets/img/cert-full.jpg"
              data-caption="Golfsmith Distinguished Clubmaker Award presented to Paul Cohn, 2002"
              aria-label="View the Golfsmith Distinguished Clubmaker Award certificate">
@@ -419,7 +419,7 @@ def admin_quotes_page():
 <main class="admin-shell">
   <section class="admin-hero">
     <div>
-      <img src="/assets/ccw-quote-helmet.webp" alt="{BRAND}" width="720" height="699">
+      <img src="/assets/ccw-denver.webp" alt="{BRAND}" width="512" height="512">
       <p><a href="/admin/shop/">← Shop command center</a></p>
       <p class="eyebrow">Admin quotes</p>
       <h1>Estimate builder</h1>
@@ -1227,7 +1227,13 @@ REDIR=[("/services","/golf-club-repair-denver"),
  ("/club-regrip","/golf-club-repair-denver#reshafting-regripping"),
  ("/loft-adjustment","/golf-club-repair-denver#loft-and-lie"),
  ("/lie-adjustment","/golf-club-repair-denver#loft-and-lie"),
- ("/custom-paint","/golf-club-repair-denver#custom-clubmaking")]
+ ("/custom-paint","/golf-club-repair-denver#custom-clubmaking"),
+ ("/assets/logo-v2.svg","/assets/ccw-denver.webp"),
+ ("/assets/ccw-quote-helmet.webp","/assets/ccw-denver.webp"),
+ ("/assets/logo.png","/assets/ccw-denver.png"),
+ ("/assets/quote-logo.png","/assets/ccw-denver.png"),
+ ("/assets/ccw-quote-helmet.png","/assets/ccw-denver.png"),
+ ("/favicon.ico","/assets/icon-32.png")]
 # www rules run only after www.tcclubworks.io is a domain on this Netlify site
 # and DNS for www points at Netlify. See the note in netlify.toml.
 WWW=[("https://www.tcclubworks.io/*","https://tcclubworks.io/:splat"),

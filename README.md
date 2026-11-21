@@ -138,22 +138,15 @@ wide**. Around 1200×1500px is ideal. Anything wider gets cropped to the centre.
 | `shop` | About page hero |
 | `w1`–`w7` | The work gallery |
 
-## Change the header logo
+## Website logo
 
-The logo is `assets/logo-v2.svg`, used in the header and footer of every page.
+The approved Denver skyline artwork is available in the project as `V2 CCW Logo_Denver.png`.
+Public pages and quote screens display `assets/ccw-denver.webp`. Business listings and quote PDFs use
+`assets/ccw-denver.png`. Header and footer display sizes are set in `assets/style.css`.
 
-- **Same logo, new file:** replace `assets/logo-v2.svg`, keeping the filename. Done.
-- **Different filename or format:** search `build.py` for `logo-v2.svg` and update the three
-  places it appears (header, footer, and the `logo` field in the schema).
-- **Resize it:** it's CSS, not the file. In `assets/style.css`:
-  ```css
-  .logo img{width:168px}        /* header  */
-  footer .logo img{width:190px} /* footer  */
-  ```
-
-If you swap the logo, regenerate the favicons and social card to match — they were
-generated from the current one and will otherwise be out of date.
-
+For a logo change, export the square artwork as WebP and PNG, refresh the three
+`assets/icon-*.png` sizes and center the complete logo on the 1200 × 630 `assets/og-image.jpg` card.
+Use new filenames for logo assets requested directly by the quote scripts so returning users see the change.
 
 ## Every image slot on the site
 

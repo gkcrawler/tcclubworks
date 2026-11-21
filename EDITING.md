@@ -131,16 +131,15 @@ footer, contact page, and the business data Google reads — 40-odd places.
 
 ---
 
-## Replacing the logo
+## Website logo
 
-The logo is `assets/logo-v2.svg`. Upload a replacement with **exactly that filename**
-and it swaps everywhere — header, footer, and the business data Google reads.
+The approved Denver skyline artwork is available in the project as `V2 CCW Logo_Denver.png`.
+Public pages and quote screens display `assets/ccw-denver.webp`. Business listings and quote PDFs use
+`assets/ccw-denver.png`. Header and footer display sizes are set in `assets/style.css`.
 
-If you replace it and still see the old one after a few minutes, that's your browser
-holding a cached copy. Hard-refresh (**Cmd/Ctrl + Shift + R**). Assets refresh within
-an hour for everyone else.
-
----
+For a logo change, export the square artwork as WebP and PNG, refresh the three
+`assets/icon-*.png` sizes and center the complete logo on the 1200 × 630 `assets/og-image.jpg` card.
+Use new filenames for logo assets requested directly by the quote scripts so returning users see the change.
 
 ## What is *not* in content.toml
 
