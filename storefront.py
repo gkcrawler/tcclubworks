@@ -104,7 +104,7 @@ def product_grid(group=None):
             <h3><button class="shop-title-button" data-live-product><shopify-data query="product.title"></shopify-data></button></h3>
             <span class="shop-stock" data-stock hidden>In Stock</span>
             <span class="shop-stock shop-sold-out" data-sold-out hidden>Sold out</span>
-            <div class="shop-card-bottom"><span class="shop-price">From <shopify-money query="product.priceRange.minVariantPrice"></shopify-money></span>
+            <div class="shop-card-bottom"><span class="shop-price"><shopify-money query="product.priceRange.minVariantPrice"></shopify-money></span>
               <button class="shop-text-button" data-live-product>View details ↗</button></div>
           </div>
         </article>
