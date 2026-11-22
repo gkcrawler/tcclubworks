@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://tcclubworks.io/assets/og-image.jpg?v=c5fe396ac5">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/style.css?v=f8691d0f01">
-<link rel="stylesheet" href="assets/storefront.css?v=bdbc40e740"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<link rel="stylesheet" href="assets/storefront.css?v=943408d850"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 
 <meta name="ccw-tracking" content="off">
 </head>
@@ -46,9 +46,9 @@
 <p class="shop-lede">Two embroidered rope hats, a Maidstone Blue polo and a dune-striped hoodie. The polo and hoodie are made to order in sizes S–XL.</p>
   <shopify-store store-domain="https://tdb7xz-4w.myshopify.com" country="US" language="en"></shopify-store>
 <shopify-context type="collection" handle="members-only" id="shop-collection">
-  <template>
+  <template><div class="members-groups"><section data-member-group="Apparel" aria-labelledby="members-apparel" data-product-list><h2 id="members-apparel">Apparel</h2>
     <div class="shop-grid">
-    <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
+    <shopify-list-context type="product" query="collection.products" first="50">
       <template>
         <article class="shop-card">
           <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
@@ -68,6 +68,29 @@
     </shopify-list-context>
     </div>
     <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
+    </section><section data-member-group="Hats" aria-labelledby="members-hats" data-product-list><h2 id="members-hats">Hats</h2>
+    <div class="shop-grid">
+    <shopify-list-context type="product" query="collection.products" first="50">
+      <template>
+        <article class="shop-card">
+          <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
+          <span data-product-availability hidden><shopify-data query="product.availableForSale"></shopify-data></span>
+          <button class="shop-image-button" data-live-product aria-label="View product details">
+            <shopify-media query="product.featuredImage" width="600" height="600"></shopify-media>
+          </button>
+          <div class="shop-card-copy"><p class="shop-meta"><span data-vendor><shopify-data query="product.vendor"></shopify-data></span> · <span data-type><shopify-data query="product.productType"></shopify-data></span></p>
+            <h3><button class="shop-title-button" data-live-product><shopify-data query="product.title"></shopify-data></button></h3>
+            <span class="shop-stock" data-stock hidden>In Stock</span>
+            <span class="shop-stock shop-sold-out" data-sold-out hidden>Sold out</span>
+            <div class="shop-card-bottom"><span class="shop-price">From <shopify-money query="product.priceRange.minVariantPrice"></shopify-money></span>
+              <button class="shop-text-button" data-live-product>View details ↗</button></div>
+          </div>
+        </article>
+      </template>
+    </shopify-list-context>
+    </div>
+    <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
+    </section></div>
   </template>
   <p shopify-loading-placeholder>Loading the collection…</p>
 </shopify-context>
@@ -108,7 +131,7 @@
 
 <div class="shop-service-links wrap"><a href="/shop-policies">Shipping &amp; returns ↗</a><a href="/shop-privacy">Privacy ↗</a><a href="/shop-terms">Terms ↗</a><a href="mailto:info@tcclubworks.io">Need a hand? Email CCW ↗</a></div>
 <script type="application/json" id="shop-data">{"mode": "live", "shipping": 0, "delivery": "Expected U.S. delivery is 3\u20135 business days after ordering.", "products": []}</script>
-<script defer src="assets/storefront.js?v=8750774e9e"></script>
+<script defer src="assets/storefront.js?v=060fb3072a"></script>
 </div></main><footer>
   <div class="wrap">
     <div class="fcols">

@@ -70,8 +70,11 @@
     const vendor = card.querySelector('[data-vendor]')?.textContent.trim();
     if (partnerShop) return vendor === supplier;
     if (vendor === supplier) return false;
-    if (storefront === 'members') return true;
     const type = (card.dataset.category || card.querySelector('[data-type]')?.textContent || '').trim();
+    if (storefront === 'members') {
+      const group = /\b(hats?|caps?)\b/i.test(type) ? 'Hats' : 'Apparel';
+      return Boolean(type) && card.closest('[data-member-group]')?.dataset.memberGroup === group;
+    }
     let category;
     if (/\bhead\s*covers?\b/i.test(type)) category = 'Headcovers';
     else if (/\bball\s*markers?\b/i.test(type)) category = 'Ball Markers';
@@ -119,7 +122,9 @@
         $('shop-cart').addLine(event); closeDialog('product-dialog'); $('shop-cart').showModal();
       }
       const page=event.target.closest('[data-page]');
-      if(page && ['nextPage','previousPage'].includes(page.dataset.page)) $('shop-products')?.[page.dataset.page]();
+      if(page && ['nextPage','previousPage'].includes(page.dataset.page)) {
+        page.closest('[data-product-list]')?.querySelector('shopify-list-context')?.[page.dataset.page]();
+      }
     }
   });
   document.querySelectorAll('.shop-dialog').forEach(dialog => dialog.addEventListener('click', event => {
@@ -180,11 +185,13 @@
     syncMarker();
     catalog.addEventListener('shopify-list-context-update', event => {
       const {hasNextPage,hasPreviousPage}=event.detail;
-      const previous=catalog.querySelector('[data-page="previousPage"]');
-      const next=catalog.querySelector('[data-page="nextPage"]');
+      const list = event.target.closest('[data-product-list]');
+      if (!list) return;
+      const previous=list.querySelector('[data-page="previousPage"]');
+      const next=list.querySelector('[data-page="nextPage"]');
       if(previous) previous.disabled=!hasPreviousPage;
       if(next) next.disabled=!hasNextPage;
-      const pagination=catalog.querySelector('.shop-pagination');
+      const pagination=list.querySelector('.shop-pagination');
       if(pagination) pagination.hidden=!(hasNextPage || hasPreviousPage);
     },true);
     function syncCatalog() {

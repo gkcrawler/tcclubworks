@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://tcclubworks.io/assets/og-image.jpg?v=c5fe396ac5">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/style.css?v=f8691d0f01">
-<link rel="stylesheet" href="assets/storefront.css?v=bdbc40e740"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
+<link rel="stylesheet" href="assets/storefront.css?v=943408d850"><script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>
 
 <meta name="ccw-tracking" content="off">
 </head>
@@ -51,9 +51,9 @@
   </div>
   <shopify-store store-domain="https://tdb7xz-4w.myshopify.com" country="US" language="en"></shopify-store>
 <shopify-context type="collection" handle="ccw-storefront" id="shop-collection">
-  <template>
+  <template><div data-product-list>
     <div class="shop-grid">
-    <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
+    <shopify-list-context type="product" query="collection.products" first="50">
       <template>
         <article class="shop-card">
           <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
@@ -73,6 +73,7 @@
     </shopify-list-context>
     </div>
     <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
+    </div>
   </template>
   <p shopify-loading-placeholder>Loading the collection…</p>
 </shopify-context>
@@ -123,7 +124,7 @@
 </section><section class="shop-custom"><div class="wrap"><div><p class="eyebrow">Something only you could carry</p><h2>Your story.<br>Your headcover.</h2></div><div><p>A favorite jersey. A thrift-store find. Something with a little history. Let's turn it into your next headcover.</p><a class="shop-primary" href="/contact">Talk through an idea ↗</a></div></div></section>
 <div class="shop-service-links wrap"><a href="/shop-policies">Shipping &amp; returns ↗</a><a href="/shop-privacy">Privacy ↗</a><a href="/shop-terms">Terms ↗</a><a href="mailto:info@tcclubworks.io">Need a hand? Email CCW ↗</a></div>
 <script type="application/json" id="shop-data">{"mode": "live", "shipping": 0, "delivery": "Expected U.S. delivery is 3\u20135 business days after ordering.", "products": []}</script>
-<script defer src="assets/storefront.js?v=8750774e9e"></script>
+<script defer src="assets/storefront.js?v=060fb3072a"></script>
 </div></main><footer>
   <div class="wrap">
     <div class="fcols">

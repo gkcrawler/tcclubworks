@@ -86,14 +86,13 @@ def draft_card(product):
 </article>'''
 
 
-def live_catalog(store, collection):
-    # Official Web Components keep pricing, variants and cart behavior in Shopify.
-    # No Admin token, local inventory counter or custom payment handler is needed.
-    return f'''<shopify-store store-domain="https://{esc(store['domain'])}" country="US" language="en"></shopify-store>
-<shopify-context type="collection" handle="{esc(collection)}" id="shop-collection">
-  <template>
+def product_grid(group=None):
+    title = f'<h2 id="members-{group.lower()}">{group}</h2>' if group else ''
+    wrapper = f'section data-member-group="{group}" aria-labelledby="members-{group.lower()}"' if group else 'div'
+    close = 'section' if group else 'div'
+    return f'''<{wrapper} data-product-list>{title}
     <div class="shop-grid">
-    <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
+    <shopify-list-context type="product" query="collection.products" first="50">
       <template>
         <article class="shop-card">
           <span data-catalog-handle hidden><shopify-data query="product.handle"></shopify-data></span>
@@ -113,6 +112,15 @@ def live_catalog(store, collection):
     </shopify-list-context>
     </div>
     <div class="shop-pagination" hidden><button class="shop-text-button" data-page="previousPage" disabled>Previous products</button><button class="shop-text-button" data-page="nextPage" disabled>More products</button></div>
+    </{close}>'''
+
+
+def live_catalog(store, collection, members=False):
+    grids = (f'<div class="members-groups">{product_grid("Apparel")}{product_grid("Hats")}</div>'
+             if members else product_grid())
+    return f'''<shopify-store store-domain="https://{esc(store['domain'])}" country="US" language="en"></shopify-store>
+<shopify-context type="collection" handle="{esc(collection)}" id="shop-collection">
+  <template>{grids}
   </template>
   <p shopify-loading-placeholder>Loading the collection…</p>
 </shopify-context>
@@ -158,7 +166,7 @@ def page(config, destination="ccw"):
     products = config.get("products", []) if main_shop else []
     banner = '<div class="shop-preview-bar">Store preview · Checkout is not open yet</div>' if preview else ''
     collection = store[collection_key]
-    catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store, collection)
+    catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store, collection, members=members)
     preview_dialogs = '''<dialog id="product-dialog" class="shop-dialog" aria-labelledby="product-title">
   <button class="shop-close" data-close="product-dialog" aria-label="Close product details">×</button><div id="product-detail"></div>
 </dialog>

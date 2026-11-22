@@ -39,7 +39,12 @@
 .shop-filters button[aria-pressed=true]{background:#eceee9;color:#12171c;border-color:#eceee9}
 .shop-grid,shopify-list-context.shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}
 .ccw-shop[data-storefront="members"] .shop-lede{margin:0 0 30px;max-width:62ch}
-@media(min-width:1101px){.ccw-shop[data-storefront="members"] .shop-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.members-groups{display:grid;gap:36px}
+.members-groups section{min-width:0}
+.members-groups h2{margin:0 0 16px;padding-top:16px;border-top:1px solid var(--line2);font-size:1.45rem}
+.members-groups .shop-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media(min-width:1000px){.members-groups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.members-groups .shop-grid{grid-template-columns:1fr}}
 .shop-card{min-width:0;border:1px solid #303645;background:#0d111c;border-radius:4px;overflow:hidden}
 .shop-card[hidden]{display:none}
 .shop-image-button{position:relative;display:block;padding:0;width:100%;border:0;background:#101216;cursor:pointer;color:#fff;text-align:left}

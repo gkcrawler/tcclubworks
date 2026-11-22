@@ -89,6 +89,9 @@ class StorefrontTests(unittest.TestCase):
         self.assertEqual(members['path'], '/members-only')
         self.assertIn('href="/members-only" aria-current="page"', members['body'])
         self.assertIn('made to order', members['body'])
+        for group in ('Apparel', 'Hats'):
+            self.assertIn(f'data-member-group="{group}"', members['body'])
+            self.assertIn(f'<h2 id="members-{group.lower()}">{group}</h2>', members['body'])
         for result, key in ((main, 'collection'), (partner, 'partner_collection'), (members, 'members_collection')):
             self.assertIn(f'handle="{config["store"][key]}" id="shop-collection"', result['body'])
             self.assertIn('id="shop-cart"', result['body'])
