@@ -36,9 +36,9 @@
     try { sessionStorage.removeItem(KEY); } catch (_) { /* already gone */ }
   }
 
-  function sendAnalytics(eventName) {
+  function sendAnalytics(eventName, details) {
     if (window.ccwAnalyticsId && typeof window.gtag === 'function') {
-      window.gtag('event', eventName, { send_to: window.ccwAnalyticsId });
+      window.gtag('event', eventName, Object.assign({ send_to: window.ccwAnalyticsId }, details || {}));
     }
   }
 
@@ -70,15 +70,18 @@
     dropPending();
     // Smart campaign quote requests are measured by this confirmation pageview.
     sendAnalytics('page_view');
+    sendAnalytics('generate_lead', { method: 'quote_form' });
   }
 
   function bindForms() {
     if (!document.querySelectorAll) return;
     document.querySelectorAll('form[name="quote"]').forEach(function (form) {
+      var source = form.querySelector ? form.querySelector('[name="source_page"]') : null;
+      if (source) source.value = window.location.pathname;
       form.addEventListener('submit', function () {
         try {
           sessionStorage.setItem(KEY, JSON.stringify({
-            id: window.crypto.randomUUID(),
+            id: window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : 'quote-' + Date.now() + '-' + Math.random().toString(36).slice(2),
             time: Date.now()
           }));
         } catch (_) { /* The form still submits if storage is unavailable. */ }
@@ -89,6 +92,11 @@
   function bindTel() {
     if (!document.addEventListener) return;
     document.addEventListener('click', function (e) {
+      var contact = e.target && e.target.closest ? e.target.closest('a[href^="sms:"], a[href^="mailto:"]') : null;
+      if (contact && contact.getAttribute('data-ccw-contact') !== '1') {
+        contact.setAttribute('data-ccw-contact', '1');
+        sendAnalytics(contact.getAttribute('href').indexOf('sms:') === 0 ? 'click_to_text' : 'click_to_email');
+      }
       var node = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
       var href, go;
       if (!node || node.getAttribute('data-ccw-tel') === '1') return;

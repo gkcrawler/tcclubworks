@@ -26,7 +26,7 @@ phone_display = "(720) 854-4132"
 phone_link    = "+17208544132"          # digits only, keep the +1
 email         = "info@tcclubworks.io"
 instagram     = "https://www.instagram.com/tc_clubworks"
-hours         = "8:00am – 5:00pm"
+hours         = "By appointment"
 hours_open    = "08:00"                 # 24-hour, for Google
 hours_close   = "17:00"                 # 24-hour, for Google
 

@@ -87,9 +87,8 @@ def FULL(key):
 
 # ----------------------------------------------------------------- schema
 def biz():
-    # TODO: no street address is published in this repo. Do not invent one.
-    # geo is Denver's city center so the service area is explicit until the
-    # owner supplies a shop address and a precise map pin.
+    # Paul keeps the street address private on the website. Do not publish it
+    # in page copy, metadata or a map pin. Visits are by appointment.
     cities = [{"@type":"City","name":c,"containedInPlace":{"@type":"State","name":"Colorado"}} for c in AREAS]
     return {"@context":"https://schema.org",
       "@type":["ProfessionalService","SportingGoodsStore"],
@@ -99,13 +98,9 @@ def biz():
       "url":D,"email":EMAIL,"telephone":TEL_E,"image":D+"/assets/og-image.jpg",
       "logo":D+"/assets/ccw-denver-cutout.png","priceRange":"$$",
       "address":{"@type":"PostalAddress","addressLocality":"Denver","addressRegion":"CO","addressCountry":"US"},
-      "geo":{"@type":"GeoCoordinates","latitude":39.7392,"longitude":-104.9903},
       "areaServed":cities + [
           {"@type":"AdministrativeArea","name":"Denver metropolitan area"},
           {"@type":"State","name":"Colorado"}],
-      "openingHoursSpecification":[{"@type":"OpeningHoursSpecification",
-        "dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-        "opens":_c["hours_open"],"closes":_c["hours_close"]}],
       "sameAs":[IG]}
 
 def svc(name, desc, anchor, low=None, high=None):
@@ -207,7 +202,7 @@ def header(active):
 </header>
 """
 
-def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None):
+def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None,quote_href="/contact#quote"):
     imghtml = pic(imgkey, 1200, 1500, loading='eager', priority=True)
     if seo_h1:
         heading = (f'<h1 class="page-title">{html.escape(seo_h1)}</h1>\n'
@@ -221,9 +216,10 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None):
       {heading}
       <p class="lede h1sub">{lede}</p>
       <div class="hbtns">
-        <a class="btn lg" href="/contact">Get a quote</a>
+        <a class="btn lg" href="{quote_href}">Get a quote</a>
         <a class="btn ghost lg" href="tel:{TEL_E}">Call {TEL_D}</a>
       </div>
+      <p class="contact-shortcut"><a href="sms:{TEL_E}">Text Paul a photo</a> · <a href="https://www.google.com/maps?cid=17885799756767367652" rel="noopener">Read our Google reviews</a></p>
     </div>
     <div class="hero-media">
       {imghtml}
@@ -232,24 +228,26 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None):
   </div>
   <div class="trust"><div class="wrap"><ul>
     <li><b>Location</b><span>Denver metro<span class="sep"> · </span><span class="num">{TEL_D}</span></span></li>
-    <li><b>Hours</b><span>{HOURS}</span></li>
+    <li><b>Visits</b><span>By appointment</span></li>
     <li><b>Turnaround</b><span>Most work in days</span></li>
     <li><b>Service area</b><span>Denver &amp; US mail-in</span></li>
   </ul></div></div>
 </section>"""
 
 def form(compact=False):
-    return f"""<form name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true"
+    return f"""<form id="quote" name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true"
         action="/thanks">
   <input type="hidden" name="form-name" value="quote">
-  <p class="hp"><label>Don't fill this out: <input name="bot-field" tabindex="-1"></label></p>
+  <input type="hidden" name="source_page" value="">
+  <p class="hp" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="f2">
     <div class="fld"><label for="n">Name</label><input id="n" name="name" type="text" autocomplete="name" required></div>
-    <div class="fld"><label for="p">Phone</label><input id="p" name="phone" type="tel" autocomplete="tel"></div>
+    <div class="fld"><label for="p">Phone (optional)</label><input id="p" name="phone" type="tel" autocomplete="tel"></div>
   </div>
   <div class="fld"><label for="e">Email</label><input id="e" name="email" type="email" autocomplete="email" required></div>
-  <div class="fld"><label for="s">What do you need?</label>
+  <div class="fld"><label for="s">Service (optional)</label>
     <select id="s" name="service">
+      <option value="">Choose a service</option>
       <option>Reshafting &amp; regripping</option>
       <option>Custom clubmaking</option>
       <option>Loft &amp; lie adjustment</option>
@@ -257,12 +255,31 @@ def form(compact=False):
       <option>Custom headcovers</option>
       <option>Not sure — need advice</option>
     </select></div>
-  <div class="fld"><label for="m">Tell us about your clubs</label>
-    <textarea id="m" name="message" rows="5" placeholder="What are you playing now, and what isn't working?" required></textarea></div>
+  <div class="fld"><label for="m">What would you like done?</label>
+    <textarea id="m" name="message" rows="4" placeholder="For example: regrip 7 irons, replace a driver shaft, or make a custom headcover." required></textarea></div>
   <div data-netlify-recaptcha="true"></div>
-  <button class="btn lg" type="submit">Send inquiry</button>
-  <p class="formnote">Goes to info@ and paul@tcclubworks.io. We reply within a day.</p>
+  <button class="btn lg" type="submit">Request my quote</button>
+  <p class="formnote">Paul will reply within one business day. No payment is required to request a quote.</p>
+  <p class="formnote">Prefer to send photos? <a href="sms:{TEL_E}">Text Paul</a> or <a href="mailto:{EMAIL}">email your project</a>.</p>
 </form>"""
+
+def repair_quote_section():
+    return f"""<section class="pad tinted" id="repair-quote">
+  <div class="wrap cgrid">
+    <div>
+      <p class="eyebrow">Talk with the clubmaker</p>
+      <h2>Get your repair <span class="grad">quote.</span></h2>
+      <p class="lede">Tell Paul which clubs need work. You'll get a quote and timing before any work starts.</p>
+      <ol class="bullets">
+        <li><strong>Describe the job.</strong> Include the club model and number of clubs, if you know them.</li>
+        <li><strong>Review your quote.</strong> Labor and any parts are explained before you approve the work.</li>
+        <li><strong>Arrange the handoff.</strong> Denver visits are by appointment. For mail-in repairs, contact Paul before shipping.</li>
+      </ol>
+      <p class="hbtns"><a class="btn ghost" href="sms:{TEL_E}">Text a photo</a><a class="btn ghost" href="tel:{TEL_E}">Call {TEL_D}</a></p>
+    </div>
+    {form()}
+  </div>
+</section>"""
 
 def contact_section():
     return f"""<section class="pad" id="contact">
@@ -283,11 +300,11 @@ def contact_section():
   </div>
 </section>"""
 
-def ctaband():
+def ctaband(quote_href="/contact#quote"):
     return f"""<div class="ctaband"><div class="wrap">
   <h2>Ready to stop <span class="grad">blaming the clubs?</span></h2>
   <div class="hbtns" style="margin:0">
-    <a class="btn lg" href="/contact">Get a quote</a>
+    <a class="btn lg" href="{quote_href}">Get a quote</a>
     <a class="btn ghost lg" href="tel:{TEL_E}">Call {TEL_D}</a>
   </div>
 </div></div>"""
@@ -603,7 +620,14 @@ def _asset_prefix(path):
     return "../" * page_file(path).count("/")
 
 def render(p):
-    h = head(p)+header(p["path"])+'<main id="main">'+p["body"]+"</main>"+footer()
+    lead_page = p["path"] in {"/", "/golf-club-repair-denver", "/custom-golf-headcovers-denver", "/custom-golf-clubs-about", "/contact"}
+    quote_link = "#quote" if 'id="quote"' in p["body"] else "/contact#quote"
+    mobile_contact = (f'<nav class="mobile-contact" aria-label="Contact Paul"><a href="tel:{TEL_E}">Call Paul</a>'
+                      f'<a href="sms:{TEL_E}">Text a photo</a><a class="btn" href="{quote_link}">Get a quote</a></nav>') if lead_page else ""
+    h = head(p)+header(p["path"])+ '<main id="main">'+p["body"]+"</main>"+footer()
+    h = h.replace("</body>", mobile_contact + "\n</body>", 1)
+    if lead_page:
+        h = h.replace("<body>", '<body class="has-contact-tools">', 1)
     h = version_asset_urls(h)
     # Root-relative asset URLs work on Netlify but break when previewing nested
     # pages directly as file:// URLs. Relative asset URLs work in both places.
@@ -686,7 +710,7 @@ PAGES=[]
 # ---------------- HOME
 PAGES.append(dict(path="/",
  title="Golf Club Repair Denver & Custom Headcovers | Chronic Clubworks",
- desc="Custom golf clubs and expert club repair in Denver. Reshafting, regripping, loft & lie adjustment and putter restoration. By appointment, 8am-5pm. Call today.",
+ desc="Custom golf clubs and expert club repair in Denver. Reshafting, regripping, loft & lie adjustment and putter restoration. By appointment. Request a quote.",
  schemas=[biz(),crumbs("/","Home"),faq(FAQS[:4])],
  body=hero("Denver, Colorado · By appointment","Craft without","compromise.",
    "Custom clubmaking and precision repair from a Denver bench. Reshafting, regripping, loft and lie, restorations — built by people who actually play.",
@@ -772,8 +796,8 @@ PAGES.append(dict(path="/",
 
 # ---------------- SERVICES
 PAGES.append(dict(path="/golf-club-repair-denver",
- title="Golf Club Repair Denver & Mail-In Service | Chronic Clubworks",
- desc="Golf club repair in Denver with US mail-in. Reshafting, regripping, loft and lie adjustments, and putter restoration.",
+ title="Golf Club Repair & Regripping in Denver | Chronic Clubworks",
+ desc="Denver golf club repair, regripping, reshafting and putter refinishing. See labor prices and request a quote from Paul. By appointment; US mail-in welcome.",
  schemas=[biz(),crumbs("/golf-club-repair-denver","Services"),
    svc("Golf Club Reshafting and Regripping","Reshafting with premium steel and graphite shafts, frequency matching, and regripping in Denver, Colorado.","reshafting-regripping",5,20),
    svc("Custom Clubmaking","Completely custom golf clubs built driver to wedge with shaft selection, MOI matching and swing weighting, in Denver, Colorado.","custom-clubmaking"),
@@ -782,7 +806,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
    faq(FAQS)],
  body=hero("Services","Golf club repair","in Denver.",
    "Reshafting, regripping, loft and lie adjustments, and restoration from our Denver bench. Local appointments and mail-in club repair from across the USA. Everything quoted before we start.",
-   "bench")
+   "bench", quote_href="#quote")
  + f"""
 <section class="pad" id="reshafting-regripping">
   <div class="wrap split service-row">
@@ -796,7 +820,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
         <li><strong>Regripping.</strong> Everything from tour-level tacky to oversized. Bring your own or we'll order.</li>
         <li><strong>Labor $5–$20 per club.</strong> Grips $6–$15, shafts $20–$60. Full-set regrip lands around $110–$250.</li>
       </ul>
-      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="/contact">Book a regrip</a></p>
+      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="#quote">Get a regripping quote</a></p>
     </div>
     {pic('m2_service',1200,1200)}
   </div>
@@ -815,7 +839,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
         <li><strong>Swing weighting &amp; MOI matching.</strong> Consistent feel from top to bottom of the bag.</li>
         <li><strong>Ferrules, paint fill &amp; stamping.</strong> Make them unmistakably yours.</li>
       </ul>
-      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="/contact">Start a build</a></p>
+      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="#quote">Start a build</a></p>
     </div>
   </div>
 </section>
@@ -829,11 +853,11 @@ PAGES.append(dict(path="/golf-club-repair-denver",
       <ul class="bullets">
         <li><strong>Loft adjustments.</strong> Fix your gapping so you're not stuck between clubs.</li>
         <li><strong>Lie adjustments.</strong> Stop fighting hooks and slices caused by an improper setup.</li>
-        <li><strong>Bending for feel.</strong> Want a softer forged club? We can bend it to improve responsiveness.</li>
+        <li><strong>Check before adjusting.</strong> We assess your clubheads and discuss the requested changes before bending.</li>
         <li><strong>$5–$12 per club, all in.</strong> Measured before and after, every time.</li>
       </ul>
-      <p><strong>Denver note:</strong> thin air carries the ball further than sea-level yardage charts suggest, which quietly compresses the gaps between your clubs. Getting lofts checked matters more here than almost anywhere else.</p>
-      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="/contact">Get your angles checked</a></p>
+      <p>Bring your current yardages and any gapping concerns so we can discuss what you want to improve.</p>
+      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="#quote">Get your angles checked</a></p>
     </div>
     {pic('w5',1200,1200)}
   </div>
@@ -852,7 +876,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
         <li><strong>Clubhead repairs.</strong> Epoxy work, sole grind adjustments, and making them look right again.</li>
         <li><strong>Vintage welcome.</strong> Old blades, persimmon woods, a putter handed down — bring it in.</li>
       </ul>
-      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="/contact">Send us photos</a></p>
+      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="sms:{TEL_E}">Text Paul photos</a></p>
     </div>
   </div>
 </section>
@@ -871,7 +895,7 @@ PAGES.append(dict(path="/golf-club-repair-denver",
     {faq_html(FAQS)}
   </div>
 </section>
-""" + ctaband()))
+""" + repair_quote_section() + ctaband("#quote")))
 
 # ---------------- HEADCOVERS
 HEADCOVER_FAQS = [
@@ -1089,7 +1113,7 @@ PAGES.append(dict(path="/custom-golf-clubs-about",
 
 # ---------------- CONTACT
 PAGES.append(dict(path="/contact",
- title="Contact | Golf Club Repair Denver | Chronic Clubworks",
+ title="Get a Golf Club Repair Quote in Denver | Chronic Clubworks",
  desc="Contact Chronic Clubworks for custom golf clubs and club repair in Denver. Call (720) 854-4132, email info@tcclubworks.io, or send us photos of your clubs.",
  schemas=[biz(),crumbs("/contact","Contact"),
    {"@context":"https://schema.org","@type":"ContactPage","name":"Contact Chronic Clubworks",
@@ -1099,7 +1123,7 @@ PAGES.append(dict(path="/contact",
   <div class="wrap cgrid">
     <div>
       <p class="eyebrow">Get in touch</p>
-      <h1 class="page-title">Contact Chronic Clubworks – Denver Golf Club Repair</h1>
+      <h1 class="page-title">Get a quote from Paul at Chronic Clubworks</h1>
       <p class="display" style="font-size:clamp(2.2rem,5vw,3.6rem)">Tell us about<br><span class="grad">your clubs.</span></p>
       <p class="lede">Send a note with what you're playing and what isn't working. If photos would help, text or email them after you submit and we'll match them to your inquiry.</p>
       <ul class="facts">
@@ -1110,7 +1134,7 @@ PAGES.append(dict(path="/contact",
         <li><b>Service area</b><span>{", ".join(AREAS)} and the Front Range</span></li>
         <li><b>Instagram</b><a href="{IG}" rel="noopener">@tc_clubworks</a></li>
       </ul>
-      <p class="note">Prefer to talk it through? Call or text — that's usually fastest.</p>
+      <p class="hbtns"><a class="btn ghost" href="tel:{TEL_E}">Call Paul</a><a class="btn ghost" href="sms:{TEL_E}">Text a photo</a></p>
     </div>
     {form()}
   </div>
