@@ -316,7 +316,8 @@ def footer():
         <li><a href="/custom-golf-headcovers-denver">Custom Headcovers</a></li>
       </ul></div>
       <div><h4>Company</h4><ul>
-        <li><a href="/shop">Shop headcovers &amp; apparel</a></li>
+        <li><a href="/shop">CCW Shop</a></li>
+        <li><a href="/pins-and-aces">Pins and Aces Platinum Partner</a></li>
         <li><a href="/custom-golf-clubs-about">About</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="{IG}" rel="noopener">Instagram</a></li>
@@ -1163,6 +1164,7 @@ PAGES.append(dict(path="/thanks",
 
 # ----------------------------------------------------------------- write
 PAGES.append(shop_page(SHOP))
+PAGES.append(shop_page(SHOP, partner=True))
 PAGES.extend(shop_policy_pages(SHOP))
 
 def w(rel, s):

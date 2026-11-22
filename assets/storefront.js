@@ -63,30 +63,41 @@
     $('bag-count').textContent=String(bag.size);
   }
   const supplier = 'Pins and Aces';
+  const partnerShop = dataNode.closest('.ccw-shop').dataset.storefront === 'partner';
   let currentFilter = 'all';
   function matchesFilter(card) {
-    if (currentFilter === 'all') return true;
-    if (currentFilter === supplier) return card.querySelector('[data-vendor]')?.textContent.trim() === supplier;
+    const vendor = card.querySelector('[data-vendor]')?.textContent.trim();
+    if (partnerShop) return vendor === supplier;
+    if (vendor === supplier) return false;
     const type = (card.dataset.category || card.querySelector('[data-type]')?.textContent || '').trim();
-    if (currentFilter === 'Headcovers') return /^headcovers?\b/i.test(type);
-    if (currentFilter === 'Apparel') return /\b(apparel|outerwear|hoodies?)\b/i.test(type);
-    if (currentFilter === 'Hats') return /\b(hats?|caps?)\b/i.test(type);
-    return type.toLowerCase() === currentFilter.toLowerCase();
+    let category;
+    if (/\bhead\s*covers?\b/i.test(type)) category = 'Headcovers';
+    else if (/\bball\s*markers?\b/i.test(type)) category = 'Ball Markers';
+    else if (/\b(hats?|caps?)\b/i.test(type)) category = 'Hats';
+    return Boolean(category && (currentFilter === 'all' || currentFilter === category));
   }
   function filterProducts() {
     const cards = [...document.querySelectorAll('.shop-card')];
     for (const card of cards) card.hidden = !matchesFilter(card);
-    $('shop-empty').hidden = (!preview && !cards.length) || cards.some(card => !card.hidden);
+    const empty = $('shop-empty');
+    empty.hidden = (!preview && !cards.length) || cards.some(card => !card.hidden);
+    if (!empty.hidden) {
+      const paginated = document.querySelector('.shop-pagination:not([hidden])');
+      empty.textContent = currentFilter === 'all' || paginated
+        ? 'No matching items on this page.'
+        : `No CCW ${currentFilter.toLowerCase()} are listed right now.`;
+    }
   }
   function selectFilter(value) {
     currentFilter = value;
     document.querySelectorAll('[data-filter]').forEach(button => {
-      button.setAttribute('aria-pressed', String(button.dataset.filter === value));
+      if (button.dataset.filter === 'all') button.hidden = value === 'all';
+      else button.setAttribute('aria-pressed', String(button.dataset.filter === value));
     });
     filterProducts();
   }
   function readCollectionLink() {
-    if (location.hash === '#pins-and-aces' && !preview) selectFilter(supplier);
+    if (!partnerShop && location.hash === '#pins-and-aces') location.replace('/pins-and-aces' + location.search);
     else if (location.hash === '#collection') selectFilter('all');
   }
   window.addEventListener('hashchange', readCollectionLink);
@@ -97,11 +108,7 @@
     const draft = event.target.closest('[data-product]');
     if (preview && draft) previewProduct(draft.dataset.product);
     const filter = event.target.closest('[data-filter]');
-    if (filter) {
-      selectFilter(filter.dataset.filter);
-      if (currentFilter === supplier) history.replaceState(null, '', '#pins-and-aces');
-      else if (location.hash === '#pins-and-aces') history.replaceState(null, '', '#collection');
-    }
+    if (filter) selectFilter(filter.dataset.filter === currentFilter ? 'all' : filter.dataset.filter);
     if (event.target.closest('a[href="#collection"]')) selectFilter('all');
     if (!preview) {
       const details=event.target.closest('[data-live-product]');
@@ -148,6 +155,7 @@
     const markerButton = $('open-marker');
     let markerDetails;
     function syncMarker() {
+      if (!markerButton) return;
       const handle = [...catalog.querySelectorAll('[data-catalog-handle]')].find(
         node => node.textContent.trim() === markerHandle
       );
@@ -158,7 +166,7 @@
       markerButton.hidden = !markerDetails;
       $('marker-inquiry').hidden = Boolean(markerDetails);
     }
-    markerButton.addEventListener('click', () => markerDetails?.click());
+    markerButton?.addEventListener('click', () => markerDetails?.click());
     syncMarker();
     catalog.addEventListener('shopify-list-context-update', event => {
       const {hasNextPage,hasPreviousPage}=event.detail;

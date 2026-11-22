@@ -9,6 +9,8 @@ except ModuleNotFoundError:
     import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parent
+PARTNER_NAME = "Pins and Aces Platinum Partner"
+PARTNER_PATH = "/pins-and-aces"
 REQUIRED_CHECKS = (
     "payments_verified", "inventory_verified", "shipping_pickup_verified",
     "tax_registrations_verified", "product_listing_approved",
@@ -32,8 +34,11 @@ def validate_config(config):
     if store["mode"] == "live":
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]*\.myshopify\.com", store["domain"]):
             raise ValueError("Live shop requires its verified myshopify.com domain")
-        if not re.fullmatch(r"[a-z0-9-]+", store["collection"]):
-            raise ValueError("Invalid Shopify collection handle")
+        for key in ("collection", "partner_collection"):
+            if not re.fullmatch(r"[a-z0-9-]+", store[key]):
+                raise ValueError("Invalid Shopify collection handle")
+        if store["collection"] == store["partner_collection"]:
+            raise ValueError("Each storefront needs its own collection")
         pending = [key for key in REQUIRED_CHECKS if config.get("launch", {}).get(key) is not True]
         for timing in ("dispatch_time", "delivery_time"):
             if not store.get(timing, "").strip():
@@ -75,11 +80,11 @@ def draft_card(product):
 </article>'''
 
 
-def live_catalog(store):
+def live_catalog(store, collection):
     # Official Web Components keep pricing, variants and cart behavior in Shopify.
     # No Admin token, local inventory counter or custom payment handler is needed.
     return f'''<shopify-store store-domain="https://{esc(store['domain'])}" country="US" language="en"></shopify-store>
-<shopify-context type="collection" handle="{esc(store['collection'])}" id="shop-collection">
+<shopify-context type="collection" handle="{esc(collection)}" id="shop-collection">
   <template>
     <div class="shop-grid">
     <shopify-list-context type="product" query="collection.products" first="50" id="shop-products">
@@ -137,12 +142,13 @@ def live_catalog(store):
 </dialog>'''
 
 
-def page(config):
+def page(config, partner=False):
     store = config["store"]
     preview = store["mode"] == "preview"
-    products = config.get("products", [])
+    products = [] if partner else config.get("products", [])
     banner = '<div class="shop-preview-bar">Store preview · Checkout is not open yet</div>' if preview else ''
-    catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store)
+    collection = store["partner_collection" if partner else "collection"]
+    catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store, collection)
     preview_dialogs = '''<dialog id="product-dialog" class="shop-dialog" aria-labelledby="product-title">
   <button class="shop-close" data-close="product-dialog" aria-label="Close product details">×</button><div id="product-detail"></div>
 </dialog>
@@ -157,8 +163,6 @@ def page(config):
     data = json.dumps({"mode": store["mode"], "shipping": store["shipping_flat_usd"], "delivery": store["delivery_time"], "products": products if preview else []}).replace('<', '\\u003c')
     pickup_strip = '<span>Denver pickup by appointment</span>' if store.get('pickup') else ''
     marker_rate = store['ball_marker_shipping_usd']
-    supplier_link = '' if preview else '<a class="shop-text-button" href="#pins-and-aces">Shop Pins and Aces ↘</a>'
-    supplier_filter = '' if preview else '<button id="pins-and-aces" data-filter="Pins and Aces" aria-pressed="false">Pins and Aces</button>'
     gallery = [
         ("front", "Turquoise and pink CCW enamel ball marker with a Denver skyline across the visor"),
         ("edge", "Angled view of the enamel face and polished metal edge"),
@@ -170,33 +174,43 @@ def page(config):
         path = f"/assets/store/ccw-denver-ball-marker-{view}.jpg"
         loading = 'fetchpriority="high"' if index == 0 else 'loading="lazy"'
         marker_photos.append(f'<a class="lightbox" href="{path}" data-caption="{alt}"><img src="{path}" alt="{alt}" width="1254" height="1254" {loading}></a>')
-    body = f'''<div class="ccw-shop" data-shop-mode="{store['mode']}">
-{banner}
-<section class="shop-intro wrap" id="ccw-denver-ball-marker">
-  <div class="shop-intro-copy"><p class="eyebrow">Chronic Clubworks / The shop</p>
-    <h1>CCW Denver<br><span>Ball Marker</span></h1>
+    marker_feature = f'''<section class="shop-intro wrap" id="ccw-denver-ball-marker">
+  <div class="shop-intro-copy"><h2>CCW Denver<br><span>Ball Marker</span></h2>
     <p class="shop-lede">The Denver skyline sits across the visor of our turquoise and pink CCW mask. A polished metal edge frames the enamel face, with “Denver, CO” on the back.</p>
     <p class="shop-price">$15.00 <small>USD each</small></p>
     <span id="marker-stock" class="shop-stock" hidden>In Stock</span>
     <p class="shop-fine">${marker_rate:g} flat U.S. shipping on ball markers. Quarter shown for scale.</p>
     <div class="shop-hero-actions"><button class="shop-primary" id="open-marker" hidden>Shop the ball marker</button>
-      <a id="marker-inquiry" class="shop-text-button" href="mailto:info@tcclubworks.io?subject=CCW%20Denver%20Ball%20Marker">Ask about availability</a>
-      <a class="shop-text-button" href="#collection">Browse the collection ↘</a>{supplier_link}</div>
+      <a id="marker-inquiry" class="shop-text-button" href="mailto:info@tcclubworks.io?subject=CCW%20Denver%20Ball%20Marker">Ask about availability</a></div>
   </div>
   <div class="shop-marker-photos" aria-label="Ball marker photos">{''.join(marker_photos)}</div>
-</section>
-<div class="shop-strip"><div class="wrap"><span>CCW ball markers · ${marker_rate:g} flat U.S. shipping</span>{pickup_strip}<span>Supplier shipping calculated at checkout</span><a href="/shop-policies">Shipping &amp; returns ↗</a></div></div>
+</section>'''
+    custom_cta = '''<section class="shop-custom"><div class="wrap"><div><p class="eyebrow">Something only you could carry</p><h2>Your story.<br>Your headcover.</h2></div><div><p>A favorite jersey. A thrift-store find. Something with a little history. Let's turn it into your next headcover.</p><a class="shop-primary" href="/contact">Talk through an idea ↗</a></div></div></section>'''
+    filters = '''<div class="shop-filters" role="group" aria-label="Filter by category">
+    <button data-filter="Hats" aria-pressed="false">Hats</button>
+    <button data-filter="Ball Markers" aria-pressed="false">Ball Markers</button>
+    <button data-filter="Headcovers" aria-pressed="false">Headcovers</button>
+    <button data-filter="all" class="shop-clear" hidden>Show all</button>
+  </div>'''
+    shop_nav = ' '.join(
+        f'<a href="{path}"' + (' aria-current="page"' if active else '') + f'>{label}</a>'
+        for path, label, active in (("/shop", "CCW Shop", not partner), (PARTNER_PATH, PARTNER_NAME, partner))
+    )
+    title = PARTNER_NAME if partner else "CCW Shop"
+    shipping = 'Ships directly from Pins and Aces. Shipping calculated at checkout.' if partner else f'CCW ball markers · ${marker_rate:g} flat U.S. shipping'
+    body = f'''<div class="ccw-shop" data-storefront="{'partner' if partner else 'ccw'}" data-shop-mode="{store['mode']}">
+{banner}
 <section class="shop-collection wrap" id="collection" aria-labelledby="collection-title">
-  <div class="shop-section-heading"><div><h2 id="collection-title">The collection.</h2></div>
+  <nav class="shop-destinations" aria-label="Storefronts">{shop_nav}</nav>
+  <div class="shop-section-heading"><h1 id="collection-title">{title}</h1>
     <button class="shop-bag-button" id="open-bag" aria-haspopup="dialog">Bag <span id="bag-count" aria-label="items in bag">0</span></button></div>
-  <div class="shop-filters" role="group" aria-label="Filter products">
-    <button data-filter="all" aria-pressed="true">All pieces</button>{supplier_filter}<button data-filter="Ball Markers" aria-pressed="false">Ball markers</button><button data-filter="Headcovers" aria-pressed="false">Headcovers</button><button data-filter="Apparel" aria-pressed="false">Apparel</button><button data-filter="Hats" aria-pressed="false">Hats</button>
-  </div>
+{'' if partner else filters}
   {catalog}
   <p id="shop-empty" class="shop-fine" role="status" hidden>No matching items on this page.</p>
   <p class="shop-fine" id="shop-announcement" role="status" aria-live="polite"></p>
 </section>
-<section class="shop-custom"><div class="wrap"><div><p class="eyebrow">Something only you could carry</p><h2>Your story.<br>Your headcover.</h2></div><div><p>A favorite jersey. A thrift-store find. Something with a little history. Let's turn it into your next headcover.</p><a class="shop-primary" href="/contact">Talk through an idea ↗</a></div></div></section>
+<div class="shop-strip"><div class="wrap"><span>{shipping}</span>{'' if partner else pickup_strip}<a href="/shop-policies">Shipping &amp; returns ↗</a></div></div>
+{'' if partner else marker_feature + custom_cta}
 <div class="shop-service-links wrap"><a href="/shop-policies">Shipping &amp; returns ↗</a><a href="/shop-privacy">Privacy ↗</a><a href="/shop-terms">Terms ↗</a><a href="mailto:info@tcclubworks.io">Need a hand? Email CCW ↗</a></div>
 {preview_dialogs}<script type="application/json" id="shop-data">{data}</script>
 <script defer src="/assets/storefront.js"></script>
@@ -204,8 +218,9 @@ def page(config):
     extra = '<link rel="stylesheet" href="/assets/storefront.css">'
     if not preview:
         extra += '<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>'
-    return dict(path="/shop", title="Shop CCW Golf Gear & Pins and Aces | Chronic Clubworks",
-                desc="Shop CCW Denver ball markers and custom headcovers alongside Pins and Aces driver, hybrid and putter covers, golf hoodies and hats.",
+    return dict(path=PARTNER_PATH if partner else "/shop",
+                title=f"{title} | Chronic Clubworks",
+                desc="Shop the Pins and Aces golf gear selected by Chronic Clubworks." if partner else "Browse Chronic Clubworks hats, ball markers and custom golf headcovers.",
                 schemas=[], body=body, noindex=preview, tracking=False, extra_head=extra)
 
 
