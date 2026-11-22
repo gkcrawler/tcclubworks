@@ -21,11 +21,13 @@ test('does not count a form attempt; counts confirmation once',()=>{
   const form=setup('/contact/',null);form.run();form.submit();
   assert.equal(form.calls.length,0);
   const thanks=setup('/thanks/',form.value());thanks.run();thanks.run();
-  assert.equal(thanks.calls.length,2);
+  assert.equal(thanks.calls.length,3);
   assert.equal(thanks.calls[0][2].send_to,SEND_TO);
   assert.equal(thanks.calls[0][2].transaction_id,'test-inquiry');
   assert.equal(thanks.calls[1][1],'page_view');
   assert.equal(thanks.calls[1][2].send_to,ANALYTICS_ID);
+  assert.equal(thanks.calls[2][1],'generate_lead');
+  assert.equal(thanks.calls[2][2].method,'quote_form');
 });
 test('direct confirmation visits do not count as inquiries',()=>{
   const page=setup('/thanks/',null);page.run();assert.equal(page.calls.length,0);
@@ -69,4 +71,22 @@ test('a tel: click fires the contact conversion once, then dials',()=>{
   assert.equal(calls[1][2].send_to, SEND_TO);
   assert.equal(event.prevented, true);
   assert.equal(context.window.location.href, 'tel:+17208544132');
+});
+
+test('text and email clicks measure intent without counting a submitted lead',()=>{
+  for (const [href, eventName] of [['sms:+17208544132','click_to_text'],['mailto:info@tcclubworks.io','click_to_email']]) {
+    const calls=[]; let click;
+    const link={attrs:{href},getAttribute(n){return this.attrs[n] || null;},setAttribute(n,v){this.attrs[n]=v;}};
+    const context={
+      window:{ccwAnalyticsId:ANALYTICS_ID,location:{pathname:'/contact'},gtag:(...args)=>calls.push(args)},
+      document:{querySelectorAll:()=>[],addEventListener:(_,fn)=>click=fn},
+      sessionStorage:{},Date,JSON
+    };
+    vm.runInNewContext(code,context);
+    const event={target:{closest:selector=>selector.includes('mailto:')?link:null}};
+    click(event);click(event);
+    assert.equal(calls.length,1);
+    assert.equal(calls[0][1],eventName);
+    assert.deepEqual(Object.keys(calls[0][2]),['send_to']);
+  }
 });
