@@ -73,7 +73,7 @@ class StorefrontTests(unittest.TestCase):
         self.assertIn('\\u003cscript>', result)
 
     def test_generated_shop_has_no_ad_tracking(self):
-        for name in ('shop', 'pins-and-aces', 'shop-policies', 'shop-privacy', 'shop-terms'):
+        for name in ('shop', 'members-only', 'pins-and-aces', 'shop-policies', 'shop-privacy', 'shop-terms'):
             text=(ROOT / (name+'.html')).read_text()
             self.assertNotIn('AW-18288494011', text)
             self.assertNotIn('inquiry-conversion.js', text)
@@ -82,10 +82,14 @@ class StorefrontTests(unittest.TestCase):
     def test_distinct_shop_collections_share_cart_and_checkout(self):
         config = self.live_config()
         main = page(config)
-        partner = page(config, partner=True)
+        partner = page(config, destination="partner")
+        members = page(config, destination="members")
         self.assertEqual(main['path'], '/shop')
         self.assertEqual(partner['path'], '/pins-and-aces')
-        for result, key in ((main, 'collection'), (partner, 'partner_collection')):
+        self.assertEqual(members['path'], '/members-only')
+        self.assertIn('href="/members-only" aria-current="page"', members['body'])
+        self.assertIn('made to order', members['body'])
+        for result, key in ((main, 'collection'), (partner, 'partner_collection'), (members, 'members_collection')):
             self.assertIn(f'handle="{config["store"][key]}" id="shop-collection"', result['body'])
             self.assertIn('id="shop-cart"', result['body'])
             self.assertIn('id="shop-product-detail"', result['body'])

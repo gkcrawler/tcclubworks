@@ -63,12 +63,14 @@
     $('bag-count').textContent=String(bag.size);
   }
   const supplier = 'Pins and Aces';
-  const partnerShop = dataNode.closest('.ccw-shop').dataset.storefront === 'partner';
+  const storefront = dataNode.closest('.ccw-shop').dataset.storefront;
+  const partnerShop = storefront === 'partner';
   let currentFilter = 'all';
   function matchesFilter(card) {
     const vendor = card.querySelector('[data-vendor]')?.textContent.trim();
     if (partnerShop) return vendor === supplier;
     if (vendor === supplier) return false;
+    if (storefront === 'members') return true;
     const type = (card.dataset.category || card.querySelector('[data-type]')?.textContent || '').trim();
     let category;
     if (/\bhead\s*covers?\b/i.test(type)) category = 'Headcovers';
@@ -141,12 +143,20 @@
     const detail=$('shop-product-detail');
     const markerHandle = 'ccw-denver-ball-marker';
     const available = scope => scope?.querySelector('[data-product-availability]')?.textContent.trim() === 'true';
+    const madeToOrder = new Set(['members-only-hanover-polo', 'members-only-hamilton-hoodie']);
+    function displayStock(scope, canBuy) {
+      const stock = scope.querySelector('[data-stock]');
+      if (!stock) return;
+      const handle = scope.querySelector('[data-catalog-handle]')?.textContent.trim();
+      const label = madeToOrder.has(handle) ? 'Made to order' : 'In Stock';
+      if (stock.textContent !== label) stock.textContent = label;
+      stock.hidden = !canBuy;
+    }
     const syncAvailability=() => {
       const button=detail.querySelector('[data-live-add]');
       const canBuy = available(detail);
       if(button) button.disabled = !canBuy;
-      const stock = detail.querySelector('[data-stock]');
-      if (stock) stock.hidden = !canBuy;
+      displayStock(detail, canBuy);
       const shipping = detail.querySelector('[data-supplier-shipping]');
       if (shipping) shipping.hidden = detail.querySelector('[data-vendor]')?.textContent.trim() !== supplier;
     };
@@ -182,7 +192,7 @@
       for (const card of cards) {
         const ready = Boolean(card.querySelector('[data-catalog-handle]')?.textContent.trim());
         const canBuy = available(card);
-        card.querySelector('[data-stock]').hidden = !ready || !canBuy;
+        displayStock(card, ready && canBuy);
         card.querySelector('[data-sold-out]').hidden = !ready || canBuy;
       }
       filterProducts();

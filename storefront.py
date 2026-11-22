@@ -11,6 +11,11 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parent
 PARTNER_NAME = "Pins and Aces Platinum Partner"
 PARTNER_PATH = "/pins-and-aces"
+STOREFRONTS = {
+    "ccw": ("/shop", "CCW Shop", "collection", "Browse Chronic Clubworks hats, ball markers and custom golf headcovers."),
+    "members": ("/members-only", "Members Only", "members_collection", "Shop CCW Members Only rope hats, the Hanover polo and the Hamilton hoodie. Polos and hoodies are made to order in S through XL."),
+    "partner": (PARTNER_PATH, PARTNER_NAME, "partner_collection", "Shop the Pins and Aces golf gear selected by Chronic Clubworks."),
+}
 REQUIRED_CHECKS = (
     "payments_verified", "inventory_verified", "shipping_pickup_verified",
     "tax_registrations_verified", "product_listing_approved",
@@ -34,10 +39,11 @@ def validate_config(config):
     if store["mode"] == "live":
         if not re.fullmatch(r"[a-z0-9][a-z0-9-]*\.myshopify\.com", store["domain"]):
             raise ValueError("Live shop requires its verified myshopify.com domain")
-        for key in ("collection", "partner_collection"):
-            if not re.fullmatch(r"[a-z0-9-]+", store[key]):
+        handles = [store[key] for _, _, key, _ in STOREFRONTS.values()]
+        for handle in handles:
+            if not re.fullmatch(r"[a-z0-9-]+", handle):
                 raise ValueError("Invalid Shopify collection handle")
-        if store["collection"] == store["partner_collection"]:
+        if len(set(handles)) != len(handles):
             raise ValueError("Each storefront needs its own collection")
         pending = [key for key in REQUIRED_CHECKS if config.get("launch", {}).get(key) is not True]
         for timing in ("dispatch_time", "delivery_time"):
@@ -142,12 +148,16 @@ def live_catalog(store, collection):
 </dialog>'''
 
 
-def page(config, partner=False):
+def page(config, destination="ccw"):
     store = config["store"]
+    path, title, collection_key, description = STOREFRONTS[destination]
+    main_shop = destination == "ccw"
+    partner = destination == "partner"
+    members = destination == "members"
     preview = store["mode"] == "preview"
-    products = [] if partner else config.get("products", [])
+    products = config.get("products", []) if main_shop else []
     banner = '<div class="shop-preview-bar">Store preview · Checkout is not open yet</div>' if preview else ''
-    collection = store["partner_collection" if partner else "collection"]
+    collection = store[collection_key]
     catalog = ('<div class="shop-grid">' + ''.join(draft_card(p) for p in products) + '</div>') if preview else live_catalog(store, collection)
     preview_dialogs = '''<dialog id="product-dialog" class="shop-dialog" aria-labelledby="product-title">
   <button class="shop-close" data-close="product-dialog" aria-label="Close product details">×</button><div id="product-detail"></div>
@@ -171,9 +181,9 @@ def page(config, partner=False):
     ]
     marker_photos = []
     for index, (view, alt) in enumerate(gallery):
-        path = f"/assets/store/ccw-denver-ball-marker-{view}.jpg"
+        photo_path = f"/assets/store/ccw-denver-ball-marker-{view}.jpg"
         loading = 'fetchpriority="high"' if index == 0 else 'loading="lazy"'
-        marker_photos.append(f'<a class="lightbox" href="{path}" data-caption="{alt}"><img src="{path}" alt="{alt}" width="1254" height="1254" {loading}></a>')
+        marker_photos.append(f'<a class="lightbox" href="{photo_path}" data-caption="{alt}"><img src="{photo_path}" alt="{alt}" width="1254" height="1254" {loading}></a>')
     marker_feature = f'''<section class="shop-intro wrap" id="ccw-denver-ball-marker">
   <div class="shop-intro-copy"><h2>CCW Denver<br><span>Ball Marker</span></h2>
     <p class="shop-lede">The Denver skyline sits across the visor of our turquoise and pink CCW mask. A polished metal edge frames the enamel face, with “Denver, CO” on the back.</p>
@@ -193,24 +203,24 @@ def page(config, partner=False):
     <button data-filter="all" class="shop-clear" hidden>Show all</button>
   </div>'''
     shop_nav = ' '.join(
-        f'<a href="{path}"' + (' aria-current="page"' if active else '') + f'>{label}</a>'
-        for path, label, active in (("/shop", "CCW Shop", not partner), (PARTNER_PATH, PARTNER_NAME, partner))
+        f'<a href="{url}"' + (' aria-current="page"' if key == destination else '') + f'>{label}</a>'
+        for key, (url, label, _, _) in STOREFRONTS.items()
     )
-    title = PARTNER_NAME if partner else "CCW Shop"
     shipping = 'Ships directly from Pins and Aces. Shipping calculated at checkout.' if partner else f'CCW ball markers · ${marker_rate:g} flat U.S. shipping'
-    body = f'''<div class="ccw-shop" data-storefront="{'partner' if partner else 'ccw'}" data-shop-mode="{store['mode']}">
+    members_intro = '<p class="shop-lede">Two embroidered rope hats, a Maidstone Blue polo and a dune-striped hoodie. The polo and hoodie are made to order in sizes S–XL.</p>'
+    body = f'''<div class="ccw-shop" data-storefront="{destination}" data-shop-mode="{store['mode']}">
 {banner}
 <section class="shop-collection wrap" id="collection" aria-labelledby="collection-title">
   <nav class="shop-destinations" aria-label="Storefronts">{shop_nav}</nav>
   <div class="shop-section-heading"><h1 id="collection-title">{title}</h1>
     <button class="shop-bag-button" id="open-bag" aria-haspopup="dialog">Bag <span id="bag-count" aria-label="items in bag">0</span></button></div>
-{'' if partner else filters}
+{filters if main_shop else members_intro if members else ''}
   {catalog}
   <p id="shop-empty" class="shop-fine" role="status" hidden>No matching items on this page.</p>
   <p class="shop-fine" id="shop-announcement" role="status" aria-live="polite"></p>
 </section>
-<div class="shop-strip"><div class="wrap"><span>{shipping}</span>{'' if partner else pickup_strip}<a href="/shop-policies">Shipping &amp; returns ↗</a></div></div>
-{'' if partner else marker_feature + custom_cta}
+{'' if members else f'<div class="shop-strip"><div class="wrap"><span>{shipping}</span>{pickup_strip if main_shop else ""}<a href="/shop-policies">Shipping &amp; returns ↗</a></div></div>'}
+{marker_feature + custom_cta if main_shop else ''}
 <div class="shop-service-links wrap"><a href="/shop-policies">Shipping &amp; returns ↗</a><a href="/shop-privacy">Privacy ↗</a><a href="/shop-terms">Terms ↗</a><a href="mailto:info@tcclubworks.io">Need a hand? Email CCW ↗</a></div>
 {preview_dialogs}<script type="application/json" id="shop-data">{data}</script>
 <script defer src="/assets/storefront.js"></script>
@@ -218,9 +228,9 @@ def page(config, partner=False):
     extra = '<link rel="stylesheet" href="/assets/storefront.css">'
     if not preview:
         extra += '<script type="module" src="https://cdn.shopify.com/storefront/web-components.js"></script>'
-    return dict(path=PARTNER_PATH if partner else "/shop",
+    return dict(path=path,
                 title=f"{title} | Chronic Clubworks",
-                desc="Shop the Pins and Aces golf gear selected by Chronic Clubworks." if partner else "Browse Chronic Clubworks hats, ball markers and custom golf headcovers.",
+                desc=description,
                 schemas=[], body=body, noindex=preview, tracking=False, extra_head=extra)
 
 
@@ -236,7 +246,8 @@ def policy_pages(config):
     policies = [
         ("/shop-policies", "Shipping & returns", f'''
 <h2>Shipping in the United States</h2><p>{shipping_policy} Applicable sales tax is shown at checkout. We do not offer international shipping at launch.</p>
-<h2>Items shipped by CCW</h2><p>{dispatch} {delivery} The delivery window includes order processing and carrier transit. If we cannot meet the promised shipment date, we will contact you about the delay and your cancellation/refund options. Contact us if delivery is delayed.</p>
+<h2>Ready-to-ship CCW items</h2><p>{dispatch} {delivery} The delivery window includes order processing and carrier transit. If we cannot meet the promised shipment date, we will contact you about the delay and your cancellation/refund options. Contact us if delivery is delayed.</p>
+<h2>Made-to-order apparel</h2><p>The Members Only Hanover polo and Hamilton hoodie are made after you order. Please allow production time before shipping. For timing on a specific size, email <a href="mailto:info@tcclubworks.io">info@tcclubworks.io</a>.</p>
 <h2>Pins and Aces shipping</h2><p>Pins and Aces ships its products directly. Available shipping rates appear at checkout. If your order also includes CCW gear, the items may arrive separately and supplier shipping may be added to the CCW rate.</p>
 {pickup_policy}
 <h2>Returns</h2><p>For an unused item shipped by CCW, contact info@tcclubworks.io within {store['return_days']} days of delivery to request a return. The buyer pays return postage for change-of-mind returns on these items.</p>

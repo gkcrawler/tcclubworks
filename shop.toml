@@ -5,6 +5,7 @@ mode = "live"
 domain = "tdb7xz-4w.myshopify.com"
 collection = "ccw-storefront"
 partner_collection = "pins-and-aces-platinum-partner"
+members_collection = "members-only"
 country = "US"
 currency = "USD"
 shipping_flat_usd = 0

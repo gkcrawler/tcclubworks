@@ -38,6 +38,8 @@
 .shop-filters button{background:transparent;border:1px solid #525769;color:#c4c7d5;border-radius:3px;padding:10px 19px;min-height:44px;font:600 .81rem var(--f);cursor:pointer}
 .shop-filters button[aria-pressed=true]{background:#eceee9;color:#12171c;border-color:#eceee9}
 .shop-grid,shopify-list-context.shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}
+.ccw-shop[data-storefront="members"] .shop-lede{margin:0 0 30px;max-width:62ch}
+@media(min-width:1101px){.ccw-shop[data-storefront="members"] .shop-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .shop-card{min-width:0;border:1px solid #303645;background:#0d111c;border-radius:4px;overflow:hidden}
 .shop-card[hidden]{display:none}
 .shop-image-button{position:relative;display:block;padding:0;width:100%;border:0;background:#101216;cursor:pointer;color:#fff;text-align:left}
