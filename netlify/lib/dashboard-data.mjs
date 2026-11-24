@@ -8,8 +8,8 @@ export function dateWindow(now = new Date()) {
   return {start:first.toISOString().slice(0,10), end};
 }
 
-// The production form check recorded by CCW on Nov 22, 2026.
-const testIds = new Set(['6b03503599cea071273d216f']);
+// Verified production checks explicitly labeled as tests in the CCW shop board.
+const testIds = new Set(['6b03503599cea071273d216f','6ae0ea72058a96d27dbbc7cc']);
 export function websiteLeads(sources, state, now = new Date()) {
   const {start, end} = dateWindow(now);
   const jobs = shopData.derive(sources, state);
