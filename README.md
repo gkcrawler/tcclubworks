@@ -222,6 +222,13 @@ draft catalog and launch settings. `mode = "live"` connects the verified Shopify
 store. Use `mode = "preview"` for isolated design review. Preview pages are marked noindex and do
 not load Google Ads or Shopify; their bag cannot submit an order.
 
+To pause retail on `tcclubworks.io`, set `[store].paused = true` in
+`shop.toml` and deploy. This hides the three retail collections and their policy
+pages, including navigation and sitemap links. Enable **Private mode** under
+**Online Store → Preferences** in the CCW Shopify admin to hide the hosted
+storefront too. To reopen, turn off Private mode, set `paused = false`, and
+redeploy. The catalog and launch settings carry over.
+
 The live integration uses Shopify's official Storefront Web Components. Shopify
 owns products, photos, prices, variants, inventory, carts, checkout, orders,
 notifications, refunds and fulfillment. The browser never receives an Admin API

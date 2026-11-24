@@ -1,6 +1,7 @@
 # CCW storefront. Draft catalog is for review; Shopify owns the live catalog.
 # Never put private Shopify or payment credentials in this file.
 [store]
+paused = true
 mode = "live"
 domain = "tdb7xz-4w.myshopify.com"
 collection = "ccw-storefront"
