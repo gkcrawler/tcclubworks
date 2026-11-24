@@ -31,6 +31,8 @@ test('uses the submitted address, customer first name, approved copy, CCs and in
   assert.equal(message.from, 'Paul Cohn <paul@tcclubworks.io>');
   assert.equal(message.reply_to, 'paul@tcclubworks.io');
   assert.equal(message.subject, 'Thanks for reaching out to Chronic Clubworks');
+  assert.match(message.text, /shoot me a text\.\n\n\nPaul Cohn\n/);
+  assert.match(message.html, /<\/a>\.<\/p><table[^>]*><tr[^>]*><td height="40"[^>]*>&nbsp;<\/td><\/tr><tr><td[^>]*><strong>Paul Cohn<\/strong>/);
   assert.ok(message.text.startsWith('Hi José,\n\nThanks for reaching out to Chronic Clubworks. We’ve received your request and are reviewing the details. I’ll follow up with you about next steps. If you have photos or anything else you’d like me to see, just reply to this email or shoot me a text.'));
   assert.ok(!JSON.stringify(message).includes('private form contents'));
   assert.match(message.html, /href="https:\/\/tcclubworks\.io"><img src="cid:ccw-logo"/);

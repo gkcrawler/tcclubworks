@@ -11,14 +11,15 @@ function message(data, email) {
   const name = /^[\p{L}\p{M}][\p{L}\p{M}'’.\-]{0,79}$/u.test(first) ? first : 'there';
   const greeting = `Hi ${name},`;
   const signature = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font:14px/20px Arial,Helvetica,sans-serif">' +
+    '<tr aria-hidden="true"><td height="40" style="height:40px;font-size:1px;mso-line-height-rule:exactly;line-height:40px">&nbsp;</td></tr>' +
     '<tr><td style="font-size:18px;line-height:24px"><strong>Paul Cohn</strong></td></tr>' +
     '<tr><td>Owner | Master Clubmaker</td></tr><tr><td>Denver, CO</td></tr>' +
     '<tr><td><a href="tel:+17208544132" style="color:inherit">(720) 854-4132</a></td></tr>' +
     '<tr><td style="padding-top:10px"><a href="https://tcclubworks.io"><img src="cid:ccw-logo" alt="Chronic Clubworks" width="144" height="66" style="display:block;border:0"></a></td></tr></table>';
   return {
     from: `Paul Cohn <${sender}>`, reply_to: sender, to: [email], cc: copies, subject,
-    text: [greeting, body, 'Paul Cohn\nOwner | Master Clubmaker\nDenver, CO\n(720) 854-4132\nhttps://tcclubworks.io'].join('\n\n'),
-    html: `<p>${greeting}</p><p>${body.replace('shoot me a text', '<a href="sms:+17208544132">shoot me a text</a>')}</p>${signature}`,
+    text: `${greeting}\n\n${body}\n\n\nPaul Cohn\nOwner | Master Clubmaker\nDenver, CO\n(720) 854-4132\nhttps://tcclubworks.io`,
+    html: `<p>${greeting}</p><p style="margin-bottom:0">${body.replace('shoot me a text', '<a href="sms:+17208544132">shoot me a text</a>')}</p>${signature}`,
     attachments: [{ filename: 'ccw-logo.png', content: logo, content_type: 'image/png', content_id: 'ccw-logo' }],
   };
 }
