@@ -1,6 +1,7 @@
 """CCW shop pages. Shopify owns live catalog, cart, checkout and order state."""
 import html
 import json
+import os
 import re
 from pathlib import Path
 try:
@@ -118,7 +119,11 @@ def product_grid(group=None):
 def live_catalog(store, collection, members=False):
     grids = (f'<div class="members-groups">{product_grid("Apparel")}{product_grid("Hats")}</div>'
              if members else product_grid())
-    return f'''<shopify-store store-domain="https://{esc(store['domain'])}" country="US" language="en"></shopify-store>
+    token = os.environ.get("CCW_SHOPIFY_PUBLIC_STOREFRONT_TOKEN", "").strip()
+    if token and not re.fullmatch(r"[A-Fa-f0-9]{32}", token):
+        raise ValueError("Expected the Shopify Headless public storefront token")
+    access = f' public-access-token="{token}"' if token else ''
+    return f'''<shopify-store store-domain="https://{esc(store['domain'])}"{access} country="US" language="en"></shopify-store>
 <shopify-context type="collection" handle="{esc(collection)}" id="shop-collection">
   <template>{grids}
   </template>

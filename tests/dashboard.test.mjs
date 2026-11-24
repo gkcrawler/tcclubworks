@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import dashboard from '../netlify/functions/dashboard.mjs';
 import ingest from '../netlify/functions/dashboard-report.mjs';
 import {dateWindow, websiteLeads, validateReport} from '../netlify/lib/dashboard-data.mjs';
-import {retailState, changeRetail} from '../netlify/lib/dashboard-store.mjs';
+import {retailState, changeRetail, checkStorefrontCatalog} from '../netlify/lib/dashboard-store.mjs';
 import shopData from '../netlify/lib/shop-data.cjs';
 
 test('Denver window counts verified inquiries by receipt date, including linked open quotes',()=>{
@@ -37,10 +37,31 @@ test('visibility uses conditional writes, reports the deployed state and allows 
     entry={data,etag:String(++serial)};return {modified:true,etag:entry.etag};
   }};
   const initial=await retailState(store);const input={visible:!initial.active,revision:initial.revision};
-  const first=await changeRetail(store,input,async()=>{throw Error('offline');});assert.equal(first.status,502);
+  const openCatalog=async()=>{};
+  if (input.visible) {
+    const denied=await changeRetail(store,input,()=>assert.fail('build queued'),new Date(),async()=>{throw Error('Shopify unavailable');});
+    assert.equal(denied.status,503);assert.equal(entry,null);
+  }
+  const first=await changeRetail(store,input,async()=>{throw Error('offline');},new Date(),openCatalog);assert.equal(first.status,502);
   const failed=await retailState(store);assert.equal(failed.active,initial.active);assert.equal(failed.failed,true);
   assert.equal((await changeRetail(store,input,async()=>{})).status,409);
-  const second=await changeRetail(store,{...input,revision:failed.revision},async()=>{});
+  const second=await changeRetail(store,{...input,revision:failed.revision},async()=>{},new Date(),openCatalog);
   assert.equal(second.status,202);const accepted=await second.json();assert.equal(accepted.active,initial.active);
   assert.equal((await changeRetail(store,{...input,revision:accepted.revision},async()=>{})).status,409);
+});
+
+test('reopening checks the live products connection for each published collection',async()=>{
+  const reply=(mode)=>async (url,options)=>{
+    assert.equal(new URL(url).hostname,'tdb7xz-4w.myshopify.com');
+    const {query,variables}=JSON.parse(options.body);
+    assert.match(query,/products\(first: 1\)/);
+    assert.deepEqual(Object.values(variables).sort(),['ccw-storefront','members-only','pins-and-aces-platinum-partner']);
+    const data=Object.fromEntries(Object.entries(variables).map(([key,handle])=>
+      [key,{handle,products:{nodes:mode==='empty'?[]:[{id:'product'}]}}]));
+    if(mode==='unpublished') data.h1=null;
+    return Response.json(mode==='error'?{errors:[{message:'Access denied'}]}:{data},{status:mode==='private'?403:200});
+  };
+  await checkStorefrontCatalog(reply('ok'));
+  for(const mode of ['private','error','unpublished','empty'])
+    await assert.rejects(checkStorefrontCatalog(reply(mode)));
 });

@@ -1252,7 +1252,11 @@ w("sitemap.xml",'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://w
   + "</urlset>\n")
 
 w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\nDisallow: /quote-approval\n\nSitemap: {D}/sitemap.xml\n")
-w("netlify/lib/retail-build.json", json.dumps({"visible": not SHOP_PAUSED}) + "\n")
+w("netlify/lib/retail-build.json", json.dumps({
+    "visible": not SHOP_PAUSED,
+    "domain": SHOP["store"]["domain"],
+    "collections": [SHOP["store"][key] for _, _, key, _ in STOREFRONTS.values()],
+}) + "\n")
 projects = [
     ("hc_coors_cowboy", "Coors Cowboy", "Driver cover"),
     ("pxg_service", "PXG Sugar Daddy II", "Wedge restoration"),
