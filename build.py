@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Chronic Clubworks — 4-page static site generator. Cyberpunk build."""
 import os, json, html, hashlib, re, datetime, shutil, subprocess
-from storefront import load_config as load_shop_config, page as shop_page, policy_pages as shop_policy_pages
+from pathlib import Path
+from storefront import STOREFRONTS, load_config as load_shop_config, page as shop_page, policy_pages as shop_policy_pages
 
 try:
     import tomllib
@@ -12,6 +13,7 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(OUT, "content.toml"), "rb") as _f:
     C = tomllib.load(_f)
 SHOP = load_shop_config()
+SHOP_PAUSED = SHOP["store"].get("paused", False)
 
 _c = C["contact"]
 D = "https://tcclubworks.io"
@@ -72,9 +74,11 @@ def pic(key, w, h, loading="lazy", priority=False):
 def img(key, w, h, loading="lazy", priority=False):
     """Same optimized, self-contained picture box as pic()."""
     return pic(key, w, h, loading, priority)
+
+SHOP_NAV = [] if SHOP_PAUSED else [("/shop", "Shop"), ("/members-only", "Members Only")]
 NAV = [("/","Home"),("/golf-club-repair-denver","Services"),
        ("/custom-golf-headcovers-denver","Headcovers"),
-       ("/shop","Shop"),("/members-only","Members Only"),
+       *SHOP_NAV,
        ("/custom-golf-clubs-about","About"),("/contact","Contact")]
 
 
@@ -310,6 +314,10 @@ def ctaband(quote_href="/contact#quote"):
 </div></div>"""
 
 def footer():
+    shop_links = "" if SHOP_PAUSED else """        <li><a href="/shop">CCW Shop</a></li>
+        <li><a href="/members-only">Members Only</a></li>
+        <li><a href="/pins-and-aces">Pins and Aces Platinum Partner</a></li>
+"""
     return f"""<footer>
   <div class="wrap">
     <div class="fcols">
@@ -333,10 +341,7 @@ def footer():
         <li><a href="/custom-golf-headcovers-denver">Custom Headcovers</a></li>
       </ul></div>
       <div><h4>Company</h4><ul>
-        <li><a href="/shop">CCW Shop</a></li>
-        <li><a href="/members-only">Members Only</a></li>
-        <li><a href="/pins-and-aces">Pins and Aces Platinum Partner</a></li>
-        <li><a href="/custom-golf-clubs-about">About</a></li>
+{shop_links}        <li><a href="/custom-golf-clubs-about">About</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="{IG}" rel="noopener">Instagram</a></li>
       </ul></div>
@@ -1188,10 +1193,15 @@ PAGES.append(dict(path="/thanks",
 </section>"""))
 
 # ----------------------------------------------------------------- write
-PAGES.append(shop_page(SHOP))
-PAGES.append(shop_page(SHOP, destination="partner"))
-PAGES.append(shop_page(SHOP, destination="members"))
-PAGES.extend(shop_policy_pages(SHOP))
+retail_pages = [shop_page(SHOP, destination=key) for key in STOREFRONTS]
+retail_pages.extend(shop_policy_pages(SHOP))
+if SHOP_PAUSED:
+    for retail_page in retail_pages:
+        route = retail_page["path"]
+        (Path(OUT) / page_file(route)).unlink(missing_ok=True)
+        (Path(OUT) / route.strip("/") / "index.html").unlink(missing_ok=True)
+else:
+    PAGES.extend(retail_pages)
 
 def w(rel, s):
     f=os.path.join(OUT,rel); os.makedirs(os.path.dirname(f),exist_ok=True)

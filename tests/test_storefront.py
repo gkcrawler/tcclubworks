@@ -1,12 +1,16 @@
 """Launch safeguards and generated store output; no calls to a live payment API."""
 import copy
-import importlib.util
+import re
+import shutil
+import subprocess
+import tempfile
 import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from inject_google_ads import inject
 from storefront import load_config, validate_config, page, REQUIRED_CHECKS
 
 
@@ -72,13 +76,6 @@ class StorefrontTests(unittest.TestCase):
         self.assertNotIn('<script>alert(1)', result)
         self.assertIn('\\u003cscript>', result)
 
-    def test_generated_shop_has_no_ad_tracking(self):
-        for name in ('shop', 'members-only', 'pins-and-aces', 'shop-policies', 'shop-privacy', 'shop-terms'):
-            text=(ROOT / (name+'.html')).read_text()
-            self.assertNotIn('AW-18288494011', text)
-            self.assertNotIn('inquiry-conversion.js', text)
-            self.assertIn('name="ccw-tracking" content="off"', text)
-
     def test_distinct_shop_collections_share_cart_and_checkout(self):
         config = self.live_config()
         main = page(config)
@@ -104,10 +101,36 @@ class StorefrontTests(unittest.TestCase):
         self.assertNotIn('id="ccw-denver-ball-marker"', partner['body'])
         self.assertIn('>Pins and Aces Platinum Partner</h1>', partner['body'])
 
-    def test_ad_injection_respects_shop_marker(self):
-        spec=importlib.util.spec_from_file_location('ads', ROOT / 'inject_google_ads.py')
-        module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        self.assertFalse(module.inject(ROOT / 'shop.html'))
+    def test_retail_pause_and_reopen(self):
+        routes = ('shop', 'members-only', 'pins-and-aces', 'shop-policies', 'shop-privacy', 'shop-terms')
+        with tempfile.TemporaryDirectory() as temp:
+            site = Path(temp)
+            for name in ('build.py', 'storefront.py', 'content.toml'):
+                shutil.copyfile(ROOT / name, site / name)
+            for name in ('assets', 'templates'):
+                (site / name).symlink_to(ROOT / name, target_is_directory=True)
+            config = (ROOT / 'shop.toml').read_text()
+            for paused in (False, True, False):
+                with self.subTest(paused=paused):
+                    setting = 'paused = ' + str(paused).lower()
+                    (site / 'shop.toml').write_text(re.sub(r'^paused = (true|false)$', setting, config, flags=re.M))
+                    subprocess.run([sys.executable, 'build.py'], cwd=site, capture_output=True, check=True)
+                    home = (site / 'index.html').read_text()
+                    sitemap = (site / 'sitemap.xml').read_text()
+                    for route in routes:
+                        output = site / (route + '.html')
+                        self.assertEqual(output.exists(), not paused)
+                        self.assertEqual('/' + route + '</loc>' in sitemap, not paused)
+                        if not paused:
+                            text = output.read_text()
+                            self.assertNotIn('AW-18288494011', text)
+                            self.assertNotIn('inquiry-conversion.js', text)
+                            self.assertIn('name="ccw-tracking" content="off"', text)
+                            self.assertFalse(inject(output))
+                    for route in routes[:3]:
+                        self.assertEqual(f'href="/{route}"' in home, not paused)
+                    self.assertIn('href="/contact"', home)
+                    self.assertTrue((site / 'admin/shop/index.html').is_file())
 
 
 if __name__ == '__main__':
