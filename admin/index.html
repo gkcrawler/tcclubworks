@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="ccw-tracking" content="off">
+<meta name="theme-color" content="#10151d"><title>CCW Dashboard | Chronic Clubworks</title>
+<link rel="icon" href="/assets/icon-32.png?v=bb71e0fd22"><link rel="apple-touch-icon" href="/assets/icon-180.png?v=efc40f2116">
+<link rel="stylesheet" href="/assets/dashboard.css?v=b3c8de5efc"><script defer src="/assets/dashboard.js?v=6474d92c63"></script>
+</head><body>
+<section id="login" class="signin"><form id="login-form" class="panel">
+<img src="/assets/ccw-denver-cutout.webp?v=4736c4e4e9" alt="Chronic Clubworks" width="110" height="99">
+<h1>Shop dashboard</h1><p>Sign in with your CCW admin password.</p>
+<label for="password">Password</label><input id="password" name="password" type="password" required autocomplete="current-password">
+<label class="remember"><input id="remember" type="checkbox"> Keep me signed in</label>
+<button class="primary" type="submit">Sign in</button><p id="login-error" role="alert"></p></form></section>
+<div id="app" hidden>
+<aside class="sidebar"><a class="brand" href="#overview"><img src="/assets/ccw-denver-cutout.webp?v=4736c4e4e9" alt="" width="65" height="60"><span>Chronic<br>Clubworks</span></a>
+<nav aria-label="Dashboard"><a class="selected" href="#overview"><span data-icon="grid"></span>Overview</a><a href="#leads"><span data-icon="inbox"></span>Website leads</a><a href="#projects"><span data-icon="photo"></span>Projects</a></nav>
+<nav aria-label="Shop tools"><a href="/admin/shop/"><span data-icon="board"></span>Shop board</a><a href="/admin/quotes/"><span data-icon="quote"></span>Quote builder</a></nav>
+<div class="side-foot"><a href="/" target="_blank" rel="noopener">tcclubworks.io ↗</a><button id="logout">Sign out</button></div></aside>
+<main id="overview"><header class="heading"><div><p id="today" class="dateline"></p><h1>Shop overview</h1></div><div class="tools"><span class="range"><span data-icon="calendar"></span>Last 30 days</span><button id="refresh" aria-label="Refresh dashboard" title="Refresh dashboard"><span data-icon="refresh"></span></button></div></header>
+<p id="notice" role="status"></p>
+<section class="metrics" aria-label="30-day performance">
+<article class="metric panel green"><span class="icon" data-icon="people"></span><h2>Website visitors</h2><strong id="visitors">—</strong><small id="visitors-note">GA4 active users</small></article>
+<article class="metric panel blue"><span class="icon" data-icon="pointer"></span><h2>Contact clicks</h2><strong id="contact-count">—</strong><small>Call, text and email taps</small></article>
+<article class="metric panel lilac"><span class="icon" data-icon="inbox"></span><h2>Website leads</h2><strong id="lead-count">—</strong><small id="lead-note">Verified form submissions</small></article>
+<article class="metric panel peach"><span class="icon" data-icon="megaphone"></span><h2>Ad spend</h2><strong id="spend">—</strong><small id="spend-note">Linked advertising · USD</small></article>
+</section>
+<div class="tiles">
+<section class="panel traffic"><div class="card-title"><div><p class="kicker">Website</p><h2>Traffic</h2></div><a class="ext" aria-label="Open Google Analytics" href="https://analytics.google.com/analytics/web/#/a395966459p550152616/reports/intelligenthome" target="_blank" rel="noopener">GA4 ↗</a></div><p class="traffic-total"><b id="sessions">—</b> sessions</p><div id="trend"></div><p class="footnote" id="report-status" role="status">Loading Analytics…</p></section>
+<section class="panel store"><div class="card-title"><div><p class="kicker">Storefront</p><h2>Retail visibility</h2></div><span class="icon lilac" data-icon="bag"></span></div>
+<div class="toggle-row"><div><strong id="shop-state">Checking…</strong><small>tcclubworks.io</small></div><button id="toggle" role="switch" aria-checked="false" aria-label="Public retail pages" disabled><i></i></button></div>
+<p class="muted">CCW Shop, Members Only, Pins &amp; Aces and their shop policy pages.</p><p id="publish-status" class="footnote" role="status"></p><button id="retry" class="small-btn" hidden>Retry publish</button></section>
+<section id="leads" class="panel leads"><div class="card-title"><div><p class="kicker">Website inquiries</p><h2>Open leads <span class="count" id="open-count">—</span></h2></div><a class="ext" href="/admin/shop/">Shop board ↗</a></div>
+<div id="lead-list" class="lead-list"><p>Loading inquiries…</p></div></section>
+<section class="panel channels"><div class="card-title"><div><p class="kicker">Engagement</p><h2>Clicks &amp; ads</h2></div><a class="ext" href="https://ads.google.com/" target="_blank" rel="noopener">Ads ↗</a></div>
+<dl id="breakdown"><div><dt>Phone / text / email</dt><dd id="contact-detail">—</dd></div><div><dt>Ad clicks</dt><dd id="ad-clicks">—</dd></div><div><dt>Ad impressions</dt><dd id="impressions">—</dd></div><div><dt>Cost per click</dt><dd id="cpc">—</dd></div></dl></section>
+</div><section id="projects"><div class="project-head"><div><p class="kicker">From the bench</p><h2>Project photos</h2></div><a class="ext" href="/custom-golf-headcovers-denver#headcover-gallery">Gallery ↗</a></div><div class="projects"><a class="project" href="/assets/img/headcover-coors-cowboy.jpg?v=0a03398c5f"><img src="/assets/img/headcover-coors-cowboy-800.webp?v=10c1f6cd9e" alt="Coors Cowboy headcover made from a gray graphic sweatshirt, with a Coors Banquet patch on the burgundy crown. Detail views show the cover in the bag, its red and gray plaid lining, and the cut sweatshirt panel." loading="lazy" width="240" height="240"><strong>Coors Cowboy</strong><small>Driver cover</small></a><a class="project" href="/assets/img/pxg-restoration.jpg?v=8615444b6d"><img src="/assets/img/pxg-restoration-800.webp?v=1404500327" alt="PXG 54 and 58 degree wedge faces before and after restoration" loading="lazy" width="240" height="240"><strong>PXG Sugar Daddy II</strong><small>Wedge restoration</small></a><a class="project" href="/assets/img/headcover-greyson-no-002.jpg?v=d330086031"><img src="/assets/img/headcover-greyson-no-002-800.webp?v=a121ed96ff" alt="Greyson × Chronic Clubworks, Dunes at Dawn No. 002. Black quilted headcover with a blue-eyed wolf, a Greyson × Chronic Clubworks label and the numbered edition patch." loading="lazy" width="240" height="240"><strong>Greyson No. 002</strong><small>Dunes at Dawn</small></a><a class="project" href="/assets/img/headcover-rotc-driver.jpg?v=68457a3c99"><img src="/assets/img/headcover-rotc-driver-800.webp?v=89722acad2" alt="ROTC driver headcover with silver chevrons and gold braid. Detail views show the U.S. R.O.T.C. shield on the crown and the plush lining." loading="lazy" width="240" height="240"><strong>ROTC driver</strong><small>Shield crown</small></a><a class="project" href="/assets/img/m2-reshafting.jpg?v=6ff4ea8928"><img src="/assets/img/m2-reshafting-800.webp?v=86ea50fbf0" alt="TaylorMade M2 driver head and detached shaft adapter against a softly blurred black background" loading="lazy" width="240" height="240"><strong>TaylorMade M2</strong><small>Reshafting</small></a><a class="project" href="/assets/img/headcover-rotc-3-wood.jpg?v=3aad4a730f"><img src="/assets/img/headcover-rotc-3-wood-800.webp?v=89288e81c2" alt="ROTC 3-wood headcover with a subdued U.S. flag on the back, three gold stripes on the crown and silver chevrons on the front." loading="lazy" width="240" height="240"><strong>ROTC 3-wood</strong><small>Three-stripe crown</small></a></div></section>
+</main></div>
+<dialog id="photo-dialog"><button id="close-photo" aria-label="Close photo">×</button><img id="large-photo" alt=""><p id="caption"></p></dialog>
+</body></html>

@@ -2,6 +2,9 @@
   command = "python3 build.py && python3 inject_google_ads.py"
   publish = "."
 
+[[plugins]]
+  package = "./netlify/plugins/retail-visibility"
+
 [functions]
   node_bundler = "esbuild"
 
