@@ -1,11 +1,11 @@
 """Launch safeguards and generated store output; no calls to a live payment API."""
 import copy
-import re
 import shutil
 import subprocess
 import tempfile
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,11 +110,13 @@ class StorefrontTests(unittest.TestCase):
             for name in ('assets', 'templates'):
                 (site / name).symlink_to(ROOT / name, target_is_directory=True)
             config = (ROOT / 'shop.toml').read_text()
+            (site / 'shop.toml').write_text(config)
+            public_token = 'abcd' * 8
             for paused in (False, True, False):
                 with self.subTest(paused=paused):
-                    setting = 'paused = ' + str(paused).lower()
-                    (site / 'shop.toml').write_text(re.sub(r'^paused = (true|false)$', setting, config, flags=re.M))
-                    subprocess.run([sys.executable, 'build.py'], cwd=site, capture_output=True, check=True)
+                    with patch.dict('os.environ', CCW_RETAIL_VISIBILITY='private' if paused else 'public',
+                                    CCW_SHOPIFY_PUBLIC_STOREFRONT_TOKEN=public_token):
+                        subprocess.run([sys.executable, 'build.py'], cwd=site, capture_output=True, check=True)
                     home = (site / 'index.html').read_text()
                     sitemap = (site / 'sitemap.xml').read_text()
                     for route in routes:
@@ -123,6 +125,8 @@ class StorefrontTests(unittest.TestCase):
                         self.assertEqual('/' + route + '</loc>' in sitemap, not paused)
                         if not paused:
                             text = output.read_text()
+                            if route in routes[:3]:
+                                self.assertIn(f'public-access-token="{public_token}"', text)
                             self.assertNotIn('AW-18288494011', text)
                             self.assertNotIn('inquiry-conversion.js', text)
                             self.assertIn('name="ccw-tracking" content="off"', text)
