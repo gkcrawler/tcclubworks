@@ -14,6 +14,11 @@ with open(os.path.join(OUT, "content.toml"), "rb") as _f:
     C = tomllib.load(_f)
 SHOP = load_shop_config()
 SHOP_PAUSED = SHOP["store"].get("paused", False)
+if "CCW_RETAIL_VISIBILITY" in os.environ:
+    visibility = os.environ["CCW_RETAIL_VISIBILITY"]
+    if visibility not in {"public", "private"}:
+        raise ValueError("Unknown CCW retail visibility")
+    SHOP_PAUSED = visibility == "private"
 
 _c = C["contact"]
 D = "https://tcclubworks.io"
@@ -1247,6 +1252,22 @@ w("sitemap.xml",'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://w
   + "</urlset>\n")
 
 w("robots.txt", f"User-agent: *\nAllow: /\nDisallow: /thanks\nDisallow: /admin\nDisallow: /quote-approval\n\nSitemap: {D}/sitemap.xml\n")
+w("netlify/lib/retail-build.json", json.dumps({"visible": not SHOP_PAUSED}) + "\n")
+projects = [
+    ("hc_coors_cowboy", "Coors Cowboy", "Driver cover"),
+    ("pxg_service", "PXG Sugar Daddy II", "Wedge restoration"),
+    ("hc_greyson_002", "Greyson No. 002", "Dunes at Dawn"),
+    ("hc_rotc_driver", "ROTC driver", "Shield crown"),
+    ("m2_service", "TaylorMade M2", "Reshafting"),
+    ("hc_rotc_3wood", "ROTC 3-wood", "Three-stripe crown"),
+]
+tiles = "".join(
+    f'<a class="project" href="{I[key]}"><img src="{I[key][:-4]}-800.webp" '
+    f'alt="{html.escape(ALT[key], quote=True)}" loading="lazy" width="240" height="240">'
+    f'<strong>{title}</strong><small>{kind}</small></a>' for key, title, kind in projects
+)
+dashboard_template = Path(OUT, "templates/dashboard.html").read_text(encoding="utf-8")
+w("admin/index.html", version_asset_urls(dashboard_template.replace("<!--project-tiles-->", tiles)))
 w("admin/quotes/index.html", version_asset_urls(admin_quotes_page()))
 with open(os.path.join(OUT, "templates/shop.html"), encoding="utf-8") as shop_template:
     w("admin/shop/index.html", version_asset_urls(shop_template.read()))
@@ -1333,6 +1354,9 @@ w("_headers", f"""/*
 w("netlify.toml", f"""[build]
   command = "python3 build.py && python3 inject_google_ads.py"
   publish = "."
+
+[[plugins]]
+  package = "./netlify/plugins/retail-visibility"
 
 [functions]
   node_bundler = "esbuild"

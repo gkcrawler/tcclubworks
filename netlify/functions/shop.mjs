@@ -5,7 +5,7 @@ import data from '../lib/shop-data.cjs';
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store','Netlify-CDN-Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Vary':'Cookie'};
 const json=(status,body,extra={})=>new Response(JSON.stringify(body),{status,headers:{...headers,...extra}});
 let cache=null;
-async function readSources(force=false){
+export async function readSources(force=false){
  if(!force&&cache&&Date.now()-cache.time<30000)return cache;
  const token=process.env.NETLIFY_API_TOKEN||process.env.NETLIFY_AUTH_TOKEN,site=process.env.NETLIFY_SITE_ID||process.env.SITE_ID;
  if(!token||!site)throw data.error('The quote connection is not configured.',503);

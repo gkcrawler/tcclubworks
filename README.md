@@ -290,3 +290,11 @@ New quotes retain the inquiry/manual-job source ID. Historical records remain se
 Dashboard source: `templates/shop.html`, `assets/shop.css`, `assets/shop.js`; API: `netlify/functions/shop.mjs` and `netlify/lib/shop-*.cjs`. `build.py` emits the page and versioned asset URLs. Existing Netlify settings `QUOTE_ADMIN_PASSWORD`, `NETLIFY_API_TOKEN`, and `NETLIFY_SITE_ID` are reused. Optional `SHOP_SESSION_SECRET` can provide an independent signing secret; otherwise signing is derived from the admin password, so rotating the password invalidates existing sessions.
 
 Run `npm test`, then `npm run build` using Python 3.11+ (or Python with tomli installed). No customer information or credentials belong in source or fixtures.
+
+## CCW dashboard
+
+Open /admin/ with the quote admin password. Website leads use verified Netlify Forms records, their original submission dates, and the current shop board status. The range includes today and the preceding 29 dates in Denver. The shop board and quote builder keep their existing URLs.
+
+The retail switch stores the requested state in the site-wide ccw-dashboard Blobs store and starts a production build using the existing Netlify site token. The build plugin applies the setting to the existing retail-page generator. The switch shows the state built into the currently served deploy and refreshes while a change publishes. Preview domains cannot publish changes. Local builds use shop.toml by default. To exercise both modes in an isolated checkout, build with CCW_RETAIL_VISIBILITY set to public or private.
+
+Google's private **CCW Dashboard Reports** Apps Script reads GA4 property 550152616 hourly. Its source and read-only Analytics manifest are in integrations/analytics. Run prepareDashboard to verify the property and print the public SHA-256 fingerprint. The write-only key stays in private Script Properties. Pin the fingerprint in netlify/lib/report-connection.json (or set CCW_REPORT_KEY_SHA256 in the Netlify Functions environment), then run installDashboard once. Reports contain aggregate visits, contact events and linked advertising metrics. The dashboard displays the report timestamp and identifies stale or missing data.
