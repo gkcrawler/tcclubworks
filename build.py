@@ -243,10 +243,12 @@ def hero(kick,h1a,h1b,lede,imgkey,plain_image=False,seo_h1=None,quote_href="/con
   </ul></div></div>
 </section>"""
 
-def form(compact=False):
+def form(compact=False, *, repair=False):
+    service_targets = ('<span id="quote-reshafting" class="quote-target" data-service="Reshafting"></span>'
+                       '<span id="quote-regripping" class="quote-target" data-service="Regripping"></span>') if repair else ""
     return f"""<form id="quote" name="quote" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-netlify-recaptcha="true"
         action="/thanks">
-  <input type="hidden" name="form-name" value="quote">
+  {service_targets}<input type="hidden" name="form-name" value="quote">
   <input type="hidden" name="source_page" value="">
   <p class="hp" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="f2">
@@ -257,6 +259,8 @@ def form(compact=False):
   <div class="fld"><label for="s">Service (optional)</label>
     <select id="s" name="service">
       <option value="">Choose a service</option>
+      <option>Reshafting</option>
+      <option>Regripping</option>
       <option>Reshafting &amp; regripping</option>
       <option>Custom clubmaking</option>
       <option>Loft &amp; lie adjustment</option>
@@ -286,8 +290,9 @@ def repair_quote_section():
       </ol>
       <p class="hbtns"><a class="btn ghost" href="sms:{TEL_E}">Text a photo</a><a class="btn ghost" href="tel:{TEL_E}">Call {TEL_D}</a></p>
     </div>
-    {form()}
+    {form(repair=True)}
   </div>
+  <script defer src="/assets/repair-quote.js"></script>
 </section>"""
 
 def contact_section():
@@ -658,10 +663,16 @@ def faq_html(pairs, first_open=True):
         out.append(f"<details{op}><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>")
     return '<div class="faq">'+"".join(out)+"</div>"
 
+def repair_rate(service):
+    row = next(row for row in C["pricing"] if row["service"] == service)
+    return (f'<strong>{html.escape(service)} labor {html.escape(row["price"])} per club.</strong><br>'
+            f'{html.escape(row["parts"])}')
+
 _rows = "".join(
     '<div class="prow"><div><b>{s}</b></div><div class="amt grad">{p}</div>'
     '<div><small>{i}</small></div></div>'.format(
-        s=html.escape(r["service"]), p=html.escape(r["price"]), i=html.escape(r["includes"]))
+        s=html.escape(r["service"]), p=html.escape(r["price"]),
+        i=html.escape(" ".join(filter(None, (r["includes"], r.get("parts"))))))
     for r in C["pricing"])
 PRICING = ('<div class="ptable">'
   '<div class="prow hd"><div>Service</div><div>Labor</div><div>What\'s included / parts</div></div>'
@@ -734,8 +745,10 @@ PAGES.append(dict(path="/",
     <div class="svc">
       <a class="card" href="/golf-club-repair-denver#reshafting-regripping">
         <span class="num grad">01 — Most requested</span><h3>Reshafting &amp; Regripping</h3>
-        <p>Your grips and shafts are the engine of the club. If the driver feels weak, the irons feel dead, or the putter grip is slicker than a wet green, it's time. Premium steel and graphite, frequency matched across the set.</p>
-        <span class="price">Labor from $5 · parts separate</span><span class="go">Reshafting &amp; regripping</span></a>
+        <p>Broken driver shaft? See the TaylorMade M2 on our bench and ask Paul about a replacement. We also replace worn grips.</p>
+        <p>{repair_rate("Reshafting")}</p>
+        <p>{repair_rate("Regripping")}</p>
+        <span class="go">See shaft and grip services</span></a>
       <a class="card" href="/golf-club-repair-denver#custom-clubmaking">
         <span class="num grad">02 — Full build</span><h3>Custom Clubmaking</h3>
         <p>Completely custom clubs tailored to your swing, feel and style. Driver through wedge, hand-assembled with tour-level precision — shaft selection, clubhead sourcing, swing weighting and MOI matching.</p>
@@ -809,7 +822,8 @@ PAGES.append(dict(path="/golf-club-repair-denver",
  title="Golf Club Repair & Regripping in Denver | Chronic Clubworks",
  desc="Denver golf club repair, regripping, reshafting and putter refinishing. See labor prices and request a quote from Paul. By appointment; US mail-in welcome.",
  schemas=[biz(),crumbs("/golf-club-repair-denver","Services"),
-   svc("Golf Club Reshafting and Regripping","Reshafting with premium steel and graphite shafts, frequency matching, and regripping in Denver, Colorado.","reshafting-regripping",5,20),
+   svc("Golf Club Reshafting","Steel and graphite shaft replacement and frequency matching in Denver, Colorado.","reshafting-regripping",15,20),
+   svc("Golf Club Regripping","Replacement grip installation in Denver, Colorado.","reshafting-regripping",5,10),
    svc("Custom Clubmaking","Completely custom golf clubs built driver to wedge with shaft selection, MOI matching and swing weighting, in Denver, Colorado.","custom-clubmaking"),
    svc("Loft and Lie Adjustment","Iron and wedge loft and lie bending to correct gapping and ball flight, in Denver, Colorado.","loft-and-lie",5,12),
    svc("Golf Club Repairs and Putter Restoration","Putter and wedge refinishing, re-milling, stamping, clubhead and ferrule repair in Denver, Colorado.","repairs-restorations"),
@@ -819,20 +833,23 @@ PAGES.append(dict(path="/golf-club-repair-denver",
    "bench", quote_href="#quote")
  + f"""
 <section class="pad" id="reshafting-regripping">
-  <div class="wrap split service-row">
-    <div>
-      <p class="eyebrow">01 — Most requested</p>
-      <h2>Reshafting &amp;<br><span class="grad">regripping.</span></h2>
-      <p class="lede">Your grips and shafts are the engine of the club. If the driver feels weak, the irons feel dead, or the putter grip is slicker than a wet green, it's time for an upgrade.</p>
-      <ul class="bullets">
-        <li><strong>Reshafting.</strong> Premium steel or graphite installed to suit your feel and swing speed.</li>
-        <li><strong>Frequency matching.</strong> No guessing — your shafts perform consistently across the set.</li>
-        <li><strong>Regripping.</strong> Everything from tour-level tacky to oversized. Bring your own or we'll order.</li>
-        <li><strong>Labor $5–$20 per club.</strong> Grips $6–$15, shafts $20–$60. Full-set regrip lands around $110–$250.</li>
-      </ul>
-      <p class="hbtns" style="margin-top:1.8em"><a class="btn" href="#quote">Get a regripping quote</a></p>
+  <div class="wrap shaft-services">
+    <h2>Reshafting &amp;<br><span class="grad">regripping.</span></h2>
+    <figure>
+      {pic("m2_service",1200,1200)}
+      <figcaption>TaylorMade M2 driver head and shaft adapter on the CCW bench.</figcaption>
+    </figure>
+    <div class="shaft-services-copy">
+      <h3>Broken driver shaft?</h3>
+      <p>Paul can help match a replacement to your driver and swing. We fit steel and graphite shafts and can frequency-match a set.</p>
+      <p>{repair_rate("Reshafting")}</p>
+      <a class="btn" href="#quote-reshafting">Get a reshafting quote</a>
+      <p><a href="sms:{TEL_E}">Text Paul a photo</a> of the break and include your driver model if you know it.</p>
+      <h3>Worn grips?</h3>
+      <p>Bring your own grips or ask Paul to order them.</p>
+      <p>{repair_rate("Regripping")}</p>
+      <a class="btn ghost" href="#quote-regripping">Get a regripping quote</a>
     </div>
-    {pic('m2_service',1200,1200)}
   </div>
 </section>
 
