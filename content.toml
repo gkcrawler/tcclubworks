@@ -40,17 +40,19 @@ service_area = [
 
 #  ── PRICING TABLE ──────────────────────────────────────────────────────
 #  Appears on the home page and the services page. Add a row by copying a
-#  whole [[pricing]] block. Delete one by removing all four of its lines.
+#  whole [[pricing]] block. The shaft and grip cards also use the parts line.
 
 [[pricing]]
 service  = "Regripping"
 price    = "$5–$10"
-includes = "Per club, labor only. Old grip and tape removal, new grip installed. Grips typically $6–$15 each — bring your own or we'll order them."
+includes = "Per club, labor only. Old grip and tape removal, new grip installed. Bring your own grips or we'll order them."
+parts    = "Replacement grips typically $6–$15 each."
 
 [[pricing]]
 service  = "Reshafting"
 price    = "$15–$20"
-includes = "Per club, labor only. Pull, prep, epoxy and frequency check. Shafts typically $20–$60 each depending on what you want."
+includes = "Per club, labor only. Pull, prep, epoxy and frequency check."
+parts    = "Replacement shafts typically $20–$60 each."
 
 [[pricing]]
 service  = "Loft & lie adjustment"

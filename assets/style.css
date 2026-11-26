@@ -363,6 +363,23 @@ h1,h2,h3{overflow-wrap:break-word}
   .split>picture,.split>figure,.split>a.lightbox{grid-row:2}
 }
 
+/* Keep the original driver photo directly below its heading on phones. */
+.shaft-services{display:grid;grid-template-columns:1fr 1fr;column-gap:clamp(40px,6vw,80px);row-gap:24px;align-items:start}
+.shaft-services h2,.shaft-services figure{margin:0}
+.shaft-services figure{grid-column:2;grid-row:1 / span 2;min-width:0}
+.shaft-services figure img{display:block;width:100%;height:auto;border-radius:20px}
+.shaft-services figcaption{margin-top:10px;color:var(--mute);font-size:.94rem}
+.shaft-services-copy p{margin:0 0 14px;color:var(--mute)}
+.shaft-services-copy strong{color:var(--ink)}
+.shaft-services-copy .btn + p{margin-top:14px}
+.shaft-services-copy p a{color:var(--cyan);text-decoration:underline}
+.shaft-services-copy h3:not(:first-child){margin-top:32px}
+.quote-target{display:block;scroll-margin-top:24px}
+@media(max-width:980px){
+  .shaft-services{grid-template-columns:minmax(0,1fr)}
+  .shaft-services figure{grid-area:auto}
+}
+
 /* Finished headcover examples: consistent square images. */
 .headcover-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
 .headcover-gallery figure{margin:0;min-width:0}
